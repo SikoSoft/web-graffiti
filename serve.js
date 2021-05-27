@@ -8,6 +8,7 @@ const http = require('http');
 console.log("Starting WebGraffiti...");
 
 const config = {
+    webPort: 8000,
     webSocketPort: 8666
 };
 
