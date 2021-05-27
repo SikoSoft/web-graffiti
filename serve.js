@@ -5,7 +5,7 @@ const http = require('http');
 console.log("Starting WebGraffiti server...");
 
 const config = {
-    webSocketPort: 66
+    webSocketPort: 8666
 };
 
 const clients = [];
