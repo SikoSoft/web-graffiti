@@ -1,8 +1,24 @@
+const express = require('express');
+const path = require('path');
 const webSocketServer = require('websocket').server;
 const http = require('http');
 
 
-console.log("Starting WebGraffiti server...");
+
+console.log("Starting WebGraffiti...");
+
+// web server
+
+const app = express();
+
+app.use(express.static(path.join(__dirname, '/public')));
+
+app.listen(config.webPort, function() {
+  console.log(`Web server listening on port ${config.webPort}`);
+});
+
+
+// web socket
 
 const config = {
     webSocketPort: 8666
