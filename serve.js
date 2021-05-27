@@ -7,6 +7,11 @@ const http = require('http');
 
 console.log("Starting WebGraffiti...");
 
+const config = {
+    webSocketPort: 8666
+};
+
+
 // web server
 
 const app = express();
@@ -19,10 +24,6 @@ app.listen(config.webPort, function() {
 
 
 // web socket
-
-const config = {
-    webSocketPort: 8666
-};
 
 const clients = [];
 const httpServer = http.createServer();
