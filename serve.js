@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const webSocketServer = require('websocket').server;
 const http = require('http');
 
@@ -15,9 +16,17 @@ const config = {
 
 // web server
 
+const router = express.Router();
 const app = express();
 
 app.use(express.static(path.join(__dirname, '/public')));
+
+router.get('/config.json', (req, res) => {
+    fs.readFile('./config.json', (error, data) => {
+        res.send(data);
+    });
+});
+app.use(router);
 
 app.listen(config.webPort, function() {
   console.log(`Web server listening on port ${config.webPort}`);

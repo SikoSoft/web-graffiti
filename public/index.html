@@ -1,8 +1,19 @@
 <html>
     <head>
         <title>Web Graffiti</title>
+        <link rel="stylesheet" type="text/css" href="web-graffiti.css">
+		<script type="module">
+			import webGraffiti from './js/webGraffiti.js';
+			const wg = new webGraffiti();
+			window.wg = wg;
+			document.onreadystatechange = function () {
+				if (document.readyState ==="complete") {
+					wg.init('wall');
+				}
+			}
+		</script>
     </head>
     <body>
-        WEB GRAFFITI
+        <canvas width="1280" height="720" id="wall"></canvas>
     </body>
 </html>
