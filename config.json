@@ -1,3 +1,6 @@
 {
+    "imageName": "wall.png",
+    "width": 1280,
+    "height": 720,
     "mpServer": "http://localhost:8666"
 }

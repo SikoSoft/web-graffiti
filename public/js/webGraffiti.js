@@ -7,6 +7,10 @@ export default class webGraffiti {
         this.config = new config(this);
         this.mouse = {x: 0, y: 0};
         this.mouseDown = false;
+        this.chunkSize = 16;
+        this.chunkMap = [];
+        this.pixelMap = [];
+        this.name = '';
     }
 
     init(canvasId) {
@@ -39,11 +43,24 @@ export default class webGraffiti {
         this.run();
     }
 
+    loadImage() {
+        return new Promise(resolve => {
+            this.image = new Image();
+            this.image.src = this.config.imageName;
+            this.image.onload = () => {
+                resolve();
+            }
+        });
+    }
+
     load() {
         console.log('load');
         return new Promise(resolve => {
           this.config
             .load()
+            .then(() => {
+                return this.loadImage();
+            })
             .then(() => {
               resolve();
             })
@@ -57,6 +74,7 @@ export default class webGraffiti {
           console.log('run');
           this.load().then(() => {
             console.log('running');
+            this.ctx.drawImage(this.image, 0, 0);
           });
       }
 
@@ -68,14 +86,35 @@ export default class webGraffiti {
       paint() {
         this.ctx.lineTo(this.mouse.x, this.mouse.y);
         this.ctx.stroke();
+        //console.log(this.getChunk(this.mouse.x, this.mouse.y));
+        //this.sendMessage({event: 'paint', x: this.mouse.x, y: this.mouse.y});
       }
 
       setColor(color) {
         this.ctx.strokeStyle = color;
       }
 
-      sendMessage() {
+      getChunk(x, y) {
+        return `${Math.floor((x-1)/this.chunkSize)}x${Math.floor((y-1)/this.chunkSize)}`;
+      }
 
+      getChunkHash(cx, cy) {
+          let chars = "";
+          for (let x = cx; x < cx+this.chunkSize; x++) {
+              for (let y = cy; y < cy+this.chunkSize; y++) {
+                chars += this.getPixel(x, y);
+              }
+          }
+          return SparkMD5.hash(chars);
+      }
+
+      getPixel(x, y) {
+        return this.ctx.getImageData(x, y, 1, 1).data.join("");
+      }
+
+      sendMessage(message) {
+        console.log(message);
+        //this.ws.send(JSON.stringify(message));
       }
 
 }
