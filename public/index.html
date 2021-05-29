@@ -22,7 +22,7 @@
 						alpha: false,
 						editor: false,
 						popup: 'top',
-						onChange: (color) => {
+						onDone: (color) => {
 							colorButton.setAttribute('data-color', color.hex);
 							colorButton.style.backgroundColor = color.hex;
 							wg.setColor(color.hex);

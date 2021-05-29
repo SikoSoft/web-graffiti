@@ -11,6 +11,16 @@ export default class webGraffiti {
         this.chunkMap = [];
         this.pixelMap = [];
         this.name = '';
+        this.color = '';
+        this.client = {
+            id: "",
+            ctx: {
+                strokeStyle: "#000000ff",
+                lineWidth: 1,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }
+        };
     }
 
     init(canvasId) {
@@ -18,9 +28,6 @@ export default class webGraffiti {
         this.canvasId = canvasId;
         this.canvas = document.getElementById(this.canvasId);
         this.ctx = this.canvas.getContext('2d');
-        this.ctx.lineWidth = 1;
-        this.ctx.lineJoin = 'round';
-        this.ctx.lineCap = 'round';
         this.canvas.addEventListener('mousedown', (e) => {
             this.ctx.beginPath();
             this.ctx.moveTo(this.mouse.x, this.mouse.y);
@@ -75,6 +82,7 @@ export default class webGraffiti {
           this.load().then(() => {
             console.log('running');
             this.ctx.drawImage(this.image, 0, 0);
+            this.setContext();
           });
       }
 
@@ -86,12 +94,26 @@ export default class webGraffiti {
       paint() {
         this.ctx.lineTo(this.mouse.x, this.mouse.y);
         this.ctx.stroke();
-        //console.log(this.getChunk(this.mouse.x, this.mouse.y));
-        //this.sendMessage({event: 'paint', x: this.mouse.x, y: this.mouse.y});
+        this.sendMessage({
+            event: 'paint',
+            x: this.mouse.x,
+            y: this.mouse.y
+        });
       }
 
       setColor(color) {
-        this.ctx.strokeStyle = color;
+        this.client.ctx.strokeStyle = color;
+        this.setContext();
+      }
+
+      setContext() {
+          for (const key in this.client.ctx) {
+              this.ctx[key] = this.client.ctx[key];
+          }
+          this.sendMessage({
+              event: "setContext",
+              ctx: this.client.ctx
+          });
       }
 
       getChunk(x, y) {
@@ -113,8 +135,8 @@ export default class webGraffiti {
       }
 
       sendMessage(message) {
-        console.log(message);
-        //this.ws.send(JSON.stringify(message));
+        //console.log(message);
+        this.ws.send(JSON.stringify(message));
       }
 
 }

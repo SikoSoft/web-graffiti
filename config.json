@@ -2,5 +2,7 @@
     "imageName": "wall.png",
     "width": 1280,
     "height": 720,
-    "mpServer": "http://localhost:8666"
+    "mpServer": "http://localhost:8666",
+    "webPort": 8000,
+    "webSocketPort": 8666
 }

@@ -1,18 +1,25 @@
+const { v4 } = require("uuid");
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const config = require('./config.json');
 const webSocketServer = require('websocket').server;
 const http = require('http');
-
+const { createCanvas, loadImage } = require('canvas');
 
 
 console.log("Starting WebGraffiti...");
 
-const config = {
-    webPort: 8000,
-    webSocketPort: 8666
-};
+const canvas = createCanvas(config.width, config.height)
+const ctx = canvas.getContext('2d');
 
+loadImage(`public/${config.imageName}`).then(image => {
+    ctx.drawImage(image, 0, 0);
+});
+
+const saveImage = () => {
+    fs.writeFileSync(`public/${config.imageName}`, canvas.toBuffer('image/png'));
+}
 
 // web server
 
@@ -42,27 +49,54 @@ const wsServer = new webSocketServer({
 });
 
 wsServer.on('request', function(request) {
-    console.log(
-      `${new Date().toTimeString()} : new connection from ${request.remoteAddress}`
-    );
-  
+
+    const id = v4();
+
     const connection = request.accept(null, request.origin);
     const client = {
-      index: clients.length,
-      connection,
-      ip: request.remoteAddress,
-      join: Math.round(new Date().getTime() / 1000)
+        id,
+        index: clients.length,
+        connection,
+        ip: request.remoteAddress,
+        join: Math.round(new Date().getTime() / 1000),
+        ctx: {}
     };
     clients.push(client);
+    connection.client = client;
+
+    console.log(
+        `${new Date().toTimeString()} : new connection from ${request.remoteAddress} (${id})`
+    );
+
+    connection.sendUTF(
+        JSON.stringify({
+          event: 'welcome',
+          id
+        })
+    );
 
     connection.on('message', function(message) {
       if (message.type === 'utf8') {
         const json = JSON.parse(message.utf8Data);
+        console.log(json);
+        switch (json.event) {
+            case "setContext":
+                connection.client.ctx = json.ctx;
+                for (const key in json.ctx) {
+                    ctx[key] = json.ctx[key];
+                }
+                break;
+            case "paint":
+                ctx.lineTo(json.x, json.y);
+                ctx.stroke();
+                break
+        }
       }
     });
   
     connection.on('close', function() {
       console.log(`Client ${client.index} disconnected`);
+      saveImage();
     });
   });
 
