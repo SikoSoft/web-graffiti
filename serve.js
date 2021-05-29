@@ -6,19 +6,33 @@ const config = require('./config.json');
 const webSocketServer = require('websocket').server;
 const http = require('http');
 const { createCanvas, loadImage } = require('canvas');
+const SparkMD5 = require('spark-md5');
 
 
 console.log("Starting WebGraffiti...");
+
+let lastHash = "";
 
 const canvas = createCanvas(config.width, config.height)
 const ctx = canvas.getContext('2d');
 
 loadImage(`public/${config.imageName}`).then(image => {
     ctx.drawImage(image, 0, 0);
+    lastHash = SparkMD5.hash(canvas.toBuffer('image/png'));
+    console.log('lastHash', lastHash);
 });
 
-const saveImage = () => {
-    fs.writeFileSync(`public/${config.imageName}`, canvas.toBuffer('image/png'));
+const saveImage = (buffer, hash) => {
+    lastHash = hash;
+    fs.writeFileSync(`public/${config.imageName}`, buffer);
+}
+
+const syncImage = () => {
+    const buffer = canvas.toBuffer('image/png');
+    const hash = SparkMD5.hash(buffer);
+    if (hash !== lastHash) {
+        saveImage(buffer, hash);
+    }
 }
 
 // web server
@@ -86,6 +100,9 @@ wsServer.on('request', function(request) {
                     ctx[key] = json.ctx[key];
                 }
                 break;
+            case "beginPath":
+                ctx.beginPath();
+                break;
             case "paint":
                 ctx.lineTo(json.x, json.y);
                 ctx.stroke();
@@ -96,11 +113,12 @@ wsServer.on('request', function(request) {
   
     connection.on('close', function() {
       console.log(`Client ${client.index} disconnected`);
-      saveImage();
+      syncImage();
     });
   });
 
 httpServer.listen(config.webSocketPort, function() {
     console.log(`WebSocket server is listening on port ${config.webSocketPort}`);
   });
-  
+
+setInterval(syncImage, config.autoSave);

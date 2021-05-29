@@ -29,11 +29,12 @@ export default class webGraffiti {
         this.canvas = document.getElementById(this.canvasId);
         this.ctx = this.canvas.getContext('2d');
         this.canvas.addEventListener('mousedown', (e) => {
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.mouse.x, this.mouse.y);
             this.mouseDown = true;
             this.updateMouse(e);
             this.ctx.beginPath();
+            this.sendMessage({
+                event: 'beginPath'
+            })
             this.ctx.moveTo(this.mouse.x, this.mouse.y);
             this.paint();
         }, false);
