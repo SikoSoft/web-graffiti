@@ -17,7 +17,6 @@ export default class webGraffiti {
         this.ctx.lineWidth = 1;
         this.ctx.lineJoin = 'round';
         this.ctx.lineCap = 'round';
-        this.ctx.strokeStyle = '#00CC99';
         this.canvas.addEventListener('mousedown', (e) => {
             this.ctx.beginPath();
             this.ctx.moveTo(this.mouse.x, this.mouse.y);
@@ -69,6 +68,10 @@ export default class webGraffiti {
       paint() {
         this.ctx.lineTo(this.mouse.x, this.mouse.y);
         this.ctx.stroke();
+      }
+
+      setColor(color) {
+        this.ctx.strokeStyle = color;
       }
 
       sendMessage() {
