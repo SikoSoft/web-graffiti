@@ -4,6 +4,7 @@ import editor from './editor.js';
 
 export default class webGraffiti {
   constructor() {
+    this.rootElement = '';
     this.config = new config(this);
     this.editor = new editor(this);
     this.mouse = {
@@ -28,9 +29,12 @@ export default class webGraffiti {
     };
   }
 
-  init(canvasId) {
-    this.canvasId = canvasId;
-    this.canvas = document.getElementById(this.canvasId);
+  init(element) {
+    this.rootElement = element;
+    this.canvas = document.createElement('canvas');
+    this.canvas.className = 'webGraffiti__canvas';
+    element.append(this.canvas);
+    editor.id = '';
     this.ctx = this.canvas.getContext('2d');
     this.canvas.addEventListener(
       'mousedown',
@@ -113,6 +117,8 @@ export default class webGraffiti {
 
   run() {
     this.load().then(() => {
+      this.canvas.setAttribute('width', this.config.width);
+      this.canvas.setAttribute('height', this.config.height);
       this.editor.init();
       this.ctx.drawImage(this.image, 0, 0);
       this.setContext();

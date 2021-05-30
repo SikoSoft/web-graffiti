@@ -10,13 +10,12 @@
       window.wg = wg;
       document.onreadystatechange = function () {
         if (document.readyState === 'complete') {
-          wg.init('wall');
+          wg.init(document.getElementById('webGraffiti'));
         }
       };
     </script>
   </head>
   <body>
-    <canvas width="1280" height="720" id="wall"></canvas>
-    <div id="webGraffiti-editor"></div>
+    <div id="webGraffiti"></div>
   </body>
 </html>

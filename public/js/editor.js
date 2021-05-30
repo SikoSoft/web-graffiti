@@ -5,7 +5,9 @@ export default class editor {
   }
 
   init() {
-    this.container = document.querySelector('#webGraffiti-editor');
+    this.container = document.createElement('div');
+    this.container.className = 'webGraffiti__editor';
+    this.wg.rootElement.append(this.container);
     this.wg.config.defaultColors.forEach((color, index) => {
       this.container.append(this.setupButton(color, index));
     });

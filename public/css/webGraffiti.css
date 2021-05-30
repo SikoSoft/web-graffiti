@@ -2,16 +2,16 @@ body {
   background-color: #000;
 }
 
-#webGraffiti-canvas {
+.webGraffiti__canvas {
   background-color: #fff;
 }
 
-#webGraffiti-editor {
+.webGraffiti__editor {
   position: fixed;
   bottom: 0;
 }
 
-.webGraffiti-connection {
+.webGraffiti__connection {
 }
 
 .webGraffiti__color {
