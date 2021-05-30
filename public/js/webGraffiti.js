@@ -59,11 +59,13 @@ export default class webGraffiti {
     document.addEventListener(
       'mouseup',
       () => {
+        if (this.mouseDown) {
+          this.ctx.closePath();
+          this.sendMessage({
+            event: 'closePath',
+          });
+        }
         this.mouseDown = false;
-        this.ctx.closePath();
-        this.sendMessage({
-          event: 'closePath',
-        });
       },
       false
     );
@@ -121,7 +123,6 @@ export default class webGraffiti {
       this.canvas.setAttribute('height', this.config.height);
       this.editor.init();
       this.ctx.drawImage(this.image, 0, 0);
-      this.setContext();
     });
   }
 

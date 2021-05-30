@@ -5,23 +5,24 @@ export default class editor {
   }
 
   init() {
+    this.colors = [...this.wg.config.defaultColors];
     this.container = document.createElement('div');
     this.container.className = 'webGraffiti__editor';
     this.wg.rootElement.append(this.container);
-    this.wg.config.defaultColors.forEach((color, index) => {
+    this.colors.forEach((color, index) => {
       this.container.append(this.setupButton(color, index));
     });
-    this.syncSelected();
+    this.selectColor(0);
   }
 
-  setupButton(defaultColor, index) {
+  setupButton(buttonColor, index) {
     const button = document.createElement('button');
     button.className = 'webGraffiti__color';
-    button.setAttribute('data-color', defaultColor);
+    button.setAttribute('data-color', buttonColor);
     button.setAttribute('data-index', index);
-    button.style.backgroundColor = defaultColor;
+    button.style.backgroundColor = buttonColor;
     new window.Picker({
-      color: defaultColor,
+      color: buttonColor,
       parent: button,
       alpha: false,
       editor: false,
@@ -29,17 +30,18 @@ export default class editor {
       onDone: (color) => {
         button.setAttribute('data-color', color.hex);
         button.style.backgroundColor = color.hex;
-        this.selected = index;
-        this.wg.setColor(color.hex);
-        this.syncSelected();
+        this.colors[index] = color.hex;
+        this.selectColor(index);
       },
     });
     return button;
   }
 
-  syncSelected() {
+  selectColor(index) {
+    this.selected = index;
+    this.wg.setColor(this.colors[index]);
     document.querySelectorAll('.webGraffiti__color').forEach((button) => {
-      if (parseInt(button.getAttribute('data-index')) === this.selected) {
+      if (parseInt(button.getAttribute('data-index')) === index) {
         button.classList.add('webGraffiti__color--active');
       } else {
         button.classList.remove('webGraffiti__color--active');
