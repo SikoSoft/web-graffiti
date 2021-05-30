@@ -5,5 +5,5 @@
     "mpServer": "ws://localhost:8666",
     "webPort": 8000,
     "webSocketPort": 8666,
-    "autoSave": 60000
+    "autoSave": 3600000
 }

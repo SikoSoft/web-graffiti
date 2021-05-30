@@ -14,8 +14,9 @@ export default class webGraffiti {
         this.color = '';
         this.client = {
             id: "",
+            connected: false,
             ctx: {
-                strokeStyle: "#000000ff",
+                strokeStyle: "#88f45366",
                 lineWidth: 1,
                 lineCap: 'round',
                 lineJoin: 'round'
@@ -46,6 +47,10 @@ export default class webGraffiti {
         });
         document.addEventListener('mouseup', () => {
             this.mouseDown = false;
+            this.ctx.closePath();
+            this.sendMessage({
+                event: 'closePath'
+            })
         }, false);
         this.run();
     }
@@ -63,7 +68,16 @@ export default class webGraffiti {
     openConnection() {
         return new Promise(resolve => {
             this.ws = new WebSocket(this.config.mpServer);
-            resolve();
+            this.ws.onopen = () => {
+                this.client.connected = true;
+                resolve();
+            };
+            this.ws.onmessage = (message) => {
+                this.handleMessage(message);
+            };
+            this.ws.onclose = () => {
+                this.client.connected = false;
+            };
         });
     }
 
@@ -87,66 +101,89 @@ export default class webGraffiti {
         });
       }
 
-      run() {
-          console.log('run');
-          this.load().then(() => {
-            console.log('running');
-            this.ctx.drawImage(this.image, 0, 0);
-            this.setContext();
-          });
-      }
+    run() {
+        console.log('run');
+        this.load().then(() => {
+          console.log('running');
+          this.ctx.drawImage(this.image, 0, 0);
+          this.setContext();
+        });
+    }
 
-      updateMouse(e) {
+    updateMouse(e) {
         this.mouse.x = e.pageX - this.canvas.offsetLeft;
         this.mouse.y = e.pageY - this.canvas.offsetTop;
-      }
+    }
 
-      paint() {
+    paint() {
         this.ctx.lineTo(this.mouse.x, this.mouse.y);
         this.ctx.stroke();
         this.sendMessage({
-            event: 'paint',
-            x: this.mouse.x,
-            y: this.mouse.y
-        });
-      }
+           event: 'paint',
+           x: this.mouse.x,
+           y: this.mouse.y
+       });
+    }
 
-      setColor(color) {
-        this.client.ctx.strokeStyle = color;
+    setColor(color) {
+        this.client.ctx.strokeStyle = color.replace(/ff$/, "55");
         this.setContext();
-      }
+    }
 
-      setContext() {
-          for (const key in this.client.ctx) {
-              this.ctx[key] = this.client.ctx[key];
-          }
-          this.sendMessage({
-              event: "setContext",
-              ctx: this.client.ctx
-          });
-      }
+    setContext() {
+        for (const key in this.client.ctx) {
+            this.ctx[key] = this.client.ctx[key];
+        }
+        this.sendMessage({
+            event: "setContext",
+            ctx: this.client.ctx
+        });
+    }
 
-      getChunk(x, y) {
+    getChunk(x, y) {
         return `${Math.floor((x-1)/this.chunkSize)}x${Math.floor((y-1)/this.chunkSize)}`;
-      }
+    }
 
-      getChunkHash(cx, cy) {
-          let chars = "";
-          for (let x = cx; x < cx+this.chunkSize; x++) {
-              for (let y = cy; y < cy+this.chunkSize; y++) {
+    getChunkHash(cx, cy) {
+        let chars = "";
+        for (let x = cx; x < cx+this.chunkSize; x++) {
+            for (let y = cy; y < cy+this.chunkSize; y++) {
                 chars += this.getPixel(x, y);
-              }
-          }
-          return SparkMD5.hash(chars);
-      }
+            }
+        }
+        return SparkMD5.hash(chars);
+    }
 
-      getPixel(x, y) {
+    getPixel(x, y) {
         return this.ctx.getImageData(x, y, 1, 1).data.join("");
-      }
+    }
 
-      sendMessage(message) {
+    drawPixel(x, y, r, g, b, a) {
+      console.log('drawPixel', x, y, r, g, b, a);
+      /*
+      const pixelData = this.ctx.createImageData(1, 1);
+      pixelData.data[0] = r;
+      pixelData.data[1] = g;
+      pixelData.data[2] = b;
+      pixelData.data[3] = a;
+      this.ctx.putImageData(pixelData, x, y);
+      */
+      this.ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
+      this.ctx.fillRect( x, y, 1, 1 );
+    }
+
+    sendMessage(message) {
         //console.log(message);
         this.ws.send(JSON.stringify(message));
-      }
+    }
+
+    handleMessage(message) {
+        const json = JSON.parse(message.data);
+        switch (json.event) {
+          case 'pixel':
+            this.drawPixel(json.x, json.y, json.r, json.g, json.b, json.a);
+            break;
+        }
+    }
 
 }

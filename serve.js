@@ -19,13 +19,12 @@ const ctx = canvas.getContext('2d');
 loadImage(`public/${config.imageName}`).then(image => {
     ctx.drawImage(image, 0, 0);
     lastHash = SparkMD5.hash(canvas.toBuffer('image/png'));
-    console.log('lastHash', lastHash);
 });
 
 const saveImage = (buffer, hash) => {
     lastHash = hash;
     fs.writeFileSync(`public/${config.imageName}`, buffer);
-}
+};
 
 const syncImage = () => {
     const buffer = canvas.toBuffer('image/png');
@@ -33,7 +32,15 @@ const syncImage = () => {
     if (hash !== lastHash) {
         saveImage(buffer, hash);
     }
-}
+};
+
+const broadcast = (message, ignoreClientId = '') => {
+    clients.filter(client => !ignoreClientId || client.id !== ignoreClientId).forEach(client => {
+        client.connection.sendUTF(
+            JSON.stringify(message)
+        )
+    });
+};
 
 // web server
 
@@ -106,7 +113,17 @@ wsServer.on('request', function(request) {
             case "paint":
                 ctx.lineTo(json.x, json.y);
                 ctx.stroke();
-                break
+                const pixelData = ctx.getImageData(json.x, json.y, 1, 1);
+                broadcast({
+                    event: 'pixel',
+                    x: json.x,
+                    y: json.y,
+                    r: pixelData.data[0],
+                    g: pixelData.data[1],
+                    b: pixelData.data[2],
+                    a: pixelData.data[3]
+                }, connection.client.id);
+                break;
         }
       }
     });
