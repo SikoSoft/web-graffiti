@@ -1,9 +1,11 @@
 import config from './config.js';
 import magicNum from './magicNum.js';
+import editor from './editor.js';
 
 export default class webGraffiti {
   constructor() {
     this.config = new config(this);
+    this.editor = new editor(this);
     this.mouse = {
       x: 0,
       y: 0,
@@ -111,6 +113,7 @@ export default class webGraffiti {
 
   run() {
     this.load().then(() => {
+      this.editor.init();
       this.ctx.drawImage(this.image, 0, 0);
       this.setContext();
     });

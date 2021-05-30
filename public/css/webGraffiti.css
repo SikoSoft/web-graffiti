@@ -2,13 +2,29 @@ body {
   background-color: #000;
 }
 
-canvas {
+#webGraffiti-canvas {
   background-color: #fff;
 }
 
-.color_button {
+#webGraffiti-editor {
+  position: fixed;
+  bottom: 0;
+}
+
+.webGraffiti-connection {
+}
+
+.webGraffiti__color {
+  vertical-align: top;
+  display: inline-block;
+  margin: 4px;
+  border: 2px #fff solid;
+  border-radius: 4px;
   width: 2rem;
   height: 2rem;
   padding: 0;
-  margin: 0;
+}
+
+.webGraffiti__color--active {
+  border: 2px rgb(255, 143, 52) solid;
 }

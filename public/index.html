@@ -1,38 +1,22 @@
 <html>
-    <head>
-        <title>Web Graffiti</title>
-        <link rel="stylesheet" type="text/css" href="css/webGraffiti.css">
-		<script src="js/vanilla-picker.min.js"></script>
-		<script src="js/spark-md5.min.js"></script>
-		<script type="module">
-			import webGraffiti from './js/webGraffiti.js';
-			const wg = new webGraffiti();
-			window.wg = wg;
-			document.onreadystatechange = function () {
-				if (document.readyState ==="complete") {
-					wg.init('wall');
-				}
-			}
-		</script>
-		<script>
-			window.addEventListener('load', function () {
-					const colorButton = document.querySelector('#colorChooser');
-					new Picker({
-						parent: colorButton,
-						alpha: false,
-						editor: false,
-						popup: 'top',
-						onDone: (color) => {
-							colorButton.setAttribute('data-color', color.hex);
-							colorButton.style.backgroundColor = color.hex;
-							wg.setColor(color.hex);
-						}
-					});
-			});
-		</script>
-    </head>
-    <body>
-        <canvas width="1280" height="720" id="wall"></canvas>
-		<button class="color_button" id="colorChooser" data-color="#00000011" style="background-color:#00000011"></button>>
-    </body>
+  <head>
+    <title>Web Graffiti</title>
+    <link rel="stylesheet" type="text/css" href="css/webGraffiti.css" />
+    <script src="js/vanilla-picker.min.js"></script>
+    <script src="js/spark-md5.min.js"></script>
+    <script type="module">
+      import webGraffiti from './js/webGraffiti.js';
+      const wg = new webGraffiti();
+      window.wg = wg;
+      document.onreadystatechange = function () {
+        if (document.readyState === 'complete') {
+          wg.init('wall');
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <canvas width="1280" height="720" id="wall"></canvas>
+    <div id="webGraffiti-editor"></div>
+  </body>
 </html>
