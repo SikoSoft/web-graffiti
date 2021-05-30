@@ -47,7 +47,6 @@ export default class webGraffiti {
         document.addEventListener('mouseup', () => {
             this.mouseDown = false;
         }, false);
-        this.ws = new WebSocket(this.config.mpServer);
         this.run();
     }
 
@@ -61,19 +60,29 @@ export default class webGraffiti {
         });
     }
 
+    openConnection() {
+        return new Promise(resolve => {
+            this.ws = new WebSocket(this.config.mpServer);
+            resolve();
+        });
+    }
+
     load() {
         console.log('load');
         return new Promise(resolve => {
           this.config
             .load()
             .then(() => {
+                return this.openConnection();
+            })
+            .then(() => {
                 return this.loadImage();
             })
             .then(() => {
-              resolve();
+                resolve();
             })
             .catch(error => {
-              console.log('Encountered an error while loading!', error);
+                console.log('Encountered an error while loading!', error);
             });
         });
       }
