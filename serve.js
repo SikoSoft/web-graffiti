@@ -101,16 +101,18 @@ wsServer.on('request', function (request) {
       const json = JSON.parse(message.utf8Data);
       console.log(json);
       switch (json.event) {
-        case 'setContext':
+        case 'setContext': {
           connection.client.ctx = json.ctx;
           for (const key in json.ctx) {
             ctx[key] = json.ctx[key];
           }
           break;
-        case 'beginPath':
+        }
+        case 'beginPath': {
           ctx.beginPath();
           break;
-        case 'paint':
+        }
+        case 'paint': {
           ctx.lineTo(json.x, json.y);
           ctx.stroke();
           const pixelData = ctx.getImageData(json.x, json.y, 1, 1);
@@ -127,6 +129,7 @@ wsServer.on('request', function (request) {
             connection.client.id
           );
           break;
+        }
       }
     }
   });
