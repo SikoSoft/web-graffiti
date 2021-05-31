@@ -2,6 +2,7 @@ import config from './config.js';
 import magicNum from './magicNum.js';
 import editor from './editor.js';
 import socket from './socket.js';
+import networkMonitor from './networkMonitor.js';
 
 export default class webGraffiti {
   constructor() {
@@ -9,6 +10,7 @@ export default class webGraffiti {
     this.config = new config(this);
     this.socket = new socket(this);
     this.editor = new editor(this);
+    this.networkMonitor = new networkMonitor(this);
     this.mouse = {
       x: 0,
       y: 0,
@@ -104,6 +106,7 @@ export default class webGraffiti {
   }
 
   run() {
+    this.networkMonitor.init();
     this.load().then(() => {
       this.canvas.setAttribute('width', this.config.width);
       this.canvas.setAttribute('height', this.config.height);

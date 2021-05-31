@@ -28,3 +28,43 @@ body {
 .webGraffiti__color--active {
   border: 2px rgb(255, 143, 52) solid;
 }
+
+.webGraffiti__network_monitor {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  padding: 1rem;
+}
+
+.webGraffiti__network_monitor_sent_per_second,
+.webGraffiti__network_monitor_received_per_second {
+  vertical-align: middle;
+  font-family: arial;
+  font-size: 1.5rem;
+}
+
+.webGraffiti__network_monitor_sent_per_second_value,
+.webGraffiti__network_monitor_received_per_second_value {
+  vertical-align: middle;
+}
+
+.webGraffiti__network_monitor_sent_per_second::after,
+.webGraffiti__network_monitor_received_per_second_value::after {
+  content: 'messages/s';
+  margin-left: 1rem;
+  vertical-align: middle;
+}
+
+.webGraffiti__network_monitor_sent_per_second::before {
+  content: 'sent';
+  margin-right: 1rem;
+  vertical-align: middle;
+}
+
+.webGraffiti__network_monitor_received_per_second::before {
+  content: 'received';
+  margin-right: 1rem;
+  vertical-align: middle;
+}

@@ -134,7 +134,7 @@ wsServer.on('request', function (request) {
               b: pixelData.data[2],
               a: pixelData.data[3],
             },
-            connection.client.id
+            111 //connection.client.id
           );
           break;
         }
