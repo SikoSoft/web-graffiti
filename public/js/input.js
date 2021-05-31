@@ -4,6 +4,10 @@ export default class input {
   }
 
   init() {
+    this.setupMouseEvents();
+  }
+
+  setupMouseEvents() {
     this.wg.render.canvas.addEventListener(
       'mousedown',
       (e) => {
@@ -18,12 +22,16 @@ export default class input {
       },
       false
     );
-    this.wg.render.canvas.addEventListener('mousemove', (e) => {
-      if (this.wg.mouseDown) {
-        this.wg.updateMouse(e);
-        this.wg.render.paint();
-      }
-    });
+    this.wg.render.canvas.addEventListener(
+      'mousemove',
+      (e) => {
+        if (this.wg.mouseDown) {
+          this.wg.updateMouse(e);
+          this.wg.render.paint();
+        }
+      },
+      false
+    );
     document.addEventListener(
       'mouseup',
       () => {
