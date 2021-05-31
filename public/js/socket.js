@@ -39,7 +39,14 @@ export default class socket {
     const json = JSON.parse(message.data);
     switch (json.event) {
       case 'pixel':
-        this.wg.drawPixel(json.x, json.y, json.r, json.g, json.b, json.a);
+        this.wg.render.drawPixel(
+          json.x,
+          json.y,
+          json.r,
+          json.g,
+          json.b,
+          json.a
+        );
         break;
     }
   }

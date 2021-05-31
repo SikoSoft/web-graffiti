@@ -1,8 +1,9 @@
 import config from './config.js';
-import magicNum from './magicNum.js';
 import editor from './editor.js';
 import socket from './socket.js';
 import networkMonitor from './networkMonitor.js';
+import render from './render.js';
+import input from './input.js';
 
 export default class webGraffiti {
   constructor() {
@@ -11,6 +12,8 @@ export default class webGraffiti {
     this.socket = new socket(this);
     this.editor = new editor(this);
     this.networkMonitor = new networkMonitor(this);
+    this.render = new render(this);
+    this.input = new input(this);
     this.mouse = {
       x: 0,
       y: 0,
@@ -35,55 +38,7 @@ export default class webGraffiti {
 
   init(element) {
     this.rootElement = element;
-    this.canvas = document.createElement('canvas');
-    this.canvas.className = 'webGraffiti__canvas';
-    element.append(this.canvas);
-    editor.id = '';
-    this.ctx = this.canvas.getContext('2d');
-    this.canvas.addEventListener(
-      'mousedown',
-      (e) => {
-        this.mouseDown = true;
-        this.updateMouse(e);
-        this.ctx.beginPath();
-        this.socket.sendMessage({
-          event: 'beginPath',
-        });
-        this.ctx.moveTo(this.mouse.x, this.mouse.y);
-        this.paint();
-      },
-      false
-    );
-    this.canvas.addEventListener('mousemove', (e) => {
-      if (this.mouseDown) {
-        this.updateMouse(e);
-        this.paint();
-      }
-    });
-    document.addEventListener(
-      'mouseup',
-      () => {
-        if (this.mouseDown) {
-          this.ctx.closePath();
-          this.socket.sendMessage({
-            event: 'closePath',
-          });
-        }
-        this.mouseDown = false;
-      },
-      false
-    );
     this.run();
-  }
-
-  loadImage() {
-    return new Promise((resolve) => {
-      this.image = new Image();
-      this.image.src = this.config.imageName;
-      this.image.onload = () => {
-        resolve();
-      };
-    });
   }
 
   load() {
@@ -94,7 +49,7 @@ export default class webGraffiti {
           return this.socket.init();
         })
         .then(() => {
-          return this.loadImage();
+          return this.render.load();
         })
         .then(() => {
           resolve();
@@ -108,41 +63,15 @@ export default class webGraffiti {
   run() {
     this.networkMonitor.init();
     this.load().then(() => {
-      this.canvas.setAttribute('width', this.config.width);
-      this.canvas.setAttribute('height', this.config.height);
+      this.render.init();
       this.editor.init();
-      this.ctx.drawImage(this.image, 0, 0);
+      this.input.init();
     });
   }
 
   updateMouse(e) {
-    this.mouse.x = e.pageX - this.canvas.offsetLeft;
-    this.mouse.y = e.pageY - this.canvas.offsetTop;
-  }
-
-  paint() {
-    this.ctx.lineTo(this.mouse.x, this.mouse.y);
-    //this.ctx.stroke();
-    this.socket.sendMessage({
-      event: 'paint',
-      x: this.mouse.x,
-      y: this.mouse.y,
-    });
-  }
-
-  setColor(color) {
-    this.client.ctx.strokeStyle = color.replace(/ff$/, 'ff');
-    this.setContext();
-  }
-
-  setContext() {
-    for (const key in this.client.ctx) {
-      this.ctx[key] = this.client.ctx[key];
-    }
-    this.socket.sendMessage({
-      event: 'setContext',
-      ctx: this.client.ctx,
-    });
+    this.mouse.x = e.pageX - this.render.canvas.offsetLeft;
+    this.mouse.y = e.pageY - this.render.canvas.offsetTop;
   }
 
   getChunk(x, y) {
@@ -159,23 +88,5 @@ export default class webGraffiti {
       }
     }
     return window.SparkMD5.hash(chars);
-  }
-
-  getPixel(x, y) {
-    return this.ctx.getImageData(x, y, 1, 1).data.join('');
-  }
-
-  drawPixel(x, y, r, g, b, a) {
-    /*
-      const pixelData = this.ctx.createImageData(1, 1);
-      pixelData.data[0] = r;
-      pixelData.data[1] = g;
-      pixelData.data[2] = b;
-      pixelData.data[3] = a;
-      this.ctx.putImageData(pixelData, x, y);
-      */
-    this.ctx.fillStyle =
-      'rgba(' + r + ',' + g + ',' + b + ',' + a / magicNum.ALPHA_MAX + ')';
-    this.ctx.fillRect(x, y, 1, 1);
   }
 }

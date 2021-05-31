@@ -39,7 +39,7 @@ export default class editor {
 
   selectColor(index) {
     this.selected = index;
-    this.wg.setColor(this.colors[index]);
+    this.wg.render.setColor(this.colors[index]);
     document.querySelectorAll('.webGraffiti__color').forEach((button) => {
       if (parseInt(button.getAttribute('data-index')) === index) {
         button.classList.add('webGraffiti__color--active');
