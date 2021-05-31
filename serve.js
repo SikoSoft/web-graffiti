@@ -1,4 +1,4 @@
-/* eslint no-console: 0 */
+/* eslint no-console: 0, no-magic-numbers: 0 */
 const { v4 } = require('uuid');
 const express = require('express');
 const path = require('path');
@@ -16,6 +16,11 @@ const clients = [];
 
 const canvas = createCanvas(config.width, config.height);
 const ctx = canvas.getContext('2d');
+//console.log('ctx after setup', ctx);
+
+ctx.lineWidth = 100;
+
+//console.log('ctx after setting line width', ctx);
 
 loadImage(`public/${config.imageName}`).then((image) => {
   ctx.drawImage(image, 0, 0);
@@ -105,7 +110,9 @@ wsServer.on('request', function (request) {
           connection.client.ctx = json.ctx;
           for (const key in json.ctx) {
             ctx[key] = json.ctx[key];
+            console.log(`adding ${key} to context with value ${json.ctx[key]}`);
           }
+          console.log(Object.keys(ctx));
           break;
         }
         case 'beginPath': {
@@ -115,6 +122,7 @@ wsServer.on('request', function (request) {
         case 'paint': {
           ctx.lineTo(json.x, json.y);
           ctx.stroke();
+          //console.log('contet>', ctx);
           const pixelData = ctx.getImageData(json.x, json.y, 1, 1);
           broadcast(
             {

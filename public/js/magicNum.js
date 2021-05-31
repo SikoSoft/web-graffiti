@@ -1,3 +1,3 @@
 export default {
-  ALPHA_MAX: 255
+  ALPHA_MAX: 255,
 };

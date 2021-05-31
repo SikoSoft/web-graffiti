@@ -1,11 +1,13 @@
 import config from './config.js';
 import magicNum from './magicNum.js';
 import editor from './editor.js';
+import socket from './socket.js';
 
 export default class webGraffiti {
   constructor() {
     this.rootElement = '';
     this.config = new config(this);
+    this.socket = new socket(this);
     this.editor = new editor(this);
     this.mouse = {
       x: 0,
@@ -42,7 +44,7 @@ export default class webGraffiti {
         this.mouseDown = true;
         this.updateMouse(e);
         this.ctx.beginPath();
-        this.sendMessage({
+        this.socket.sendMessage({
           event: 'beginPath',
         });
         this.ctx.moveTo(this.mouse.x, this.mouse.y);
@@ -61,7 +63,7 @@ export default class webGraffiti {
       () => {
         if (this.mouseDown) {
           this.ctx.closePath();
-          this.sendMessage({
+          this.socket.sendMessage({
             event: 'closePath',
           });
         }
@@ -82,28 +84,12 @@ export default class webGraffiti {
     });
   }
 
-  openConnection() {
-    return new Promise((resolve) => {
-      this.ws = new WebSocket(this.config.mpServer);
-      this.ws.onopen = () => {
-        this.client.connected = true;
-        resolve();
-      };
-      this.ws.onmessage = (message) => {
-        this.handleMessage(message);
-      };
-      this.ws.onclose = () => {
-        this.client.connected = false;
-      };
-    });
-  }
-
   load() {
     return new Promise((resolve) => {
       this.config
         .load()
         .then(() => {
-          return this.openConnection();
+          return this.socket.init();
         })
         .then(() => {
           return this.loadImage();
@@ -133,8 +119,8 @@ export default class webGraffiti {
 
   paint() {
     this.ctx.lineTo(this.mouse.x, this.mouse.y);
-    this.ctx.stroke();
-    this.sendMessage({
+    //this.ctx.stroke();
+    this.socket.sendMessage({
       event: 'paint',
       x: this.mouse.x,
       y: this.mouse.y,
@@ -142,7 +128,7 @@ export default class webGraffiti {
   }
 
   setColor(color) {
-    this.client.ctx.strokeStyle = color.replace(/ff$/, '55');
+    this.client.ctx.strokeStyle = color.replace(/ff$/, 'ff');
     this.setContext();
   }
 
@@ -150,7 +136,7 @@ export default class webGraffiti {
     for (const key in this.client.ctx) {
       this.ctx[key] = this.client.ctx[key];
     }
-    this.sendMessage({
+    this.socket.sendMessage({
       event: 'setContext',
       ctx: this.client.ctx,
     });
@@ -188,18 +174,5 @@ export default class webGraffiti {
     this.ctx.fillStyle =
       'rgba(' + r + ',' + g + ',' + b + ',' + a / magicNum.ALPHA_MAX + ')';
     this.ctx.fillRect(x, y, 1, 1);
-  }
-
-  sendMessage(message) {
-    this.ws.send(JSON.stringify(message));
-  }
-
-  handleMessage(message) {
-    const json = JSON.parse(message.data);
-    switch (json.event) {
-      case 'pixel':
-        this.drawPixel(json.x, json.y, json.r, json.g, json.b, json.a);
-        break;
-    }
   }
 }
