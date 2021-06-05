@@ -14,11 +14,6 @@ export default class webGraffiti {
     this.networkMonitor = new networkMonitor(this);
     this.render = new render(this);
     this.input = new input(this);
-    this.mouse = {
-      x: 0,
-      y: 0,
-    };
-    this.mouseDown = false;
     this.chunkSize = 16;
     this.chunkMap = [];
     this.pixelMap = [];
@@ -28,7 +23,6 @@ export default class webGraffiti {
       id: '',
       connected: false,
       ctx: {
-        strokeStyle: '#88f45366',
         lineWidth: 1,
         lineCap: 'round',
         lineJoin: 'round',
@@ -67,11 +61,6 @@ export default class webGraffiti {
       this.editor.init();
       this.input.init();
     });
-  }
-
-  updateMouse(e) {
-    this.mouse.x = e.pageX - this.render.canvas.offsetLeft;
-    this.mouse.y = e.pageY - this.render.canvas.offsetTop;
   }
 
   getChunk(x, y) {

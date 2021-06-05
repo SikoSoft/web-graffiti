@@ -24,17 +24,20 @@ export default class render {
   }
 
   loadImage() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       this.image = new Image();
       this.image.src = this.wg.config.imageName;
       this.image.onload = () => {
         resolve();
       };
+      this.image.onerror = () => {
+        reject();
+      };
     });
   }
 
   setColor(color) {
-    this.wg.client.ctx.strokeStyle = color.replace(/ff$/, 'dd');
+    this.wg.client.ctx.strokeStyle = color.replace(/ff$/, 'ff');
     this.setContext();
   }
 
@@ -63,8 +66,17 @@ export default class render {
   }
 
   drawPixel(x, y, r, g, b, a) {
+    return;
     this.ctx.fillStyle =
       'rgba(' + r + ',' + g + ',' + b + ',' + a / magicNum.ALPHA_MAX + ')';
     this.ctx.fillRect(x, y, 1, 1);
+  }
+
+  drawLine(x1, y1, x2, y2) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.stroke();
+    this.ctx.closePath();
   }
 }
