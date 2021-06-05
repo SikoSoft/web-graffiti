@@ -119,9 +119,27 @@ wsServer.on('request', function (request) {
           ctx.beginPath();
           break;
         }
+        case 'closePath': {
+          //ctx.stroke();
+          //ctx.closePath();
+          break;
+        }
+        case 'line': {
+          const [x1, y1, x2, y2] = json.line;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+          ctx.closePath();
+          broadcast({
+            event: 'line',
+            line: json.line,
+          });
+          break;
+        }
         case 'paint': {
           ctx.lineTo(json.x, json.y);
-          ctx.stroke();
+          //ctx.stroke();
           //console.log('contet>', ctx);
           const pixelData = ctx.getImageData(json.x, json.y, 1, 1);
           broadcast(
@@ -134,7 +152,7 @@ wsServer.on('request', function (request) {
               b: pixelData.data[2],
               a: pixelData.data[3],
             },
-            111 //connection.client.id
+            connection.client.id
           );
           break;
         }

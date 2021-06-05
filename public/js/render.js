@@ -72,7 +72,7 @@ export default class render {
     this.ctx.fillRect(x, y, 1, 1);
   }
 
-  drawLine(x1, y1, x2, y2) {
+  drawLine([x1, y1, x2, y2]) {
     this.ctx.beginPath();
     this.ctx.moveTo(x1, y1);
     this.ctx.lineTo(x2, y2);

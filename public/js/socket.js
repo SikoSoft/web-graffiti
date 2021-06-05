@@ -48,6 +48,8 @@ export default class socket {
           json.a
         );
         break;
+      case 'line':
+        this.wg.render.drawLine(json.line);
     }
   }
 

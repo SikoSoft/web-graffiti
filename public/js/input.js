@@ -56,12 +56,17 @@ export default class input {
   handleMove(e) {
     if (this.mouseDown) {
       this.updateMouse(e);
-      this.wg.render.drawLine(
+      const line = [
         this.latestPoint.x,
         this.latestPoint.y,
         this.mouse.x,
-        this.mouse.y
-      );
+        this.mouse.y,
+      ];
+      this.wg.render.drawLine(line);
+      this.wg.socket.sendMessage({
+        event: 'line',
+        line,
+      });
       this.latestPoint = {
         x: this.mouse.x,
         y: this.mouse.y,
@@ -71,9 +76,11 @@ export default class input {
 
   handleUp() {
     if (this.mouseDown) {
+      /*
       this.wg.socket.sendMessage({
         event: 'closePath',
       });
+      */
     }
     this.mouseDown = false;
   }
