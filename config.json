@@ -7,6 +7,7 @@
   "webSocketPort": 8666,
   "autoSave": 3600000,
   "doubleClick": 200,
+  "defaultAlpha": 0.75,
   "defaultColors": [
     "#000000ff",
     "#ffffffff",

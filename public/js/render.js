@@ -1,9 +1,12 @@
 export default class render {
   constructor(wg) {
     this.wg = wg;
+    this.color = '';
+    this.alpha = 1;
   }
 
   init() {
+    this.alpha = this.wg.config.defaultAlpha;
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'webGraffiti__canvas';
     this.wg.rootElement.append(this.canvas);
@@ -35,8 +38,22 @@ export default class render {
   }
 
   setColor(color) {
-    this.wg.client.ctx.strokeStyle = color.replace(/ff$/, 'ff');
+    this.color = color;
+    this.wg.client.ctx.strokeStyle = color.replace(
+      /ff$/,
+      Math.round(this.alpha * 255).toString(16) // eslint-disable-line
+    );
     this.setContext();
+  }
+
+  setLineWidth(width) {
+    this.wg.client.ctx.lineWidth = width;
+    this.setContext();
+  }
+
+  setAlpha(alpha) {
+    this.alpha = alpha;
+    this.setColor(this.color);
   }
 
   setContext() {

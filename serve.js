@@ -107,7 +107,6 @@ wsServer.on('request', function (request) {
           connection.client.ctx = json.ctx;
           for (const key in json.ctx) {
             ctx[key] = json.ctx[key];
-            console.log(`adding ${key} to context with value ${json.ctx[key]}`);
           }
           break;
         }

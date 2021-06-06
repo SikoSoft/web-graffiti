@@ -5,6 +5,7 @@ export default class config {
     this.width = 1280;
     this.height = 720;
     this.doubleClick = 200;
+    this.defaultAlpha = 1;
     this.mpServer = 'ws://localhost:8666';
   }
 
