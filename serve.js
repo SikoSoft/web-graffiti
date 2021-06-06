@@ -16,11 +16,8 @@ const clients = [];
 
 const canvas = createCanvas(config.width, config.height);
 const ctx = canvas.getContext('2d');
-//console.log('ctx after setup', ctx);
 
 ctx.lineWidth = 100;
-
-//console.log('ctx after setting line width', ctx);
 
 loadImage(`public/${config.imageName}`).then((image) => {
   ctx.drawImage(image, 0, 0);
@@ -112,16 +109,6 @@ wsServer.on('request', function (request) {
             ctx[key] = json.ctx[key];
             console.log(`adding ${key} to context with value ${json.ctx[key]}`);
           }
-          console.log(Object.keys(ctx));
-          break;
-        }
-        case 'beginPath': {
-          ctx.beginPath();
-          break;
-        }
-        case 'closePath': {
-          //ctx.stroke();
-          //ctx.closePath();
           break;
         }
         case 'line': {
@@ -135,25 +122,6 @@ wsServer.on('request', function (request) {
             event: 'line',
             line: json.line,
           });
-          break;
-        }
-        case 'paint': {
-          ctx.lineTo(json.x, json.y);
-          //ctx.stroke();
-          //console.log('contet>', ctx);
-          const pixelData = ctx.getImageData(json.x, json.y, 1, 1);
-          broadcast(
-            {
-              event: 'pixel',
-              x: json.x,
-              y: json.y,
-              r: pixelData.data[0],
-              g: pixelData.data[1],
-              b: pixelData.data[2],
-              a: pixelData.data[3],
-            },
-            connection.client.id
-          );
           break;
         }
       }

@@ -1,5 +1,3 @@
-import magicNum from './magicNum.js';
-
 export default class render {
   constructor(wg) {
     this.wg = wg;
@@ -63,13 +61,6 @@ export default class render {
 
   getPixel(x, y) {
     return this.ctx.getImageData(x, y, 1, 1).data.join('');
-  }
-
-  drawPixel(x, y, r, g, b, a) {
-    return;
-    this.ctx.fillStyle =
-      'rgba(' + r + ',' + g + ',' + b + ',' + a / magicNum.ALPHA_MAX + ')';
-    this.ctx.fillRect(x, y, 1, 1);
   }
 
   drawLine([x1, y1, x2, y2]) {

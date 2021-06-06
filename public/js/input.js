@@ -75,13 +75,6 @@ export default class input {
   }
 
   handleUp() {
-    if (this.mouseDown) {
-      /*
-      this.wg.socket.sendMessage({
-        event: 'closePath',
-      });
-      */
-    }
     this.mouseDown = false;
   }
 }
