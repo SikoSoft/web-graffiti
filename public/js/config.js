@@ -4,6 +4,7 @@ export default class config {
     this.imageName = 'wall.png';
     this.width = 1280;
     this.height = 720;
+    this.doubleClick = 200;
     this.mpServer = 'ws://localhost:8666';
   }
 

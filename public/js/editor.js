@@ -21,7 +21,7 @@ export default class editor {
     button.setAttribute('data-color', buttonColor);
     button.setAttribute('data-index', index);
     button.style.backgroundColor = buttonColor;
-    new window.Picker({
+    const picker = new window.Picker({
       color: buttonColor,
       parent: button,
       alpha: false,
@@ -34,6 +34,12 @@ export default class editor {
         this.selectColor(index);
       },
     });
+    picker.openHandler = () => {
+      this.selectColor(index);
+      if (this.wg.input.doubleClick) {
+        picker.show();
+      }
+    };
     return button;
   }
 

@@ -7,6 +7,9 @@ export default class input {
       y: 0,
     };
     this.mouseDown = false;
+    this.lastClickTime = 0;
+    this.lastClickNode = '';
+    this.doubleClick = false;
   }
 
   init() {
@@ -14,6 +17,19 @@ export default class input {
   }
 
   setupMouseEvents() {
+    document.addEventListener('mousedown', (e) => {
+      if (
+        Date.now() - this.lastClickTime < this.wg.config.doubleClick &&
+        this.lastClickNode === e.target
+      ) {
+        this.doubleClick = true;
+      } else {
+        this.doubleClick = false;
+      }
+      this.lastClickTime = Date.now();
+      this.lastClickNode = e.target;
+    });
+
     this.wg.render.canvas.addEventListener(
       'mousedown',
       (e) => {

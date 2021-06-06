@@ -6,6 +6,7 @@
   "webPort": 8000,
   "webSocketPort": 8666,
   "autoSave": 3600000,
+  "doubleClick": 200,
   "defaultColors": [
     "#000000ff",
     "#ffffffff",
