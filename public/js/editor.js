@@ -8,9 +8,15 @@ export default class editor {
     this.colors = [...this.wg.config.defaultColors];
     this.container = document.createElement('div');
     this.container.className = 'webGraffiti__editor';
+    this.containerInner = document.createElement('div');
+    this.containerInner.className = 'webGraffiti__editor_inner';
+    this.container.append(this.containerInner);
     this.wg.rootElement.append(this.container);
+    this.handle = document.createElement('div');
+    this.handle.className = 'webGraffiti__editor_handle';
+    this.containerInner.append(this.handle);
     this.colors.forEach((color, index) => {
-      this.container.append(this.setupButton(color, index));
+      this.containerInner.append(this.setupButton(color, index));
     });
     this.selectColor(0);
   }

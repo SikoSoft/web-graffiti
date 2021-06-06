@@ -1,20 +1,54 @@
 body {
   background-color: #000;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .webGraffiti__canvas {
   background-color: #fff;
+  cursor: crosshair;
 }
 
 .webGraffiti__editor {
   position: fixed;
   bottom: 0;
+  height: 3rem;
+  width: 100%;
+  padding: 1rem;
+  background-color: rgb(92, 122, 101);
+  border-top: 5px rgb(49, 66, 54) solid;
+  transition: all 0.2s;
+  text-align:center;
+  opacity: 0.6;
+}
+
+.webGraffiti__editor_container {
+  position: relative;
+}
+
+.webGraffiti__editor_handle {
+  display: none;
+  position: absolute;
+  top: calc(-2rem - 5px);
+  left: calc(50% - 5rem);
+  height: 2rem;
+  width: 10rem;
+  background-color: rgb(92, 122, 101);
+  border: 5px rgb(49, 66, 54) solid;
+  border-bottom: 0;
+}
+
+.webGraffiti__editor:hover {
+  bottom: 0;
+  opacity: 1;
 }
 
 .webGraffiti__connection {
 }
 
 .webGraffiti__color {
+  cursor: pointer;
   vertical-align: top;
   display: inline-block;
   margin: 4px;
@@ -23,6 +57,13 @@ body {
   width: 2rem;
   height: 2rem;
   padding: 0;
+  transition: all 0.1s;
+  opacity: 0.6;
+}
+
+.webGraffiti__color:hover {
+  transform: scale(1.25);
+  opacity: 1;
 }
 
 .webGraffiti__color--active {
@@ -30,6 +71,7 @@ body {
 }
 
 .webGraffiti__network_monitor {
+  display: none;
   position: fixed;
   bottom: 0;
   right: 0;

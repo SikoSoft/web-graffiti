@@ -19,6 +19,8 @@ export default class webGraffiti {
     this.pixelMap = [];
     this.name = '';
     this.color = '';
+    this.useNetworkMonitor = true;
+    this.useEditor = true;
     this.client = {
       id: '',
       connected: false,

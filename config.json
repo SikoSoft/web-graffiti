@@ -10,9 +10,26 @@
   "defaultAlpha": 0.75,
   "defaultColors": [
     "#000000ff",
+    "#444444ff",
+    "#888888ff",
+    "#ccccccff",
     "#ffffffff",
+    "#ffccccff",
+    "#ff8888ff",
+    "#cc4444ff",
     "#ff0000ff",
+    "#ff8800ff",
+    "#ffff00ff",
+    "#bbff00ff",
     "#00ff00ff",
-    "#0000ffff"
+    "#00cc00ff",
+    "#0044ccff",
+    "#0088ffff",
+    "#00ffffff",
+    "#0088ffff",
+    "#0000ffff",
+    "#8800ffff",
+    "#ff00ffff",
+    "#ff0088ff"
   ]
 }
