@@ -8,11 +8,14 @@ export default class socket {
   }
 
   init() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       this.ws = new WebSocket(this.wg.config.mpServer);
       this.ws.onopen = () => {
         this.wg.client.connected = true;
         resolve();
+      };
+      this.ws.onerror = () => {
+        reject();
       };
       this.ws.onmessage = (message) => {
         this.handleMessage(message);

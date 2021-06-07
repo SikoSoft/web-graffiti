@@ -42,9 +42,6 @@ export default class webGraffiti {
       this.config
         .load()
         .then(() => {
-          return this.socket.init();
-        })
-        .then(() => {
           return this.render.load();
         })
         .then(() => {
@@ -60,8 +57,18 @@ export default class webGraffiti {
     this.networkMonitor.init();
     this.load().then(() => {
       this.render.init();
-      this.editor.init();
-      this.input.init();
+      this.socket
+        .init()
+        .then(() => {
+          this.editor.init();
+          this.input.init();
+        })
+        .catch((error) => {
+          console.log(
+            'Encountered an error while establishing connection!',
+            error
+          );
+        });
     });
   }
 
