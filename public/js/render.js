@@ -41,20 +41,6 @@ export default class render {
     }
   }
 
-  paint() {
-    this.ctx.lineTo(this.wg.mouse.x, this.wg.mouse.y);
-    this.ctx.stroke();
-    this.wg.socket.sendMessage({
-      event: 'paint',
-      x: this.wg.mouse.x,
-      y: this.wg.mouse.y,
-    });
-  }
-
-  getPixel(x, y) {
-    return this.ctx.getImageData(x, y, 1, 1).data.join('');
-  }
-
   drawLine([x1, y1, x2, y2], context) {
     this.setContext(context);
     this.ctx.beginPath();
