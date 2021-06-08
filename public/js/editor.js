@@ -47,6 +47,9 @@ export default class editor {
         picker.show();
       }
     };
+    button.addEventListener('touchstart', () => {
+      this.selectColor(index);
+    });
     return button;
   }
 
