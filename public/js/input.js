@@ -14,6 +14,7 @@ export default class input {
 
   init() {
     this.setupMouseEvents();
+    this.setupTouchEvents();
   }
 
   setupMouseEvents() {
@@ -48,6 +49,32 @@ export default class input {
 
     document.addEventListener(
       'mouseup',
+      () => {
+        this.handleUp();
+      },
+      false
+    );
+  }
+
+  setupTouchEvents() {
+    this.wg.render.canvas.addEventListener(
+      'touchstart',
+      (e) => {
+        this.handleDown(e);
+      },
+      false
+    );
+
+    this.wg.render.canvas.addEventListener(
+      'touchmove',
+      (e) => {
+        this.handleMove(e);
+      },
+      false
+    );
+
+    document.addEventListener(
+      'touchend',
       () => {
         this.handleUp();
       },
