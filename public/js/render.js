@@ -1,8 +1,6 @@
 export default class render {
   constructor(wg) {
     this.wg = wg;
-    this.color = '';
-    this.alpha = 1;
   }
 
   init() {
@@ -37,33 +35,10 @@ export default class render {
     });
   }
 
-  setColor(color) {
-    this.color = color;
-    this.wg.client.ctx.strokeStyle = color.replace(
-      /ff$/,
-      Math.round(this.alpha * 255).toString(16) // eslint-disable-line
-    );
-    this.setContext();
-  }
-
-  setLineWidth(width) {
-    this.wg.client.ctx.lineWidth = width;
-    this.setContext();
-  }
-
-  setAlpha(alpha) {
-    this.alpha = alpha;
-    this.setColor(this.color);
-  }
-
-  setContext() {
-    for (const key in this.wg.client.ctx) {
-      this.ctx[key] = this.wg.client.ctx[key];
+  setContext(ctx) {
+    for (const key in ctx) {
+      this.ctx[key] = ctx[key];
     }
-    this.wg.socket.sendMessage({
-      event: 'setContext',
-      ctx: this.wg.client.ctx,
-    });
   }
 
   paint() {
@@ -80,11 +55,13 @@ export default class render {
     return this.ctx.getImageData(x, y, 1, 1).data.join('');
   }
 
-  drawLine([x1, y1, x2, y2]) {
+  drawLine([x1, y1, x2, y2], context) {
+    this.setContext(context);
     this.ctx.beginPath();
     this.ctx.moveTo(x1, y1);
     this.ctx.lineTo(x2, y2);
     this.ctx.stroke();
     this.ctx.closePath();
+    this.setContext(this.wg.client);
   }
 }

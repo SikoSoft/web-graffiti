@@ -119,7 +119,7 @@ export default class input {
         this.mouse.x,
         this.mouse.y,
       ];
-      this.wg.render.drawLine(line);
+      this.wg.render.drawLine(line, this.wg.client.ctx);
       this.wg.socket.sendMessage({
         event: 'line',
         line,

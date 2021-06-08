@@ -2,6 +2,7 @@ export default class editor {
   constructor(wg) {
     this.wg = wg;
     this.selected = 0;
+    this.disabled = false;
   }
 
   init() {
@@ -51,7 +52,7 @@ export default class editor {
 
   selectColor(index) {
     this.selected = index;
-    this.wg.render.setColor(this.colors[index]);
+    this.wg.client.setColor(this.colors[index]);
     document.querySelectorAll('.webGraffiti__color').forEach((button) => {
       if (parseInt(button.getAttribute('data-index')) === index) {
         button.classList.add('webGraffiti__color--active');
@@ -59,5 +60,9 @@ export default class editor {
         button.classList.remove('webGraffiti__color--active');
       }
     });
+  }
+
+  disable() {
+    this.disabled = true;
   }
 }

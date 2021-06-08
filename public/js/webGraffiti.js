@@ -4,6 +4,7 @@ import socket from './socket.js';
 import networkMonitor from './networkMonitor.js';
 import render from './render.js';
 import input from './input.js';
+import client from './client.js';
 
 export default class webGraffiti {
   constructor() {
@@ -21,15 +22,7 @@ export default class webGraffiti {
     this.color = '';
     this.useNetworkMonitor = true;
     this.useEditor = true;
-    this.client = {
-      id: '',
-      connected: false,
-      ctx: {
-        lineWidth: 1,
-        lineCap: 'round',
-        lineJoin: 'round',
-      },
-    };
+    this.clients = [];
   }
 
   init(element) {
@@ -57,6 +50,8 @@ export default class webGraffiti {
     this.networkMonitor.init();
     this.load().then(() => {
       this.render.init();
+      this.client = new client(this);
+      this.clients.push(this.client);
       this.socket
         .init()
         .then(() => {
@@ -86,5 +81,18 @@ export default class webGraffiti {
       }
     }
     return window.SparkMD5.hash(chars);
+  }
+
+  registerClient(id) {
+    this.clients.push(new client(this, id));
+  }
+
+  setClientContext(id, context) {
+    this.clients.map((client) => {
+      if (id === client.id) {
+        client.ctx = context;
+      }
+      return client;
+    });
   }
 }

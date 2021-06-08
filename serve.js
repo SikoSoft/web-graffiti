@@ -98,6 +98,14 @@ wsServer.on('request', function (request) {
     })
   );
 
+  broadcast(
+    {
+      event: 'newClient',
+      id,
+    },
+    id
+  );
+
   connection.on('message', function (message) {
     if (message.type === 'utf8') {
       const json = JSON.parse(message.utf8Data);
@@ -108,6 +116,14 @@ wsServer.on('request', function (request) {
           for (const key in json.ctx) {
             ctx[key] = json.ctx[key];
           }
+          broadcast(
+            {
+              event: 'setContext',
+              id,
+              ctx: json.ctx,
+            },
+            id
+          );
           break;
         }
         case 'line': {
@@ -117,10 +133,14 @@ wsServer.on('request', function (request) {
           ctx.lineTo(x2, y2);
           ctx.stroke();
           ctx.closePath();
-          broadcast({
-            event: 'line',
-            line: json.line,
-          });
+          broadcast(
+            {
+              event: 'line',
+              id,
+              line: json.line,
+            },
+            id
+          );
           break;
         }
       }

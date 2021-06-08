@@ -11,7 +11,6 @@ export default class socket {
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(this.wg.config.mpServer);
       this.ws.onopen = () => {
-        this.wg.client.connected = true;
         resolve();
       };
       this.ws.onerror = () => {
@@ -41,18 +40,20 @@ export default class socket {
     }, magicNum.MS_IN_SECOND);
     const json = JSON.parse(message.data);
     switch (json.event) {
-      case 'pixel':
-        this.wg.render.drawPixel(
-          json.x,
-          json.y,
-          json.r,
-          json.g,
-          json.b,
-          json.a
-        );
+      case 'welcome':
+        this.wg.client.id = json.id;
+        break;
+      case 'newClient':
+        this.wg.registerClient(json.id);
+        break;
+      case 'setContext':
+        this.wg.setClientContext(json.id, json.ctx);
         break;
       case 'line':
-        this.wg.render.drawLine(json.line);
+        this.wg.render.drawLine(
+          json.line,
+          this.wg.clients.filter((client) => client.id === json.id)[0].ctx
+        );
     }
   }
 
