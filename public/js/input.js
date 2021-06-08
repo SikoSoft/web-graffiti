@@ -60,7 +60,13 @@ export default class input {
     this.wg.render.canvas.addEventListener(
       'touchstart',
       (e) => {
-        this.handleDown(e);
+        let touch = e.touches[0];
+        let mouseEvent = new MouseEvent('mousedown', {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+        this.wg.render.canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
       },
       false
     );
@@ -68,15 +74,23 @@ export default class input {
     this.wg.render.canvas.addEventListener(
       'touchmove',
       (e) => {
-        this.handleMove(e);
+        let touch = e.touches[0];
+        let mouseEvent = new MouseEvent('mousemove', {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+        });
+        this.wg.render.canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
       },
       false
     );
 
     document.addEventListener(
       'touchend',
-      () => {
-        this.handleUp();
+      (e) => {
+        let mouseEvent = new MouseEvent('mouseup', {});
+        this.wg.render.canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
       },
       false
     );
