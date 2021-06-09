@@ -13,7 +13,7 @@ body {
 .webGraffiti__editor {
   position: fixed;
   bottom: 0;
-  height: 3rem;
+  height: 5rem;
   width: 100%;
   padding: 1rem;
   background-color: rgb(92, 122, 101);
@@ -21,6 +21,7 @@ body {
   transition: all 0.2s;
   text-align:center;
   opacity: 0.6;
+  box-sizing: border-box;
 }
 
 .webGraffiti__editor_container {
@@ -42,6 +43,41 @@ body {
 .webGraffiti__editor:hover {
   bottom: 0;
   opacity: 1;
+}
+
+.webGraffiti__editor_brush {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 5rem;
+  height: 5rem;
+  background-color:rgba(255, 255, 255, 0.3);
+}
+
+.webGraffiti__editor_brush_inner {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.webGraffiti__editor_brush_preview {
+  border-radius: 50%;
+  margin: auto;
+  display: inline-block;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+}
+
+.webGraffiti_editor_brush_slider {
+  position: absolute;
+  right: calc(5rem + 4px);
+  top: 4px;
+  height: 4rem;
+  margin: 0;
+  padding: 0;
 }
 
 .webGraffiti__connection {

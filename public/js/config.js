@@ -6,6 +6,9 @@ export default class config {
     this.height = 720;
     this.doubleClick = 200;
     this.defaultAlpha = 1;
+    this.minBrushSize = 1;
+    this.maxBrushSize = 10;
+    this.defBrushSize = 1;
     this.mpServer = 'ws://localhost:8666';
   }
 

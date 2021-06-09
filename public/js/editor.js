@@ -19,7 +19,31 @@ export default class editor {
     this.colors.forEach((color, index) => {
       this.containerInner.append(this.setupButton(color, index));
     });
+    this.setupBrushTool();
     this.selectColor(0);
+  }
+
+  setupBrushTool() {
+    this.brushTool = document.createElement('div');
+    this.brushTool.className = 'webGraffiti__editor_brush';
+    this.brushToolInner = document.createElement('div');
+    this.brushToolInner.className = 'webGraffiti__editor_brush_inner';
+    this.brushTool.append(this.brushToolInner);
+    this.brushPreview = document.createElement('div');
+    this.brushPreview.className = 'webGraffiti__editor_brush_preview';
+    this.brushToolInner.append(this.brushPreview);
+    this.brushSlider = document.createElement('input');
+    this.brushSlider.className = 'webGraffiti_editor_brush_slider';
+    this.brushSlider.setAttribute('type', 'range');
+    this.brushSlider.setAttribute('orient', 'vertical');
+    this.brushSlider.setAttribute('min', this.wg.config.minBrushSize);
+    this.brushSlider.setAttribute('max', this.wg.config.maxBrushSize);
+    this.brushSlider.setAttribute('value', this.wg.config.defBrushSize);
+    this.brushSlider.addEventListener('input', (e) => {
+      this.setBrushSize(e.target.value);
+    });
+    this.brushToolInner.append(this.brushSlider);
+    this.containerInner.append(this.brushTool);
   }
 
   setupButton(buttonColor, index) {
@@ -63,9 +87,21 @@ export default class editor {
         button.classList.remove('webGraffiti__color--active');
       }
     });
+    this.updateBrushPreview();
+  }
+
+  setBrushSize(size) {
+    this.wg.client.setLineWidth(size);
+    this.updateBrushPreview();
   }
 
   disable() {
     this.disabled = true;
+  }
+
+  updateBrushPreview() {
+    this.brushPreview.style.backgroundColor = this.colors[this.selected];
+    this.brushPreview.style.width = `${this.wg.client.ctx.lineWidth}px`;
+    this.brushPreview.style.height = `${this.wg.client.ctx.lineWidth}px`;
   }
 }

@@ -6,7 +6,7 @@ export default class client {
     this.color = '';
     this.alpha = 1;
     this.ctx = {
-      lineWidth: 1,
+      lineWidth: this.wg.config.defBrushSize,
       lineCap: 'round',
       lineJoin: 'round',
     };
@@ -34,7 +34,12 @@ export default class client {
   }
 
   setLineWidth(width) {
-    this.ctx.lineWidth = width;
+    this.ctx.lineWidth =
+      width > this.wg.config.maxBrushSize
+        ? this.wg.config.maxBrushSize
+        : width < this.wg.config.minBrushSize
+        ? this.wg.config.minBrushSize
+        : width;
     this.syncContext();
   }
 }
