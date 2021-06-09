@@ -98,6 +98,17 @@ wsServer.on('request', function (request) {
     })
   );
 
+  clients
+    .filter((client) => client.id !== id)
+    .forEach((client) => {
+      connection.sendUTF(
+        JSON.stringify({
+          event: 'newClient',
+          id: client.id,
+        })
+      );
+    });
+
   broadcast(
     {
       event: 'newClient',
