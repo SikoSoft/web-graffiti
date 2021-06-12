@@ -1,3 +1,5 @@
+import magicNum from './magicNum.js';
+
 export default class render {
   constructor(wg) {
     this.wg = wg;
@@ -49,5 +51,20 @@ export default class render {
     this.ctx.stroke();
     this.ctx.closePath();
     this.setContext(this.wg.client);
+  }
+
+  getCursor() {
+    const color = this.wg.client.color;
+    const brushSize = this.wg.client.ctx.lineWidth;
+    const halfSize = brushSize * magicNum.HALF;
+    const rawCursor = `<svg viewBox="0 0 ${brushSize} ${brushSize}" xmlns="http://www.w3.org/2000/svg" width="${brushSize}px" height="${brushSize}px">
+      <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize}" fill="${color}" stroke="${color}"/>
+    </svg>`;
+    return btoa(rawCursor);
+  }
+
+  syncCursor() {
+    const halfSize = this.wg.client.ctx.lineWidth * magicNum.HALF;
+    this.canvas.style.cursor = `url('data:image/svg+xml;base64,${this.getCursor()}') ${halfSize} ${halfSize}, crosshair`;
   }
 }

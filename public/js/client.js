@@ -31,6 +31,7 @@ export default class client {
       Math.round(this.alpha * 255).toString(16) // eslint-disable-line
     );
     this.syncContext();
+    this.wg.render.syncCursor();
   }
 
   setLineWidth(width) {
@@ -41,5 +42,6 @@ export default class client {
         ? this.wg.config.minBrushSize
         : width;
     this.syncContext();
+    this.wg.render.syncCursor();
   }
 }
