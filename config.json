@@ -7,7 +7,7 @@
   "webSocketPort": 8666,
   "autoSave": 3600000,
   "doubleClick": 200,
-  "defaultAlpha": 0.75,
+  "defAlpha": 0.75,
   "minBrushSize": 1,
   "maxBrushSize": 50,
   "defBrushSize": 3,

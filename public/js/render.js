@@ -6,7 +6,6 @@ export default class render {
   }
 
   init() {
-    this.alpha = this.wg.config.defaultAlpha;
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'webGraffiti__canvas';
     this.wg.rootElement.append(this.canvas);

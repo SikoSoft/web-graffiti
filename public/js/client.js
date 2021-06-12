@@ -4,7 +4,7 @@ export default class client {
     this.id = id;
     this.connected = true;
     this.color = '';
-    this.alpha = 1;
+    this.alpha = this.wg.config.defAlpha;
     this.ctx = {
       lineWidth: this.wg.config.defBrushSize,
       lineCap: 'round',
@@ -26,10 +26,7 @@ export default class client {
 
   setColor(color) {
     this.color = color;
-    this.ctx.strokeStyle = color.replace(
-      /ff$/,
-      Math.round(this.alpha * 255).toString(16) // eslint-disable-line
-    );
+    this.ctx.strokeStyle = `${color}${Math.round(this.alpha * 255).toString(16)}` // eslint-disable-line
     this.syncContext();
     this.wg.render.syncCursor();
   }

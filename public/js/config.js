@@ -5,7 +5,7 @@ export default class config {
     this.width = 1280;
     this.height = 720;
     this.doubleClick = 200;
-    this.defaultAlpha = 1;
+    this.defAlpha = 1;
     this.minBrushSize = 1;
     this.maxBrushSize = 10;
     this.defBrushSize = 1;
