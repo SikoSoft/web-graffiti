@@ -160,6 +160,7 @@ wsServer.on('request', function (request) {
 
   connection.on('close', function () {
     console.log(`Client ${client.index} disconnected`);
+    clients.splice(clients.indexOf(client), 1);
     syncImage();
   });
 });
