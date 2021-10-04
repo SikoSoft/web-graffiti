@@ -5,6 +5,7 @@ import networkMonitor from './networkMonitor.js';
 import render from './render.js';
 import input from './input.js';
 import client from './client.js';
+import magicNum from './magicNum.js';
 
 export default class webGraffiti {
   constructor() {
@@ -23,10 +24,16 @@ export default class webGraffiti {
     this.useNetworkMonitor = true;
     this.useEditor = true;
     this.clients = [];
+    this.mode = magicNum.MODE_INTERACTIVE;
   }
 
   init(element) {
     this.rootElement = element;
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const params = Object.fromEntries(urlSearchParams.entries());
+    if (params.mode) {
+      this.setMode(parseInt(params.mode));
+    }
     this.run();
   }
 
@@ -55,8 +62,10 @@ export default class webGraffiti {
       this.socket
         .init()
         .then(() => {
-          this.editor.init();
-          this.input.init();
+          if (this.mode === magicNum.MODE_INTERACTIVE) {
+            this.editor.init();
+            this.input.init();
+          }
         })
         .catch((error) => {
           console.log(
@@ -94,5 +103,13 @@ export default class webGraffiti {
       }
       return client;
     });
+  }
+
+  setMode(mode) {
+    if (
+      [magicNum.MODE_INTERACTIVE, magicNum.MODE_SPECTATOR].indexOf(mode) > -1
+    ) {
+      this.mode = mode;
+    }
   }
 }
