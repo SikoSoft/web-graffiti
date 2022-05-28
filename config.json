@@ -1,11 +1,16 @@
 {
+  "server": {
+    "secure": false,
+    "secureKey": "",
+    "secureCert": "",
+    "webPort": 80,
+    "webSocketPort": 8666,
+    "autoSave": 3600000
+  },
   "imageName": "wall.png",
   "width": 2000,
   "height": 1200,
-  "mpServer": "ws://192.168.1.149:8666",
-  "webPort": 8000,
-  "webSocketPort": 8666,
-  "autoSave": 3600000,
+  "wsServer": "ws://localhost:8666",
   "doubleClick": 200,
   "defAlpha": 0.75,
   "minBrushSize": 1,
