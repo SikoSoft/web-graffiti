@@ -61,14 +61,14 @@ router.get("/config.json", (req, res) => {
 });
 app.use(router);
 
-const secureConfig = config.secure
+const secureConfig = config.server.secure
   ? {
-      key: fs.readFileSync(config.secureKey),
-      cert: fs.readFileSync(config.secureCert),
+      key: fs.readFileSync(config.server.secureKey),
+      cert: fs.readFileSync(config.server.secureCert),
     }
   : {};
 
-(config.secure ? https : http)
+(config.server.secure ? https : http)
   .createServer(secureConfig, app)
   .listen(config.server.webPort, () => {
     // eslint-disable-next-line
