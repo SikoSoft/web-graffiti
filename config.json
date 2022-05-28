@@ -8,7 +8,7 @@
     "autoSave": 3600000
   },
   "imageName": "wall.png",
-  "width": 2000,
+  "width": 1800,
   "height": 1200,
   "wsServer": "ws://localhost:8666",
   "doubleClick": 200,
