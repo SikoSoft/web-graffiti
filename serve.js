@@ -77,7 +77,9 @@ const secureConfig = config.server.secure
 
 // web socket
 
-const httpServer = http.createServer();
+const httpServer = config.server.secure
+  ? https.createServer(secureConfig)
+  : http.createServer();
 const wsServer = new webSocketServer({
   httpServer,
 });
