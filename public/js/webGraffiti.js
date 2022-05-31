@@ -1,15 +1,15 @@
-import config from './config.js';
-import editor from './editor.js';
-import socket from './socket.js';
-import networkMonitor from './networkMonitor.js';
-import render from './render.js';
-import input from './input.js';
-import client from './client.js';
-import magicNum from './magicNum.js';
+import config from "./config.js";
+import editor from "./editor.js";
+import socket from "./socket.js";
+import networkMonitor from "./networkMonitor.js";
+import render from "./render.js";
+import input from "./input.js";
+import client from "./client.js";
+import magicNum from "./magicNum.js";
 
 export default class webGraffiti {
   constructor() {
-    this.rootElement = '';
+    this.rootElement = "";
     this.config = new config(this);
     this.socket = new socket(this);
     this.editor = new editor(this);
@@ -19,21 +19,17 @@ export default class webGraffiti {
     this.chunkSize = 16;
     this.chunkMap = [];
     this.pixelMap = [];
-    this.name = '';
-    this.color = '';
+    this.name = "";
+    this.color = "";
     this.useNetworkMonitor = true;
     this.useEditor = true;
     this.clients = [];
     this.mode = magicNum.MODE_INTERACTIVE;
   }
 
-  init(element) {
+  init(element, mode = magicNum.MODE_INTERACTIVE) {
     this.rootElement = element;
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    if (params.mode) {
-      this.setMode(parseInt(params.mode));
-    }
+    this.setMode(mode);
     this.run();
   }
 
@@ -48,7 +44,7 @@ export default class webGraffiti {
           resolve();
         })
         .catch((error) => {
-          console.log('Encountered an error while loading!', error); // eslint-disable-line
+          console.log("Encountered an error while loading!", error); // eslint-disable-line
         });
     });
   }
@@ -69,7 +65,7 @@ export default class webGraffiti {
         })
         .catch((error) => {
           console.log(
-            'Encountered an error while establishing connection!',
+            "Encountered an error while establishing connection!",
             error
           );
         });
@@ -83,7 +79,7 @@ export default class webGraffiti {
   }
 
   getChunkHash(cx, cy) {
-    let chars = '';
+    let chars = "";
     for (let x = cx; x < cx + this.chunkSize; x++) {
       for (let y = cy; y < cy + this.chunkSize; y++) {
         chars += this.getPixel(x, y);

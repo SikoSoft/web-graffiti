@@ -1,14 +1,16 @@
-import { WebGraffitiCanvas } from "./web-graffiti-canvas.comp.js";
+//import { WebGraffitiCanvas } from "./web-graffiti-canvas.comp.js";
+import wg from "../js/webGraffiti.js";
 
 const props = { width: Number, height: Number };
 
 export class WebGraffiti extends HTMLElement {
   constructor() {
     super();
+    this.wg = new wg();
     this.props = {};
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(this.template().content.cloneNode(true));
-    this.canvas = this.shadowRoot.querySelector("web-graffiti-canvas");
+    this.rootElement = this.shadowRoot.querySelector(".web-graffiti");
   }
 
   static get observedAttributes() {
@@ -16,17 +18,14 @@ export class WebGraffiti extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log("connected");
-    //this.setupProps();
+    this.wg.init(this.rootElement, 0);
   }
 
-  disconnectedCallback() {
-    console.log("disconnected");
-  }
+  disconnectedCallback() {}
 
   attributeChangedCallback(name, oldValue, newValue) {
     console.log("attributeChanged", name, oldValue, newValue);
-    this.props[name] = this.formatProp(name, newValue);
+    //this.props[name] = this.formatProp(name, newValue);
   }
 
   formatProp(name, value) {
@@ -41,7 +40,7 @@ export class WebGraffiti extends HTMLElement {
   setupProps() {
     for (const propName of observedAttributes) {
       const value = this.getAttribute(propName);
-      console.log("setupProp", propName, value, this);
+      //console.log("setupProp", propName, value, this);
     }
   }
 
@@ -54,7 +53,6 @@ export class WebGraffiti extends HTMLElement {
   render() {
     return `
     <div class="web-graffiti">
-      <web-graffiti-canvas width="${this.props.width}" height="${this.props.height}"/>
     </div>
     `;
   }
