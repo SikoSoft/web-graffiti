@@ -1,14 +1,14 @@
-import { WebGraffitiCanvas } from "./web-graffiti-canvas.comp.js";
-
-const props = { width: Number, height: Number };
+import wg from "../js/webGraffiti.js";
+import config from "./config.js";
 
 export class WebGraffiti extends HTMLElement {
   constructor() {
     super();
-    this.props = {};
+    console.log("###############config", config);
+    this.wg = new wg();
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(this.template().content.cloneNode(true));
-    this.canvas = this.shadowRoot.querySelector("web-graffiti-canvas");
+    this.rootElement = this.shadowRoot.querySelector(".web-graffiti");
   }
 
   static get observedAttributes() {
@@ -16,32 +16,19 @@ export class WebGraffiti extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log("connected");
-    //this.setupProps();
+    this.wg.init(this.rootElement, config);
   }
 
-  disconnectedCallback() {
-    console.log("disconnected");
-  }
+  disconnectedCallback() {}
 
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log("attributeChanged", name, oldValue, newValue);
-    this.props[name] = this.formatProp(name, newValue);
-  }
-
-  formatProp(name, value) {
-    switch (props[name]) {
-      case Number:
-        return parseInt(value);
-      default:
-        return value;
+    if (this.wg.render.ready && name === "width") {
+      this.wg.config.width = parseInt(newValue);
+      this.wg.render.setWidth(newValue);
     }
-  }
-
-  setupProps() {
-    for (const propName of observedAttributes) {
-      const value = this.getAttribute(propName);
-      console.log("setupProp", propName, value, this);
+    if (this.wg.render.ready && name === "height") {
+      this.wg.config.height = parseInt(newValue);
+      this.wg.render.setHeight(newValue);
     }
   }
 
@@ -53,9 +40,12 @@ export class WebGraffiti extends HTMLElement {
 
   render() {
     return `
-    <div class="web-graffiti">
-      <web-graffiti-canvas width="${this.props.width}" height="${this.props.height}"/>
-    </div>
+    <style>
+      :host {
+        display: inline-block;
+      }
+    </style>
+    <div class="web-graffiti"></div>
     `;
   }
 }

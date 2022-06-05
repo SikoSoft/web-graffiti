@@ -42,6 +42,8 @@ export default class socket {
     switch (json.event) {
       case "welcome":
         this.wg.client.id = json.id;
+        this.wg.render.setActualWidth(json.width);
+        this.wg.render.setActualHeight(json.height);
         break;
       case "newClient":
         this.wg.registerClient(json.id);
@@ -59,11 +61,13 @@ export default class socket {
 
   setSentPerSecond(number) {
     this.sentPerSecond = number;
-    this.wg.networkMonitor.setSentPerSecond(number);
+    this.wg.useNetworkMonitor &&
+      this.wg.networkMonitor.setSentPerSecond(number);
   }
 
   setReceivedPerSecond(number) {
     this.receivedPerSecond = number;
-    this.wg.networkMonitor.setReceivedPerSecond(number);
+    this.wg.useNetworkMonitor &&
+      this.wg.networkMonitor.setReceivedPerSecond(number);
   }
 }

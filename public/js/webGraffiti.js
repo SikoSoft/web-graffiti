@@ -1,15 +1,15 @@
-import config from './config.js';
-import editor from './editor.js';
-import socket from './socket.js';
-import networkMonitor from './networkMonitor.js';
-import render from './render.js';
-import input from './input.js';
-import client from './client.js';
-import magicNum from './magicNum.js';
+import config from "./config.js";
+import editor from "./editor.js";
+import socket from "./socket.js";
+import networkMonitor from "./networkMonitor.js";
+import render from "./render.js";
+import input from "./input.js";
+import client from "./client.js";
+import magicNum from "./magicNum.js";
 
 export default class webGraffiti {
   constructor() {
-    this.rootElement = '';
+    this.rootElement = "";
     this.config = new config(this);
     this.socket = new socket(this);
     this.editor = new editor(this);
@@ -19,28 +19,24 @@ export default class webGraffiti {
     this.chunkSize = 16;
     this.chunkMap = [];
     this.pixelMap = [];
-    this.name = '';
-    this.color = '';
-    this.useNetworkMonitor = true;
+    this.name = "";
+    this.color = "";
+    this.useNetworkMonitor = false;
     this.useEditor = true;
     this.clients = [];
-    this.mode = magicNum.MODE_INTERACTIVE;
+    this.initiConfig = {};
   }
 
-  init(element) {
+  init(element, initConfig = {}) {
+    this.initConfig = initConfig;
     this.rootElement = element;
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const params = Object.fromEntries(urlSearchParams.entries());
-    if (params.mode) {
-      this.setMode(parseInt(params.mode));
-    }
     this.run();
   }
 
-  load() {
-    return new Promise((resolve) => {
+  async load() {
+    return new Promise((resolve, reject) => {
       this.config
-        .load()
+        .load(this.initConfig)
         .then(() => {
           return this.render.load();
         })
@@ -48,13 +44,16 @@ export default class webGraffiti {
           resolve();
         })
         .catch((error) => {
-          console.log('Encountered an error while loading!', error); // eslint-disable-line
+          console.log("Encountered an error while loading!", error); // eslint-disable-line
+          reject(error);
         });
     });
   }
 
   run() {
-    this.networkMonitor.init();
+    if (this.useNetworkMonitor) {
+      this.networkMonitor.init();
+    }
     this.load().then(() => {
       this.render.init();
       this.client = new client(this);
@@ -62,14 +61,14 @@ export default class webGraffiti {
       this.socket
         .init()
         .then(() => {
-          if (this.mode === magicNum.MODE_INTERACTIVE) {
+          if (this.config.mode === magicNum.MODE_INTERACTIVE) {
             this.editor.init();
             this.input.init();
           }
         })
         .catch((error) => {
           console.log(
-            'Encountered an error while establishing connection!',
+            "Encountered an error while establishing connection!",
             error
           );
         });
@@ -83,7 +82,7 @@ export default class webGraffiti {
   }
 
   getChunkHash(cx, cy) {
-    let chars = '';
+    let chars = "";
     for (let x = cx; x < cx + this.chunkSize; x++) {
       for (let y = cy; y < cy + this.chunkSize; y++) {
         chars += this.getPixel(x, y);
@@ -109,7 +108,7 @@ export default class webGraffiti {
     if (
       [magicNum.MODE_INTERACTIVE, magicNum.MODE_SPECTATOR].indexOf(mode) > -1
     ) {
-      this.mode = mode;
+      this.config.mode = mode;
     }
   }
 }
