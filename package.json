@@ -1,10 +1,13 @@
 {
   "name": "web-graffiti",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "serve.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon ./serve.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install",
+    "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +20,27 @@
   },
   "homepage": "https://github.com/SikoSoft/web-graffiti#readme",
   "dependencies": {
+    "canvas": "^2.8.0",
+    "express": "^4.17.1",
     "http": "0.0.1-security",
+    "path": "^0.12.7",
+    "spark-md5": "^3.0.1",
+    "uuid": "^8.3.2",
     "websocket": "^1.0.34"
+  },
+  "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
+    "eslint": "^7.27.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
+    "nodemon": "^2.0.16",
+    "prettier": "^2.3.0",
+    "rollup": "^2.75.4",
+    "rollup-plugin-terser": "^7.0.2"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
   }
 }

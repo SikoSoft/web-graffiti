@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Web Graffiti</title>
+    <link rel="stylesheet" type="text/css" href="css/webGraffiti.css" />
+    <script src="js/vanilla-picker.min.js"></script>
+    <script src="js/spark-md5.min.js"></script>
+    <script type="module">
+      import webGraffiti from './js/webGraffiti.js';
+      const wg = new webGraffiti();
+      window.wg = wg;
+      document.onreadystatechange = function () {
+        if (document.readyState === 'complete') {
+          wg.init(document.getElementById('webGraffiti'));
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <div id="webGraffiti"></div>
+  </body>
+</html>
