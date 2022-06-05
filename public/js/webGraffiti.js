@@ -24,19 +24,19 @@ export default class webGraffiti {
     this.useNetworkMonitor = true;
     this.useEditor = true;
     this.clients = [];
-    this.mode = magicNum.MODE_INTERACTIVE;
+    this.initiConfig = {};
   }
 
-  init(element, mode = magicNum.MODE_INTERACTIVE) {
+  init(element, initConfig = {}) {
+    this.initConfig = initConfig;
     this.rootElement = element;
-    this.setMode(mode);
     this.run();
   }
 
-  load() {
-    return new Promise((resolve) => {
+  async load() {
+    return new Promise((resolve, reject) => {
       this.config
-        .load()
+        .load(this.initConfig)
         .then(() => {
           return this.render.load();
         })
@@ -45,6 +45,7 @@ export default class webGraffiti {
         })
         .catch((error) => {
           console.log("Encountered an error while loading!", error); // eslint-disable-line
+          reject(error);
         });
     });
   }
