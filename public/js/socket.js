@@ -59,11 +59,13 @@ export default class socket {
 
   setSentPerSecond(number) {
     this.sentPerSecond = number;
-    this.wg.networkMonitor.setSentPerSecond(number);
+    this.wg.useNetworkMonitor &&
+      this.wg.networkMonitor.setSentPerSecond(number);
   }
 
   setReceivedPerSecond(number) {
     this.receivedPerSecond = number;
-    this.wg.networkMonitor.setReceivedPerSecond(number);
+    this.wg.useNetworkMonitor &&
+      this.wg.networkMonitor.setReceivedPerSecond(number);
   }
 }
