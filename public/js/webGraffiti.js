@@ -21,7 +21,7 @@ export default class webGraffiti {
     this.pixelMap = [];
     this.name = "";
     this.color = "";
-    this.useNetworkMonitor = true;
+    this.useNetworkMonitor = false;
     this.useEditor = true;
     this.clients = [];
     this.initiConfig = {};
@@ -51,7 +51,9 @@ export default class webGraffiti {
   }
 
   run() {
-    this.networkMonitor.init();
+    if (this.useNetworkMonitor) {
+      this.networkMonitor.init();
+    }
     this.load().then(() => {
       this.render.init();
       this.client = new client(this);
