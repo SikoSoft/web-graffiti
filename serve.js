@@ -53,6 +53,8 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, "/public")));
 
+app.use(express.static(path.join(__dirname, "/dist")));
+
 router.get("/config.json", (req, res) => {
   fs.readFile("./config.json", (error, data) => {
     const { server, ...config } = JSON.parse(data);

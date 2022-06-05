@@ -3,24 +3,8 @@
     <title>Web Graffiti</title>
     <link rel="stylesheet" type="text/css" href="css/webGraffiti.css" />
     <script type="module" src="components/web-graffiti.comp.js"></script>
-    <script>
-      document.onreadystatechange = async () => {
-        if (document.readyState === "complete") {
-          try {
-            const configResponse = await fetch("config.json");
-            const config = await configResponse.json();
-            const wg = document.querySelector("web-graffiti");
-            for (const configProp of Object.keys(config)) {
-              wg.setAttribute(configProp, config[configProp]);
-            }
-          } catch (error) {
-            console.log("uh oh, spaghetti o's!", error);
-          }
-        }
-      };
-    </script>
   </head>
   <body>
-    <web-graffiti server="" />
+    <web-graffiti server="" width="320" height="214"></web-graffiti>
   </body>
 </html>
