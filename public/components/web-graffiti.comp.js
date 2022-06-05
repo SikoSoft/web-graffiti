@@ -18,14 +18,23 @@ export class WebGraffiti extends HTMLElement {
   }
 
   connectedCallback() {
-    this.wg.init(this.rootElement, 0);
+    this.wg.init(this.rootElement, {
+      width: this.getAttribute("width"),
+      height: this.getAttribute("height"),
+    });
   }
 
   disconnectedCallback() {}
 
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log("attributeChanged", name, oldValue, newValue);
-    //this.props[name] = this.formatProp(name, newValue);
+    if (this.wg.render.ready && name === "width") {
+      this.wg.config.width = parseInt(newValue);
+      this.wg.render.setWidth(newValue);
+    }
+    if (this.wg.render.ready && name === "height") {
+      this.wg.config.height = parseInt(newValue);
+      this.wg.render.setHeight(newValue);
+    }
   }
 
   formatProp(name, value) {
@@ -52,8 +61,12 @@ export class WebGraffiti extends HTMLElement {
 
   render() {
     return `
-    <div class="web-graffiti">
-    </div>
+    <style>
+      :host {
+        display: inline-block;
+      }
+    </style>
+    <div class="web-graffiti"></div>
     `;
   }
 }

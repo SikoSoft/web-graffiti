@@ -1,18 +1,49 @@
-import magicNum from './magicNum.js';
+import magicNum from "./magicNum.js";
 
 export default class render {
   constructor(wg) {
     this.wg = wg;
+    this.resizeDebounce = 0;
+    this.ready = false;
   }
 
   init() {
-    this.canvas = document.createElement('canvas');
-    this.canvas.className = 'webGraffiti__canvas';
+    this.canvas = document.createElement("canvas");
+    this.canvas.className = "webGraffiti__canvas";
     this.wg.rootElement.append(this.canvas);
-    this.ctx = this.canvas.getContext('2d');
-    this.canvas.setAttribute('width', this.wg.config.width);
-    this.canvas.setAttribute('height', this.wg.config.height);
-    this.ctx.drawImage(this.image, 0, 0);
+    this.ctx = this.canvas.getContext("2d");
+    this.setWidth(this.wg.config.width);
+    this.setHeight(this.wg.config.height);
+    this.ready = true;
+  }
+
+  setWidth(width) {
+    this.canvas.setAttribute("width", width);
+    this.queueRedraw();
+  }
+
+  setHeight(height) {
+    this.canvas.setAttribute("height", height);
+    this.queueRedraw();
+  }
+
+  queueRedraw() {
+    if (this.resizeDebounce) {
+      clearTimeout(this.resizeDebounce);
+    }
+    this.resizeDebounce = setTimeout(() => {
+      this.drawImage();
+    }, 50);
+  }
+
+  drawImage() {
+    this.ctx.drawImage(
+      this.image,
+      0,
+      0,
+      this.wg.config.width,
+      this.wg.config.height
+    );
   }
 
   load() {
