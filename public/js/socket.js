@@ -42,6 +42,8 @@ export default class socket {
     switch (json.event) {
       case "welcome":
         this.wg.client.id = json.id;
+        this.wg.render.setActualWidth(json.width);
+        this.wg.render.setActualHeight(json.height);
         break;
       case "newClient":
         this.wg.registerClient(json.id);

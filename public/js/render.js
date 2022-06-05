@@ -5,6 +5,12 @@ export default class render {
     this.wg = wg;
     this.resizeDebounce = 0;
     this.ready = false;
+    this.width = 0;
+    this.height = 0;
+    this.actualWidth = 0;
+    this.actualHeight = 0;
+    this.xRatio = 1;
+    this.yRatio = 1;
   }
 
   init() {
@@ -17,14 +23,38 @@ export default class render {
     this.ready = true;
   }
 
+  setActualWidth(width) {
+    this.actualWidth = width;
+    this.syncXRatio();
+  }
+
+  setActualHeight(height) {
+    this.actualHeight = height;
+    this.syncYRatio();
+  }
+
   setWidth(width) {
+    this.width = width;
     this.canvas.setAttribute("width", width);
+    this.syncXRatio();
     this.queueRedraw();
   }
 
   setHeight(height) {
+    this.height = height;
     this.canvas.setAttribute("height", height);
+    this.syncYRatio();
     this.queueRedraw();
+  }
+
+  syncXRatio() {
+    this.xRatio =
+      this.width && this.actualWidth ? this.width / this.actualWidth : 1;
+  }
+
+  syncYRatio() {
+    this.yRatio =
+      this.height && this.actualHeight ? this.height / this.actualHeight : 1;
   }
 
   queueRedraw() {
@@ -74,10 +104,11 @@ export default class render {
   }
 
   drawLine([x1, y1, x2, y2], context) {
+    context.lineWidth = context.lineWidth * Math.max(this.xRatio, this.yRatio);
     this.setContext(context);
     this.ctx.beginPath();
-    this.ctx.moveTo(x1, y1);
-    this.ctx.lineTo(x2, y2);
+    this.ctx.moveTo(x1 * this.xRatio, y1 * this.yRatio);
+    this.ctx.lineTo(x2 * this.xRatio, y2 * this.yRatio);
     this.ctx.stroke();
     this.ctx.closePath();
     this.setContext(this.wg.client);

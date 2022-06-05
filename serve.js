@@ -111,6 +111,8 @@ wsServer.on("request", function (request) {
     JSON.stringify({
       event: "welcome",
       id,
+      width: config.width,
+      height: config.height,
     })
   );
 

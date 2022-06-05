@@ -10,7 +10,7 @@
   "imageName": "wall.png",
   "width": 1800,
   "height": 1200,
-  "webServer": "https://drawonmywall.live",
+  "webServer": "http://localhost",
   "wsServer": "ws://localhost:8666",
   "doubleClick": 200,
   "defAlpha": 0.75,
