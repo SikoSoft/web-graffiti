@@ -1,13 +1,11 @@
-//import { WebGraffitiCanvas } from "./web-graffiti-canvas.comp.js";
 import wg from "../js/webGraffiti.js";
-
-const props = { width: Number, height: Number };
+import config from "./config.js";
 
 export class WebGraffiti extends HTMLElement {
   constructor() {
     super();
+    console.log("###############config", config);
     this.wg = new wg();
-    this.props = {};
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(this.template().content.cloneNode(true));
     this.rootElement = this.shadowRoot.querySelector(".web-graffiti");
@@ -18,10 +16,7 @@ export class WebGraffiti extends HTMLElement {
   }
 
   connectedCallback() {
-    this.wg.init(this.rootElement, {
-      width: this.getAttribute("width"),
-      height: this.getAttribute("height"),
-    });
+    this.wg.init(this.rootElement, config);
   }
 
   disconnectedCallback() {}
@@ -34,22 +29,6 @@ export class WebGraffiti extends HTMLElement {
     if (this.wg.render.ready && name === "height") {
       this.wg.config.height = parseInt(newValue);
       this.wg.render.setHeight(newValue);
-    }
-  }
-
-  formatProp(name, value) {
-    switch (props[name]) {
-      case Number:
-        return parseInt(value);
-      default:
-        return value;
-    }
-  }
-
-  setupProps() {
-    for (const propName of observedAttributes) {
-      const value = this.getAttribute(propName);
-      //console.log("setupProp", propName, value, this);
     }
   }
 

@@ -61,7 +61,7 @@ export default class webGraffiti {
       this.socket
         .init()
         .then(() => {
-          if (this.mode === magicNum.MODE_INTERACTIVE) {
+          if (this.config.mode === magicNum.MODE_INTERACTIVE) {
             this.editor.init();
             this.input.init();
           }
@@ -108,7 +108,7 @@ export default class webGraffiti {
     if (
       [magicNum.MODE_INTERACTIVE, magicNum.MODE_SPECTATOR].indexOf(mode) > -1
     ) {
-      this.mode = mode;
+      this.config.mode = mode;
     }
   }
 }

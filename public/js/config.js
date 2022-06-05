@@ -11,7 +11,7 @@ export default class config {
     this.minBrushSize = 1;
     this.maxBrushSize = 10;
     this.defBrushSize = 1;
-    this.mpServer = "ws://localhost:8666";
+    this.wsServer = "ws://localhost:8666";
     this.mode = magicNum.MODE_INTERACTIVE;
     this.allowedInitOverrides = ["width", "height", "mode"];
   }
@@ -28,7 +28,11 @@ export default class config {
     return this.allowedInitOverrides.indexOf(key) > -1;
   }
 
-  load(initConfig = {}) {
+  async load(initConfig = {}) {
+    if (Object.keys(initConfig).length) {
+      this.process(initConfig);
+      return;
+    }
     return new Promise((resolve, reject) => {
       fetch("config.json")
         .then((response) => response.json())

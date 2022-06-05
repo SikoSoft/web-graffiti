@@ -57,7 +57,7 @@ export default class render {
   loadImage() {
     return new Promise((resolve, reject) => {
       this.image = new Image();
-      this.image.src = this.wg.config.imageName;
+      this.image.src = `${this.wg.config.webServer}/${this.wg.config.imageName}`;
       this.image.onload = () => {
         resolve();
       };
