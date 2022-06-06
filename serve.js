@@ -182,6 +182,9 @@ wsServer.on("request", function (request) {
         }
         case "line": {
           const [x1, y1, x2, y2] = json.line;
+          for (const key in connection.client.ctx) {
+            ctx[key] = connection.client.ctx[key];
+          }
           ctx.beginPath();
           ctx.moveTo(x1, y1);
           ctx.lineTo(x2, y2);
