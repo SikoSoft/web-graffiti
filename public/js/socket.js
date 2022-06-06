@@ -47,6 +47,9 @@ export default class socket {
         break;
       case "newClient":
         this.wg.registerClient(json.id);
+        if (json.ctx) {
+          this.wg.setClientContext(json.id, json.ctx);
+        }
         break;
       case "setContext":
         this.wg.setClientContext(json.id, json.ctx);

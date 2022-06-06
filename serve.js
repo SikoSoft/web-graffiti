@@ -148,6 +148,7 @@ wsServer.on("request", function (request) {
         JSON.stringify({
           event: "newClient",
           id: client.id,
+          ctx: client.ctx,
         })
       );
     });
