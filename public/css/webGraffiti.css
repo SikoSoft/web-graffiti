@@ -1,3 +1,7 @@
+:root {
+  --loader-light: #fff;
+}
+
 body {
   background-color: #000;
   margin: 0;
@@ -5,8 +9,74 @@ body {
   overflow: hidden;
 }
 
+.webGraffiti {
+  position: relative;
+}
+
 .webGraffiti__canvas {
   background-color: #fff;
+}
+
+.webGraffiti__loader {
+  position: absolute;
+  z-index: 10;
+  background-color: #456;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: space-around;
+}
+
+.webGraffiti__loader--shown {
+  display: flex;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(2);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.webGraffiti__loader_spinner {
+  position: relative;
+  align-self: center;
+  transform: translateY(-50%);
+}
+
+.webGraffiti__loader_spinner:before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  border: 6px solid #f66;
+  border-top-color: #ee0;
+  border-right-color: #6dd;
+  border-bottom-color: #09f;
+  animation: spinner 1.6s linear infinite;
+}
+
+.webGraffiti__loader_spinner:after {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid #f6f;
+  border-top-color: #0e0;
+  border-right-color: #0dd;
+  border-bottom-color: #f90;
+  animation: spinner 1.8s linear infinite;
 }
 
 .webGraffiti__editor {
@@ -18,7 +88,7 @@ body {
   background-color: rgb(92, 122, 101);
   border-top: 5px rgb(49, 66, 54) solid;
   transition: all 0.2s;
-  text-align:center;
+  text-align: center;
   opacity: 0.6;
   box-sizing: border-box;
 }
@@ -50,7 +120,7 @@ body {
   top: 0;
   width: 5rem;
   height: 5rem;
-  background-color:rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .webGraffiti__editor_brush_inner {
@@ -129,19 +199,19 @@ body {
 
 .webGraffiti__network_monitor_sent_per_second::after,
 .webGraffiti__network_monitor_received_per_second_value::after {
-  content: 'messages/s';
+  content: "messages/s";
   margin-left: 1rem;
   vertical-align: middle;
 }
 
 .webGraffiti__network_monitor_sent_per_second::before {
-  content: 'sent';
+  content: "sent";
   margin-right: 1rem;
   vertical-align: middle;
 }
 
 .webGraffiti__network_monitor_received_per_second::before {
-  content: 'received';
+  content: "received";
   margin-right: 1rem;
   vertical-align: middle;
 }

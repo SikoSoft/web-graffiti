@@ -3,6 +3,7 @@ import editor from "./editor.js";
 import socket from "./socket.js";
 import networkMonitor from "./networkMonitor.js";
 import render from "./render.js";
+import loader from "./loader.js";
 import input from "./input.js";
 import client from "./client.js";
 import magicNum from "./magicNum.js";
@@ -15,6 +16,7 @@ export default class webGraffiti {
     this.editor = new editor(this);
     this.networkMonitor = new networkMonitor(this);
     this.render = new render(this);
+    this.loader = new loader(this);
     this.input = new input(this);
     this.chunkSize = 16;
     this.chunkMap = [];
@@ -30,6 +32,7 @@ export default class webGraffiti {
   init(element, initConfig = {}) {
     this.initConfig = initConfig;
     this.rootElement = element;
+    this.rootElement.classList.add("webGraffiti");
     this.run();
   }
 
@@ -37,6 +40,9 @@ export default class webGraffiti {
     return new Promise((resolve, reject) => {
       this.config
         .load(this.initConfig)
+        .then(() => {
+          return this.loader.init();
+        })
         .then(() => {
           return this.render.load();
         })

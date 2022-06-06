@@ -1,3 +1,4 @@
+import loader from "./loader.js";
 import magicNum from "./magicNum.js";
 
 export default class render {
@@ -77,8 +78,10 @@ export default class render {
   }
 
   load() {
+    this.wg.loader.show();
     return new Promise((resolve) => {
       this.loadImage().then(() => {
+        this.wg.loader.hide();
         resolve();
       });
     });
