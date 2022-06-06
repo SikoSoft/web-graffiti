@@ -96,6 +96,9 @@ export default class webGraffiti {
   }
 
   setClientContext(id, context) {
+    if (context.lineWidth) {
+      context.lineWidth = parseInt(context.lineWidth);
+    }
     this.clients.map((client) => {
       if (id === client.id) {
         client.ctx = context;

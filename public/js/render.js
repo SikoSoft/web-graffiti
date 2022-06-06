@@ -103,15 +103,16 @@ export default class render {
     }
   }
 
-  drawLine([x1, y1, x2, y2], context) {
-    context.lineWidth = context.lineWidth * Math.max(this.xRatio, this.yRatio);
-    this.setContext(context);
+  drawLine([x1, y1, x2, y2], ctx) {
+    const newCtx = { ...ctx };
+    newCtx.lineWidth = newCtx.lineWidth * Math.max(this.xRatio, this.yRatio);
+    this.setContext(newCtx);
     this.ctx.beginPath();
     this.ctx.moveTo(x1 * this.xRatio, y1 * this.yRatio);
     this.ctx.lineTo(x2 * this.xRatio, y2 * this.yRatio);
     this.ctx.stroke();
     this.ctx.closePath();
-    this.setContext(this.wg.client);
+    this.setContext(this.wg.client.ctx);
   }
 
   getCursor() {
