@@ -60,9 +60,10 @@ export default class editor {
         editor: false,
         popup: "top",
         onDone: (color) => {
-          button.setAttribute("data-color", color.hex);
-          button.style.backgroundColor = color.hex;
-          this.colors[index] = color.hex;
+          const hexValue = color.hex.substr(0, 7);
+          button.setAttribute("data-color", hexValue);
+          button.style.backgroundColor = hexValue;
+          this.colors[index] = hexValue;
           this.selectColor(index);
         },
       });
