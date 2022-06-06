@@ -12,6 +12,8 @@ const SparkMD5 = require("spark-md5");
 
 console.log("Starting WebGraffiti...");
 
+// initialization, callbacks & handlers
+
 let lastHash = "";
 const clients = [];
 
@@ -20,21 +22,40 @@ const ctx = canvas.getContext("2d");
 
 ctx.lineWidth = 100;
 
-loadImage(`public/${config.imageName}`).then((image) => {
-  ctx.drawImage(image, 0, 0);
-  lastHash = SparkMD5.hash(canvas.toBuffer("image/png"));
-});
+const load = () => {
+  loadImage(`public/${config.imageName}`)
+    .then((image) => {
+      ctx.drawImage(image, 0, 0);
+      lastHash = SparkMD5.hash(canvas.toBuffer("image/png"));
+      console.log("Initialized image context");
+    })
+    .catch((error) => {
+      console.log("Error opening image");
+      restore();
+    });
+};
 
-const saveImage = (buffer, hash) => {
+const restore = () => {
+  fs.copyFile(`public/new-wall.png`, `public/${config.imageName}`, (error) => {
+    if (error) {
+      console.log("There was a problem restoring the wall");
+    } else {
+      console.log("Wall was missing, but has been restored");
+      load();
+    }
+  });
+};
+
+const save = (buffer, hash) => {
   lastHash = hash;
   fs.writeFileSync(`public/${config.imageName}`, buffer);
 };
 
-const syncImage = () => {
+const sync = () => {
   const buffer = canvas.toBuffer("image/png");
   const hash = SparkMD5.hash(buffer);
   if (hash !== lastHash) {
-    saveImage(buffer, hash);
+    save(buffer, hash);
   }
 };
 
@@ -45,6 +66,10 @@ const broadcast = (message, ignoreClientId = "") => {
       client.connection.sendUTF(JSON.stringify(message));
     });
 };
+
+// prepare the image
+
+load();
 
 // web server
 
@@ -179,7 +204,7 @@ wsServer.on("request", function (request) {
   connection.on("close", function () {
     console.log(`Client ${client.index} disconnected`);
     clients.splice(clients.indexOf(client), 1);
-    syncImage();
+    sync();
   });
 });
 
@@ -189,4 +214,4 @@ httpServer.listen(config.server.webSocketPort, function () {
   );
 });
 
-setInterval(syncImage, config.server.autoSave);
+setInterval(sync, config.server.autoSave);

@@ -4,7 +4,6 @@ import config from "./config.js";
 export class WebGraffiti extends HTMLElement {
   constructor() {
     super();
-    console.log("###############config", config);
     this.wg = new wg();
     this.attachShadow({ mode: "open" });
     this.shadowRoot.appendChild(this.template().content.cloneNode(true));
