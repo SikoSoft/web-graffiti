@@ -11,13 +11,16 @@ export default class editor {
     this.container.className = "webGraffiti__editor";
     this.containerInner = document.createElement("div");
     this.containerInner.className = "webGraffiti__editor_inner";
+    this.palette = document.createElement("div");
+    this.palette.className = "webGraffiti__editor_palette";
+    this.containerInner.append(this.palette);
     this.container.append(this.containerInner);
     this.wg.rootElement.append(this.container);
     this.handle = document.createElement("div");
     this.handle.className = "webGraffiti__editor_handle";
     this.containerInner.append(this.handle);
     this.colors.forEach((color, index) => {
-      this.containerInner.append(this.setupButton(color, index));
+      this.palette.append(this.setupButton(color, index));
     });
     this.setupBrushTool();
     this.selectColor(0);
