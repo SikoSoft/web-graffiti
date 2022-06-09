@@ -130,6 +130,7 @@ body {
 .webGraffiti__editor_palette {
   flex-grow: 8;
   width: 80%;
+  padding: 8px;
   overflow-y: hidden;
   overflow-x: auto;
 }
