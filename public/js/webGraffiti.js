@@ -27,6 +27,8 @@ export default class webGraffiti {
     this.useEditor = true;
     this.clients = [];
     this.initiConfig = {};
+    this.panOffset = { x: 0, y: 0 };
+    this.minOffset = { x: 0, y: 0 };
   }
 
   init(element, initConfig = {}) {
@@ -119,5 +121,27 @@ export default class webGraffiti {
     ) {
       this.config.mode = mode;
     }
+  }
+
+  panX(x) {
+    this.panOffset.x += x;
+    if (this.panOffset.x >= 0) {
+      this.panOffset.x = 0;
+    }
+    if (this.panOffset.x < this.minOffset.x) {
+      this.panOffset.x = this.minOffset.x;
+    }
+    this.render.canvas.style.marginLeft = this.panOffset.x;
+  }
+
+  panY(y) {
+    this.panOffset.y += y;
+    if (this.panOffset.y >= 0) {
+      this.panOffset.y = 0;
+    }
+    if (this.panOffset.y < this.minOffset.y) {
+      this.panOffset.y = this.minOffset.y;
+    }
+    this.render.canvas.style.marginTop = this.panOffset.y;
   }
 }

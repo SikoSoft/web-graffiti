@@ -26,11 +26,13 @@ export default class render {
 
   setActualWidth(width) {
     this.actualWidth = width;
+    this.wg.minOffset.x = 0 - (width - window.innerWidth);
     this.syncXRatio();
   }
 
   setActualHeight(height) {
     this.actualHeight = height;
+    this.wg.minOffset.y = 0 - (height - window.innerHeight);
     this.syncYRatio();
   }
 

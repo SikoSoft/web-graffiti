@@ -10,6 +10,7 @@ export default class input {
     this.lastClickTime = 0;
     this.lastClickNode = "";
     this.doubleClick = false;
+    this.multiGesture = false;
   }
 
   init() {
@@ -34,6 +35,7 @@ export default class input {
     this.wg.render.canvas.addEventListener(
       "mousedown",
       (e) => {
+        //this.multiGesture = false;
         this.handleDown(e);
       },
       false
@@ -60,7 +62,12 @@ export default class input {
     this.wg.render.canvas.addEventListener(
       "touchstart",
       (e) => {
-        console.log(e.changedTouches);
+        if (e.targetTouches.length > 1) {
+          this.multiGesture = true;
+        } else {
+          this.multiGesture = false;
+        }
+        this.wg.editor.handle.innerHTML = e.targetTouches.length;
         let touch = e.touches[0];
         let mouseEvent = new MouseEvent("mousedown", {
           clientX: touch.clientX,
@@ -116,17 +123,22 @@ export default class input {
   handleMove(e) {
     if (this.mouseDown) {
       this.updateMouse(e);
-      const line = [
-        this.latestPoint.x,
-        this.latestPoint.y,
-        this.mouse.x,
-        this.mouse.y,
-      ];
-      this.wg.render.drawLine(line, this.wg.client.ctx);
-      this.wg.socket.sendMessage({
-        event: "line",
-        line,
-      });
+      if (this.multiGesture) {
+        this.wg.panX(this.mouse.x - this.latestPoint.x);
+        this.wg.panY(this.mouse.y - this.latestPoint.y);
+      } else {
+        const line = [
+          this.latestPoint.x,
+          this.latestPoint.y,
+          this.mouse.x,
+          this.mouse.y,
+        ];
+        this.wg.render.drawLine(line, this.wg.client.ctx);
+        this.wg.socket.sendMessage({
+          event: "line",
+          line,
+        });
+      }
       this.latestPoint = {
         x: this.mouse.x,
         y: this.mouse.y,
