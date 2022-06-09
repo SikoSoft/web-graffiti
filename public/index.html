@@ -1,16 +1,20 @@
 <html>
   <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
     <title>Web Graffiti</title>
     <link rel="stylesheet" type="text/css" href="css/webGraffiti.css" />
     <script src="js/vanilla-picker.min.js"></script>
     <script src="js/spark-md5.min.js"></script>
     <script type="module">
-      import webGraffiti from './js/webGraffiti.js';
+      import webGraffiti from "./js/webGraffiti.js";
       const wg = new webGraffiti();
       window.wg = wg;
       document.onreadystatechange = function () {
-        if (document.readyState === 'complete') {
-          wg.init(document.getElementById('webGraffiti'));
+        if (document.readyState === "complete") {
+          wg.init(document.getElementById("webGraffiti"));
         }
       };
     </script>
