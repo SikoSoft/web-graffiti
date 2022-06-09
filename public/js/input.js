@@ -8,7 +8,7 @@ export default class input {
     };
     this.mouseDown = false;
     this.lastClickTime = 0;
-    this.lastClickNode = '';
+    this.lastClickNode = "";
     this.doubleClick = false;
   }
 
@@ -18,7 +18,7 @@ export default class input {
   }
 
   setupMouseEvents() {
-    document.addEventListener('mousedown', (e) => {
+    document.addEventListener("mousedown", (e) => {
       if (
         Date.now() - this.lastClickTime < this.wg.config.doubleClick &&
         this.lastClickNode === e.target
@@ -32,7 +32,7 @@ export default class input {
     });
 
     this.wg.render.canvas.addEventListener(
-      'mousedown',
+      "mousedown",
       (e) => {
         this.handleDown(e);
       },
@@ -40,7 +40,7 @@ export default class input {
     );
 
     this.wg.render.canvas.addEventListener(
-      'mousemove',
+      "mousemove",
       (e) => {
         this.handleMove(e);
       },
@@ -48,7 +48,7 @@ export default class input {
     );
 
     document.addEventListener(
-      'mouseup',
+      "mouseup",
       () => {
         this.handleUp();
       },
@@ -58,10 +58,11 @@ export default class input {
 
   setupTouchEvents() {
     this.wg.render.canvas.addEventListener(
-      'touchstart',
+      "touchstart",
       (e) => {
+        console.log(e.changedTouches);
         let touch = e.touches[0];
-        let mouseEvent = new MouseEvent('mousedown', {
+        let mouseEvent = new MouseEvent("mousedown", {
           clientX: touch.clientX,
           clientY: touch.clientY,
         });
@@ -72,10 +73,10 @@ export default class input {
     );
 
     this.wg.render.canvas.addEventListener(
-      'touchmove',
+      "touchmove",
       (e) => {
         let touch = e.touches[0];
-        let mouseEvent = new MouseEvent('mousemove', {
+        let mouseEvent = new MouseEvent("mousemove", {
           clientX: touch.clientX,
           clientY: touch.clientY,
         });
@@ -86,11 +87,13 @@ export default class input {
     );
 
     document.addEventListener(
-      'touchend',
+      "touchend",
       (e) => {
-        let mouseEvent = new MouseEvent('mouseup', {});
+        let mouseEvent = new MouseEvent("mouseup", {});
         this.wg.render.canvas.dispatchEvent(mouseEvent);
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
       },
       false
     );
@@ -121,7 +124,7 @@ export default class input {
       ];
       this.wg.render.drawLine(line, this.wg.client.ctx);
       this.wg.socket.sendMessage({
-        event: 'line',
+        event: "line",
         line,
       });
       this.latestPoint = {
