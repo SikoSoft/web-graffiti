@@ -107,6 +107,8 @@ export default class input {
   }
 
   updateMouse(e) {
+    this.mouse.pageX = e.pageX;
+    this.mouse.pageY = e.pageY;
     this.mouse.x = e.pageX - this.wg.render.canvas.offsetLeft;
     this.mouse.y = e.pageY - this.wg.render.canvas.offsetTop;
   }
@@ -115,6 +117,8 @@ export default class input {
     this.mouseDown = true;
     this.updateMouse(e);
     this.latestPoint = {
+      pageX: this.mouse.pageX,
+      pageY: this.mouse.pageY,
       x: this.mouse.x,
       y: this.mouse.y,
     };
@@ -124,8 +128,8 @@ export default class input {
     if (this.mouseDown) {
       this.updateMouse(e);
       if (this.multiGesture) {
-        this.wg.panX(this.mouse.x - this.latestPoint.x);
-        this.wg.panY(this.mouse.y - this.latestPoint.y);
+        this.wg.panX(this.mouse.pageX - this.latestPoint.pageX);
+        this.wg.panY(this.mouse.pageY - this.latestPoint.pageY);
       } else {
         const line = [
           this.latestPoint.x,
@@ -140,6 +144,8 @@ export default class input {
         });
       }
       this.latestPoint = {
+        pageX: this.mouse.pageX,
+        pageY: this.mouse.pageY,
         x: this.mouse.x,
         y: this.mouse.y,
       };
