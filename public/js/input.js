@@ -137,11 +137,14 @@ export default class input {
           this.mouse.x,
           this.mouse.y,
         ];
-        this.wg.render.drawLine(line, this.wg.client.ctx);
-        this.wg.socket.sendMessage({
-          event: "line",
-          line,
-        });
+        const paintNeeded = this.wg.client.ctx.lineWidth * Math.PI;
+        if (this.wg.client.paint - paintNeeded > 0) {
+          this.wg.render.drawLine(line, this.wg.client.ctx);
+          this.wg.socket.sendMessage({
+            event: "line",
+            line,
+          });
+        }
       }
       this.latestPoint = {
         pageX: this.mouse.pageX,

@@ -2,19 +2,21 @@ export default class client {
   constructor(wg, id) {
     this.wg = wg;
     this.id = id;
+    this.delta = 0;
     this.connected = true;
-    this.color = '';
+    this.paint = 10000;
+    this.color = "";
     this.alpha = this.wg.config.defAlpha;
     this.ctx = {
       lineWidth: this.wg.config.defBrushSize,
-      lineCap: 'round',
-      lineJoin: 'round',
+      lineCap: "round",
+      lineJoin: "round",
     };
   }
 
   syncContext() {
     this.wg.socket.sendMessage({
-      event: 'setContext',
+      event: "setContext",
       ctx: this.ctx,
     });
   }
@@ -26,7 +28,9 @@ export default class client {
 
   setColor(color) {
     this.color = color;
-    this.ctx.strokeStyle = `${color}${Math.round(this.alpha * 255).toString(16)}` // eslint-disable-line
+    this.ctx.strokeStyle = `${color}${Math.round(this.alpha * 255).toString(
+      16
+    )}`; // eslint-disable-line
     this.syncContext();
     this.wg.render.syncCursor();
   }
@@ -40,5 +44,17 @@ export default class client {
         : width;
     this.syncContext();
     this.wg.render.syncCursor();
+  }
+
+  adjustPaint(amount) {
+    this.paint += amount;
+  }
+
+  setPaint(paint) {
+    this.paint = paint;
+  }
+
+  setDelta(delta) {
+    this.delta = delta;
   }
 }

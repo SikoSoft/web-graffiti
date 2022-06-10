@@ -42,6 +42,8 @@ export default class socket {
     switch (json.event) {
       case "welcome":
         this.wg.client.id = json.id;
+        this.wg.client.setPaint(json.paint);
+        this.wg.client.setDelta(Date.now() - json.join);
         this.wg.render.setActualWidth(json.width);
         this.wg.render.setActualHeight(json.height);
         break;
@@ -59,6 +61,10 @@ export default class socket {
           json.line,
           this.wg.clients.filter((client) => client.id === json.id)[0].ctx
         );
+        break;
+      case "paint":
+        this.wg.client.setPaint(json.paint);
+        break;
     }
   }
 

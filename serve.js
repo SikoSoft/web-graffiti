@@ -115,12 +115,14 @@ wsServer.on("request", function (request) {
   const id = v4();
 
   const connection = request.accept(null, request.origin);
+  const joinTime = Math.round(new Date().getTime());
   const client = {
     id,
     index: clients.length,
     connection,
     ip: request.remoteAddress,
-    join: Math.round(new Date().getTime() / 1000),
+    join: joinTime,
+    paint: config.paintVolume,
     ctx: {},
   };
   clients.push(client);
@@ -138,6 +140,8 @@ wsServer.on("request", function (request) {
       id,
       width: config.width,
       height: config.height,
+      paint: connection.client.paint,
+      join: connection.client.join,
     })
   );
 
@@ -186,19 +190,35 @@ wsServer.on("request", function (request) {
           for (const key in connection.client.ctx) {
             ctx[key] = connection.client.ctx[key];
           }
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.stroke();
-          ctx.closePath();
-          broadcast(
-            {
-              event: "line",
-              id,
-              line: json.line,
-            },
-            id
-          );
+          const paintUsed = ctx.lineWidth * Math.PI;
+          let newVolume = connection.client.paint - paintUsed;
+          let exceeded = false;
+          if (newVolume < 0) {
+            newVolume = 0;
+            exceeded = true;
+          }
+          if (!exceeded) {
+            connection.client.paint = newVolume;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.closePath();
+            connection.sendUTF(
+              JSON.stringify({
+                event: "paint",
+                paint: newVolume,
+              })
+            );
+            broadcast(
+              {
+                event: "line",
+                id,
+                line: json.line,
+              },
+              id
+            );
+          }
           break;
         }
       }
@@ -219,3 +239,20 @@ httpServer.listen(config.server.webSocketPort, function () {
 });
 
 setInterval(sync, config.server.autoSave);
+
+const paintPerTick =
+  (config.server.paintRefill / config.paintTime) * config.paintVolume;
+setInterval(() => {
+  clients.forEach((client) => {
+    if (client.paint < config.paintVolume) {
+      const newPaint =
+        client.paint + paintPerTick < config.paintVolume
+          ? client.paint + paintPerTick
+          : config.paintVolume;
+      client.paint = newPaint;
+      client.connection.sendUTF(
+        JSON.stringify({ event: "paint", paint: client.paint })
+      );
+    }
+  });
+}, config.server.paintRefill);
