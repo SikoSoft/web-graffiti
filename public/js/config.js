@@ -12,6 +12,8 @@ export default class config {
     this.maxBrushSize = 10;
     this.defBrushSize = 1;
     this.wsServer = "ws://localhost:8666";
+    this.paintVolume = 10000;
+    this.paintTime = 30000;
     this.mode = magicNum.MODE_INTERACTIVE;
     this.allowedInitOverrides = ["width", "height", "mode"];
   }

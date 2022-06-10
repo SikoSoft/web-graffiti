@@ -11,6 +11,9 @@ export default class editor {
     this.container.className = "webGraffiti__editor";
     this.containerInner = document.createElement("div");
     this.containerInner.className = "webGraffiti__editor_inner";
+    this.paintMeter = document.createElement("div");
+    this.paintMeter.className = "webGraffiti__editor_paint_meter";
+    this.containerInner.append(this.paintMeter);
     this.palette = document.createElement("div");
     this.palette.className = "webGraffiti__editor_palette";
     this.containerInner.append(this.palette);
@@ -22,8 +25,15 @@ export default class editor {
     this.colors.forEach((color, index) => {
       this.palette.append(this.setupButton(color, index));
     });
+    this.setupPaintMeter();
     this.setupBrushTool();
     this.selectColor(0);
+  }
+
+  setupPaintMeter() {
+    this.paintRemaining = document.createElement("div");
+    this.paintRemaining.className = "webGraffiti__editor_paint_remaining";
+    this.paintMeter.append(this.paintRemaining);
   }
 
   setupBrushTool() {
@@ -94,6 +104,7 @@ export default class editor {
       }
     });
     this.updateBrushPreview();
+    this.paintRemaining.style.backgroundColor = this.colors[this.selected];
   }
 
   setBrushSize(size) {
@@ -109,5 +120,10 @@ export default class editor {
     this.brushPreview.style.backgroundColor = this.colors[this.selected];
     this.brushPreview.style.width = `${this.wg.client.ctx.lineWidth}px`;
     this.brushPreview.style.height = `${this.wg.client.ctx.lineWidth}px`;
+  }
+
+  updatePaintMeter() {
+    const height = (this.wg.client.paint / this.wg.config.paintVolume) * 100;
+    this.paintRemaining.style.height = `${height}%`;
   }
 }

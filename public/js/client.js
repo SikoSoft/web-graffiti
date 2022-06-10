@@ -52,6 +52,7 @@ export default class client {
 
   setPaint(paint) {
     this.paint = paint;
+    this.wg.editor.updatePaintMeter();
   }
 
   setDelta(delta) {
