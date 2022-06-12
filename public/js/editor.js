@@ -50,6 +50,9 @@ export default class editor {
     this.paintRemaining = document.createElement("div");
     this.paintRemaining.className = "webGraffiti__editor_paint_remaining";
     this.paintMeter.append(this.paintRemaining);
+    this.wg.input.registerClick(this.paintMeter, () => {
+      this.wg.client.refill();
+    });
   }
 
   setupBrushTool() {

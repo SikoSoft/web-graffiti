@@ -219,4 +219,11 @@ export default class input {
   handleUp() {
     this.mouseDown = false;
   }
+
+  registerClick(element, action) {
+    element.addEventListener("mousedown", action);
+    element.addEventListener("touchstart", () => {
+      element.dispatchEvent(new MouseEvent("mousedown"));
+    });
+  }
 }

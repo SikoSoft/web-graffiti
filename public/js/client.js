@@ -58,4 +58,8 @@ export default class client {
   setDelta(delta) {
     this.delta = delta;
   }
+
+  refill() {
+    this.wg.socket.sendMessage({ event: "refill" });
+  }
 }

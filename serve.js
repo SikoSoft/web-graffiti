@@ -221,6 +221,12 @@ wsServer.on("request", function (request) {
           }
           break;
         }
+        case "refill":
+          connection.client.paint = config.paintVolume;
+          connection.sendUTF(
+            JSON.stringify({ event: "paint", paint: config.paintVolume })
+          );
+          break;
       }
     }
   });
