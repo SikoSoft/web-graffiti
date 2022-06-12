@@ -11,14 +11,22 @@ export default class input {
     this.lastClickNode = "";
     this.doubleClick = false;
     this.multiGesture = false;
+    this.enabled = false;
   }
 
   init() {
+    this.enable();
+  }
+
+  enable() {
     this.setupMouseEvents();
     this.setupTouchEvents();
+    this.disableConnectEvents();
+    this.enabled = true;
   }
 
   disable() {
+    document.removeEventListener("mousedown", this.doubleClickListener);
     this.wg.render.canvas.removeEventListener(
       "mousedown",
       this.mouseUpListener
@@ -27,7 +35,7 @@ export default class input {
       "mousemove",
       this.mouseMoveListener
     );
-    this.wg.render.canvas.removeEventListener("mouseup", this.mouseUpListener);
+    document.removeEventListener("mouseup", this.mouseUpListener);
     this.wg.render.canvas.removeEventListener(
       "touchstart",
       this.touchStartListener
@@ -36,14 +44,35 @@ export default class input {
       "touchmove",
       this.touchMoveListener
     );
-    this.wg.render.canvas.removeEventListener(
-      "touchend",
-      this.touchEndListener
-    );
+    document.removeEventListener("touchend", this.touchEndListener);
+    this.enableConnectEvents();
+    this.enabled = false;
+  }
+
+  enableClickToConnect() {
+    this.ctcListener = (e) => {
+      this.wg.socket.connect();
+    };
+    document.addEventListener("mousedown", this.ctcListener);
+  }
+
+  disableClickToConnect() {
+    document.removeEventListener("mousedown", this.ctcListener);
+  }
+
+  enableTouchToConnect() {
+    this.ttcListener = (e) => {
+      this.wg.render.canvas.dispatchEvent(new MouseEvent("mousedown"));
+    };
+    document.addEventListener("touchstart", this.ttcListener);
+  }
+
+  disableTouchToConnect() {
+    document.removeEventListener("touchstart", this.ttcListener);
   }
 
   setupMouseEvents() {
-    document.addEventListener("mousedown", (e) => {
+    this.doubleClickListener = (e) => {
       if (
         Date.now() - this.lastClickTime < this.wg.config.doubleClick &&
         this.lastClickNode === e.target
@@ -54,7 +83,8 @@ export default class input {
       }
       this.lastClickTime = Date.now();
       this.lastClickNode = e.target;
-    });
+    };
+    document.addEventListener("mousedown", this.mouseDCListener);
 
     this.mouseDownListener = (e) => {
       this.handleDown(e);
@@ -125,6 +155,16 @@ export default class input {
       }
     };
     document.addEventListener("touchend", this.touchEndListener, false);
+  }
+
+  enableConnectEvents() {
+    this.enableClickToConnect();
+    this.enableTouchToConnect();
+  }
+
+  disableConnectEvents() {
+    this.disableClickToConnect();
+    this.disableTouchToConnect();
   }
 
   updateMouse(e) {

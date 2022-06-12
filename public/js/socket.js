@@ -5,26 +5,43 @@ export default class socket {
     this.wg = wg;
     this.sentPerSecond = 0;
     this.receivedPerSecond = 0;
+    this.connected = false;
+    this.connectionPromise = false;
   }
 
-  init() {
+  async init() {
+    return this.connect();
+  }
+
+  async connect() {
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(this.wg.config.wsServer);
       this.ws.onopen = () => {
+        this.wg.editor.enable();
+        this.wg.input.enable();
+        this.connected = true;
+        this.connectionPromise = false;
         resolve();
       };
       this.ws.onerror = () => {
         reject();
       };
       this.ws.onmessage = (message) => {
-        this.handleMessage(message);
+        if (this.connected) {
+          this.handleMessage(message); //
+        }
       };
       this.ws.onclose = () => {
         this.wg.editor.disable();
         this.wg.input.disable();
-        this.wg.client.connected = false;
+        this.connectionPromise = false;
+        this.connected = false;
       };
     });
+  }
+
+  disconnect() {
+    this.ws.this.ws.disconnect();
   }
 
   sendMessage(message) {

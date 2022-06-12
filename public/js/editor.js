@@ -2,7 +2,8 @@ export default class editor {
   constructor(wg) {
     this.wg = wg;
     this.selected = 0;
-    this.disabled = false;
+    this.initialized = false;
+    this.enabled = false;
   }
 
   init() {
@@ -28,11 +29,21 @@ export default class editor {
     this.setupPaintMeter();
     this.setupBrushTool();
     this.selectColor(0);
+    this.initialized = true;
+  }
+
+  enable() {
+    if (this.initialized) {
+      this.enabled = true;
+      this.container.classList.remove("webGraffiti__editor--gone");
+    }
   }
 
   disable() {
-    this.disabled = true;
-    this.container.classList.add("webGraffiti__editor--gone");
+    if (this.initialized) {
+      this.enabled = false;
+      this.container.classList.add("webGraffiti__editor--gone");
+    }
   }
 
   setupPaintMeter() {
