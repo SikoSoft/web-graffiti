@@ -20,6 +20,8 @@ export default class socket {
         this.handleMessage(message);
       };
       this.ws.onclose = () => {
+        this.wg.editor.disable();
+        this.wg.input.disable();
         this.wg.client.connected = false;
       };
     });

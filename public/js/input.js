@@ -18,6 +18,30 @@ export default class input {
     this.setupTouchEvents();
   }
 
+  disable() {
+    this.wg.render.canvas.removeEventListener(
+      "mousedown",
+      this.mouseUpListener
+    );
+    this.wg.render.canvas.removeEventListener(
+      "mousemove",
+      this.mouseMoveListener
+    );
+    this.wg.render.canvas.removeEventListener("mouseup", this.mouseUpListener);
+    this.wg.render.canvas.removeEventListener(
+      "touchstart",
+      this.touchStartListener
+    );
+    this.wg.render.canvas.removeEventListener(
+      "touchmove",
+      this.touchMoveListener
+    );
+    this.wg.render.canvas.removeEventListener(
+      "touchend",
+      this.touchEndListener
+    );
+  }
+
   setupMouseEvents() {
     document.addEventListener("mousedown", (e) => {
       if (
@@ -32,78 +56,75 @@ export default class input {
       this.lastClickNode = e.target;
     });
 
+    this.mouseDownListener = (e) => {
+      this.handleDown(e);
+    };
     this.wg.render.canvas.addEventListener(
       "mousedown",
-      (e) => {
-        //this.multiGesture = false;
-        this.handleDown(e);
-      },
+      this.mouseDownListener,
       false
     );
 
+    this.mouseMoveListener = (e) => {
+      this.handleMove(e);
+    };
     this.wg.render.canvas.addEventListener(
       "mousemove",
-      (e) => {
-        this.handleMove(e);
-      },
+      this.mouseMoveListener,
       false
     );
 
-    document.addEventListener(
-      "mouseup",
-      () => {
-        this.handleUp();
-      },
-      false
-    );
+    this.mouseUpListener = () => {
+      this.handleUp();
+    };
+    document.addEventListener("mouseup", this.mouseUpListener, false);
   }
 
   setupTouchEvents() {
+    this.touchStartListener = (e) => {
+      if (e.targetTouches.length > 1) {
+        this.multiGesture = true;
+      } else {
+        this.multiGesture = false;
+      }
+      this.wg.editor.handle.innerHTML = e.targetTouches.length;
+      let touch = e.touches[0];
+      let mouseEvent = new MouseEvent("mousedown", {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      this.wg.render.canvas.dispatchEvent(mouseEvent);
+      e.preventDefault();
+    };
     this.wg.render.canvas.addEventListener(
       "touchstart",
-      (e) => {
-        if (e.targetTouches.length > 1) {
-          this.multiGesture = true;
-        } else {
-          this.multiGesture = false;
-        }
-        this.wg.editor.handle.innerHTML = e.targetTouches.length;
-        let touch = e.touches[0];
-        let mouseEvent = new MouseEvent("mousedown", {
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-        });
-        this.wg.render.canvas.dispatchEvent(mouseEvent);
-        e.preventDefault();
-      },
+      this.touchStartListener,
       false
     );
 
+    this.touchMoveListener = (e) => {
+      let touch = e.touches[0];
+      let mouseEvent = new MouseEvent("mousemove", {
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+      this.wg.render.canvas.dispatchEvent(mouseEvent);
+      e.preventDefault();
+    };
     this.wg.render.canvas.addEventListener(
       "touchmove",
-      (e) => {
-        let touch = e.touches[0];
-        let mouseEvent = new MouseEvent("mousemove", {
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-        });
-        this.wg.render.canvas.dispatchEvent(mouseEvent);
-        e.preventDefault();
-      },
+      this.touchMoveListener,
       false
     );
 
-    document.addEventListener(
-      "touchend",
-      (e) => {
-        let mouseEvent = new MouseEvent("mouseup", {});
-        this.wg.render.canvas.dispatchEvent(mouseEvent);
-        if (e.cancelable) {
-          e.preventDefault();
-        }
-      },
-      false
-    );
+    this.touchEndListener = (e) => {
+      let mouseEvent = new MouseEvent("mouseup", {});
+      this.wg.render.canvas.dispatchEvent(mouseEvent);
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener("touchend", this.touchEndListener, false);
   }
 
   updateMouse(e) {

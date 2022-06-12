@@ -30,6 +30,11 @@ export default class editor {
     this.selectColor(0);
   }
 
+  disable() {
+    this.disabled = true;
+    this.container.classList.add("webGraffiti__editor--gone");
+  }
+
   setupPaintMeter() {
     this.paintRemaining = document.createElement("div");
     this.paintRemaining.className = "webGraffiti__editor_paint_remaining";
@@ -110,10 +115,6 @@ export default class editor {
   setBrushSize(size) {
     this.wg.client.setLineWidth(size);
     this.updateBrushPreview();
-  }
-
-  disable() {
-    this.disabled = true;
   }
 
   updateBrushPreview() {

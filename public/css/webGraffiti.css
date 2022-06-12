@@ -115,9 +115,8 @@ body {
   border-bottom: 0;
 }
 
-.webGraffiti__editor:hover {
-  bottom: 0;
-  opacity: 1;
+.webGraffiti__editor--gone {
+  display: none;
 }
 
 .webGraffiti__editor_brush {
@@ -133,6 +132,8 @@ body {
   background-color: rgba(255, 255, 255, 0.2);
   border: 1px #fff solid;
   box-sizing: border-box;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .webGraffiti__editor_paint_remaining {
