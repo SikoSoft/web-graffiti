@@ -15,6 +15,12 @@ export class WebGraffiti extends HTMLElement {
   }
 
   connectedCallback() {
+    config.width = this.hasAttribute("width")
+      ? parseInt(this.getAttribute("width"))
+      : config.width;
+    config.height = this.hasAttribute("height")
+      ? parseInt(this.getAttribute("height"))
+      : config.height;
     this.wg.init(this.rootElement, config);
   }
 
@@ -22,13 +28,21 @@ export class WebGraffiti extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (this.wg.render.ready && name === "width") {
-      this.wg.config.width = parseInt(newValue);
-      this.wg.render.setWidth(newValue);
+      this.setWidth(newValue);
     }
     if (this.wg.render.ready && name === "height") {
-      this.wg.config.height = parseInt(newValue);
-      this.wg.render.setHeight(newValue);
+      this.setHeight(newValue);
     }
+  }
+
+  setWidth(width) {
+    this.wg.config.width = parseInt(width);
+    this.wg.render.setWidth(width);
+  }
+
+  setHeight(height) {
+    this.wg.config.height = parseInt(height);
+    this.wg.render.setHeight(height);
   }
 
   template() {
