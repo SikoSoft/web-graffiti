@@ -57,6 +57,10 @@ export class WebGraffiti extends HTMLElement {
       :host {
         display: inline-block;
       }
+
+      canvas {
+        max-width: 100%;
+      }
     </style>
     <div class="web-graffiti"></div>
     `;

@@ -19,10 +19,12 @@ export default class input {
   }
 
   enable() {
-    this.setupMouseEvents();
-    this.setupTouchEvents();
-    this.disableConnectEvents();
-    this.enabled = true;
+    if (!this.enabled) {
+      this.setupMouseEvents();
+      this.setupTouchEvents();
+      this.disableConnectEvents();
+      this.enabled = true;
+    }
   }
 
   disable() {
@@ -84,7 +86,7 @@ export default class input {
       this.lastClickTime = Date.now();
       this.lastClickNode = e.target;
     };
-    document.addEventListener("mousedown", this.mouseDCListener);
+    document.addEventListener("mousedown", this.doubleClickListener);
 
     this.mouseDownListener = (e) => {
       this.handleDown(e);
