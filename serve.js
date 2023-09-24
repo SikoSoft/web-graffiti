@@ -229,8 +229,7 @@ wsServer.on("request", function (request) {
           break;
         }
         case "role":
-          console.log("role json", json);
-          connection.client.role = json.newRole;
+          setRole(connection.client, json.newRole);
         case "refill":
           connection.client.paint = config.paintVolume;
           connection.sendUTF(
@@ -254,18 +253,6 @@ httpServer.listen(config.server.webSocketPort, function () {
   );
 });
 
-function hasInfinitePaint(client) {
-  console.log("hasInfinitePaint", client);
-  const hasInfinitePaint = getPaintFromRole(client.role);
-  console.log("hasInfinitePaint", hasInfinitePaint);
-  return hasInfinitePaint;
-}
-
-function getPaintFromRole(role) {
-  console.log("getPaintFromRole", role);
-  return config.roles.find((r) => r.id == parseInt(role)).infinitePaint;
-}
-
 setInterval(sync, config.server.autoSave);
 
 const paintPerTick =
@@ -284,3 +271,22 @@ setInterval(() => {
     }
   });
 }, config.server.paintRefill);
+
+function hasInfinitePaint(client) {
+  const hasInfinitePaint = getPaintFromRole(client.role);
+  return hasInfinitePaint;
+}
+
+function getPaintFromRole(role) {
+  return config.roles.find((r) => r.id == role).infinitePaint;
+}
+
+function roleIsValid(role) {
+  return config.roles.filter((r) => r.id === role).length === 1;
+}
+
+function setRole(client, role) {
+  if (roleIsValid(role)) {
+    client.role = role;
+  }
+}
