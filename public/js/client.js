@@ -62,4 +62,8 @@ export default class client {
   refill() {
     this.wg.socket.sendMessage({ event: "refill" });
   }
+
+  setRole(role) {
+    this.wg.socket.sendMessage({ event: "role", newRole: role });
+  }
 }

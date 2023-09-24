@@ -123,6 +123,7 @@ wsServer.on("request", function (request) {
     ip: request.remoteAddress,
     join: joinTime,
     paint: config.paintVolume,
+    role: 0,
     ctx: {},
   };
   clients.push(client);
@@ -190,7 +191,13 @@ wsServer.on("request", function (request) {
           for (const key in connection.client.ctx) {
             ctx[key] = connection.client.ctx[key];
           }
-          const paintUsed = ctx.lineWidth * Math.PI;
+          let paintUsed;
+          if (hasInfinitePaint(connection.client)) {
+            paintUsed = 0;
+          } else {
+            paintUsed = ctx.lineWidth * Math.PI;
+          }
+
           let newVolume = connection.client.paint - paintUsed;
           let exceeded = false;
           if (newVolume < 0) {
@@ -221,6 +228,9 @@ wsServer.on("request", function (request) {
           }
           break;
         }
+        case "role":
+          console.log("role json", json);
+          connection.client.role = json.newRole;
         case "refill":
           connection.client.paint = config.paintVolume;
           connection.sendUTF(
@@ -243,6 +253,18 @@ httpServer.listen(config.server.webSocketPort, function () {
     `WebSocket server is listening on port ${config.server.webSocketPort}`
   );
 });
+
+function hasInfinitePaint(client) {
+  console.log("hasInfinitePaint", client);
+  const hasInfinitePaint = getPaintFromRole(client.role);
+  console.log("hasInfinitePaint", hasInfinitePaint);
+  return hasInfinitePaint;
+}
+
+function getPaintFromRole(role) {
+  console.log("getPaintFromRole", role);
+  return config.roles.find((r) => r.id == parseInt(role)).infinitePaint;
+}
 
 setInterval(sync, config.server.autoSave);
 
