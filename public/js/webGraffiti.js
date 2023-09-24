@@ -72,6 +72,12 @@ export default class webGraffiti {
           if (this.config.mode === magicNum.MODE_INTERACTIVE) {
             this.editor.init();
             this.input.init();
+            const role = new URLSearchParams(window.location.search).get(
+              "wgRole"
+            );
+            if (role) {
+              this.client.setRole(parseInt(role));
+            }
           }
         })
         .catch((error) => {
