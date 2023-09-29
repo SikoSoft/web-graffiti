@@ -17,7 +17,7 @@ export default class client {
   syncContext() {
     this.wg.socket.sendMessage({
       event: "setContext",
-      ctx: this.ctx,
+      payload: { ctx: this.ctx },
     });
   }
 
@@ -64,6 +64,6 @@ export default class client {
   }
 
   setRole(role) {
-    this.wg.socket.sendMessage({ event: "role", newRole: role });
+    this.wg.socket.sendMessage({ event: "role", payload: { newRole: role } });
   }
 }

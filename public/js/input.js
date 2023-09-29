@@ -205,7 +205,7 @@ export default class input {
           this.wg.render.drawLine(line, this.wg.client.ctx);
           this.wg.socket.sendMessage({
             event: "line",
-            line,
+            payload: { line },
           });
         }
       }

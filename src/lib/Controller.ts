@@ -2,12 +2,14 @@ import pino from "pino";
 import { v4 } from "uuid";
 import http from "http";
 import https from "https";
-import { connection, server } from "websocket";
+import { connection, server, w3cwebsocket } from "websocket";
 import fs from "fs";
 import express from "express";
 import { Config } from "./Config";
 import { Client } from "./Client";
 import { Wall } from "./Wall";
+import { Messenger } from "./Messenger";
+import { MessageEvent } from "./MessageSpec";
 
 export interface ControllerOptions {
   staticRoot: string;
@@ -16,15 +18,26 @@ export interface ControllerOptions {
   wall: Wall;
 }
 
+interface xxconnection {
+  client: Client;
+}
+
+/*
+export interface ClientConnection extends connection {
+  client: Client;
+}
+*/
+
 export class Controller {
   private staticRoot: string;
   private config: Config;
-  private clients: Client[];
+  public clients: Client[];
   private logger: pino.Logger;
   private wall: Wall;
   private secureConfig: https.ServerOptions;
   private httpApp: express.Express;
   private router: express.Router;
+  private messenger: Messenger;
 
   constructor({ config, staticRoot, logger, wall }: ControllerOptions) {
     this.staticRoot = staticRoot;
@@ -35,6 +48,7 @@ export class Controller {
     this.secureConfig = {};
     this.httpApp = express();
     this.router = express.Router();
+    this.messenger = new Messenger({ controller: this, logger });
   }
 
   init() {
@@ -91,6 +105,12 @@ export class Controller {
 
       this.clients.push(client);
 
+      connection.on("message", (message) => {
+        if (message.type === "utf8") {
+          this.messenger.handle(client, JSON.parse(message.utf8Data));
+        }
+      });
+
       connection.on("close", () => {
         this.removeClient(client);
       });
@@ -101,14 +121,6 @@ export class Controller {
         `WebSocket server is listening on port ${this.config.server.webSocketPort}`
       );
     });
-  }
-
-  broadcast(message: any, ignoreClientId: string | undefined = "") {
-    this.clients
-      .filter((client) => !ignoreClientId || client.id !== ignoreClientId)
-      .forEach((client) => {
-        client.connection.sendUTF(JSON.stringify(message));
-      });
   }
 
   registerClient(ip: string, connection: connection): Client {
@@ -126,6 +138,18 @@ export class Controller {
     });
 
     this.clients.push(client);
+    //connection.client = client;
+
+    this.messenger.send(connection, {
+      event: MessageEvent.WELCOME,
+      payload: {
+        id,
+        width: this.config.width,
+        height: this.config.height,
+        paint: client.paint,
+        join: client.joinTime,
+      },
+    });
 
     return client;
   }

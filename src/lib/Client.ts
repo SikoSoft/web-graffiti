@@ -17,9 +17,9 @@ export class Client {
   //public index: number;
   //private connection:
   private ip: string;
-  private joinTime: number;
-  private paint: number;
-  private role: number;
+  public joinTime: number;
+  public paint: number;
+  public role: number;
   //private ctx: CanvasRenderingContext2D;
   public connection: connection;
 
