@@ -18,22 +18,13 @@ export interface ControllerOptions {
   wall: Wall;
 }
 
-interface xxconnection {
-  client: Client;
-}
-
-/*
-export interface ClientConnection extends connection {
-  client: Client;
-}
-*/
-
 export class Controller {
   private staticRoot: string;
   private config: Config;
   public clients: Client[];
+  private paintPerTick: number;
   private logger: pino.Logger;
-  private wall: Wall;
+  public wall: Wall;
   private secureConfig: https.ServerOptions;
   private httpApp: express.Express;
   private router: express.Router;
@@ -42,6 +33,9 @@ export class Controller {
   constructor({ config, staticRoot, logger, wall }: ControllerOptions) {
     this.staticRoot = staticRoot;
     this.config = config;
+    this.paintPerTick =
+      (this.config.server.paintRefill / this.config.paintTime) *
+      this.config.paintVolume;
     this.clients = [];
     this.logger = logger;
     this.wall = wall;
@@ -59,6 +53,8 @@ export class Controller {
     this.startWebServer();
 
     this.startWebSocketServer();
+
+    this.startTickTimers();
   }
 
   registerRoutes() {
@@ -103,8 +99,6 @@ export class Controller {
 
       const client = this.registerClient(request.remoteAddress, connection);
 
-      this.clients.push(client);
-
       connection.on("message", (message) => {
         if (message.type === "utf8") {
           this.messenger.handle(client, JSON.parse(message.utf8Data));
@@ -129,6 +123,7 @@ export class Controller {
     this.logger.info(`New connection for ${id}`);
 
     const client = new Client({
+      config: this.config,
       id,
       joinTime: Date.now(),
       role: 0,
@@ -138,7 +133,6 @@ export class Controller {
     });
 
     this.clients.push(client);
-    //connection.client = client;
 
     this.messenger.send(connection, {
       event: MessageEvent.WELCOME,
@@ -158,5 +152,29 @@ export class Controller {
     this.logger.info(`Client ${client.id} disconnected`);
     this.clients.splice(this.clients.indexOf(client), 1);
     this.wall.sync();
+  }
+
+  startTickTimers() {
+    setInterval(() => {
+      this.clients.forEach((client) => {
+        if (client.paint < this.config.paintVolume) {
+          const newPaint =
+            client.paint + this.paintPerTick < this.config.paintVolume
+              ? client.paint + this.paintPerTick
+              : this.config.paintVolume;
+          client.paint = newPaint;
+          this.messenger.send(client.connection, {
+            event: MessageEvent.PAINT,
+            payload: { paint: client.paint },
+          });
+        }
+      });
+    }, this.config.server.paintRefill);
+
+    setInterval(() => {
+      this.logger.debug(
+        `There are ${this.clients.length} clients currently connected`
+      );
+    }, this.config.server.status);
   }
 }

@@ -60,29 +60,30 @@ export default class socket {
     const json = JSON.parse(message.data);
     switch (json.event) {
       case "welcome":
-        this.wg.client.id = json.id;
-        this.wg.client.setPaint(json.paint);
-        this.wg.client.setDelta(Date.now() - json.join);
-        this.wg.render.setActualWidth(json.width);
-        this.wg.render.setActualHeight(json.height);
+        this.wg.client.id = json.payload.id;
+        this.wg.client.setPaint(json.payload.paint);
+        this.wg.client.setDelta(Date.now() - json.payload.join);
+        this.wg.render.setActualWidth(json.payload.width);
+        this.wg.render.setActualHeight(json.payload.height);
         break;
       case "newClient":
-        this.wg.registerClient(json.id);
+        this.wg.registerClient(json.payload.id);
         if (json.ctx) {
-          this.wg.setClientContext(json.id, json.ctx);
+          this.wg.setClientContext(json.payload.id, json.payload.ctx);
         }
         break;
       case "setContext":
-        this.wg.setClientContext(json.id, json.ctx);
+        this.wg.setClientContext(json.payload.id, json.payload.ctx);
         break;
       case "line":
         this.wg.render.drawLine(
-          json.line,
-          this.wg.clients.filter((client) => client.id === json.id)[0].ctx
+          json.payload.line,
+          this.wg.clients.filter((client) => client.id === json.payload.id)[0]
+            .ctx
         );
         break;
       case "paint":
-        this.wg.client.setPaint(json.paint);
+        this.wg.client.setPaint(json.payload.paint);
         break;
     }
   }

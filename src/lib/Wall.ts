@@ -1,5 +1,7 @@
 import {
   Canvas,
+  CanvasLineCap,
+  CanvasLineJoin,
   CanvasRenderingContext2D,
   createCanvas,
   loadImage,
@@ -9,17 +11,27 @@ import fs from "fs";
 import SparkMD5 from "spark-md5";
 import pino from "pino";
 
+export enum ContextType {
+  STROKE_STYLE = "strokeStyle",
+  LINE_WIDTH = "lineWidth",
+  LINE_CAP = "lineCap",
+  LINE_JOIN = "lineJoin",
+}
+
 export interface WallOptions {
   logger: pino.Logger;
   config: Config;
 }
+
+export type ContextHandler = (v: string | number) => void;
 
 export class Wall {
   private logger: pino.Logger;
   private config: Config;
   private lastHash: string;
   private canvas: Canvas;
-  private ctx: CanvasRenderingContext2D;
+  public ctx: CanvasRenderingContext2D;
+  private ctxMap: Record<string, ContextHandler>;
 
   constructor({ logger, config }: WallOptions) {
     this.logger = logger;
@@ -27,6 +39,20 @@ export class Wall {
     this.lastHash = "";
     this.canvas = createCanvas(this.config.width, this.config.height);
     this.ctx = this.canvas.getContext("2d");
+    this.ctxMap = {
+      [ContextType.LINE_CAP]: (v) => {
+        this.ctx.lineCap = v as CanvasLineCap;
+      },
+      [ContextType.LINE_JOIN]: (v) => {
+        this.ctx.lineJoin = v as CanvasLineJoin;
+      },
+      [ContextType.LINE_WIDTH]: (v) => {
+        this.ctx.lineWidth = v as number;
+      },
+      [ContextType.STROKE_STYLE]: (v) => {
+        this.ctx.strokeStyle = v as string;
+      },
+    };
   }
 
   init() {
@@ -74,6 +100,14 @@ export class Wall {
     const hash = SparkMD5.hash(buffer.toString());
     if (hash !== this.lastHash) {
       this.save(buffer, hash);
+    }
+  }
+
+  setContext(ctx: Record<string, string | number>) {
+    for (const key in ctx) {
+      if (key in this.ctxMap) {
+        this.ctxMap[key](ctx[key]);
+      }
     }
   }
 }

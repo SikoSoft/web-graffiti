@@ -12,6 +12,7 @@ export interface Config {
     webSocketPort: number;
     autoSave: number;
     paintRefill: number;
+    status: number;
   };
   imageName: string;
   width: number;

@@ -1,9 +1,12 @@
+import { ContextType } from "./Wall";
+
 export enum MessageEvent {
   WELCOME = "welcome",
   LINE = "line",
   SET_CONTEXT = "setContext",
   SET_ROLE = "setRole",
   REFILL = "refill",
+  PAINT = "paint",
 }
 
 export interface MessagePayload {
@@ -16,12 +19,16 @@ export interface MessagePayload {
   };
   [MessageEvent.LINE]: {
     line: [number, number, number, number];
+    id?: string;
   };
   [MessageEvent.SET_CONTEXT]: {
-    ctx: Record<string, string | number>;
+    ctx: Record<ContextType, string | number>;
   };
   [MessageEvent.SET_ROLE]: {
     role: number;
+  };
+  [MessageEvent.PAINT]: {
+    paint: number;
   };
 }
 
@@ -40,4 +47,13 @@ export interface LineMessage {
   payload: MessagePayload[MessageEvent.LINE];
 }
 
-export type Message = WelcomeMessage | SetContextMessage | LineMessage;
+export interface PaintMessage {
+  event: MessageEvent.PAINT;
+  payload: MessagePayload[MessageEvent.PAINT];
+}
+
+export type Message =
+  | WelcomeMessage
+  | SetContextMessage
+  | LineMessage
+  | PaintMessage;
