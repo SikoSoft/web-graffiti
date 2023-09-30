@@ -1,25 +1,19 @@
-import { CanvasRenderingContext2D } from "canvas";
 import { connection } from "websocket";
 import { Config } from "./Config";
 
 export interface ClientOptions {
   config: Config;
   id: string;
-  //index: number;
-  //connection: Connection;
   ip: string;
   joinTime: number;
   paint: number;
   role: number;
-  //ctx: Record<string, string | number>;
   connection: connection;
 }
 
 export class Client {
   private config: Config;
   public id: string;
-  //public index: number;
-  //private connection:
   private ip: string;
   public joinTime: number;
   public paint: number;
@@ -30,7 +24,6 @@ export class Client {
   constructor({
     config,
     id,
-    //index,
     ip,
     joinTime,
     paint,
@@ -39,8 +32,6 @@ export class Client {
   }: ClientOptions) {
     this.config = config;
     this.id = id;
-    //this.index = index;
-    // this.connection = connection;
     this.ip = ip;
     this.joinTime = joinTime;
     this.paint = paint;
@@ -50,6 +41,12 @@ export class Client {
   }
 
   hasInfinitePaint(): boolean {
-    return false;
+    return this.config.getPaintFromRole(this.role);
+  }
+
+  setRole(role: number): void {
+    if (this.config.roleIsValid(role)) {
+      this.role = role;
+    }
   }
 }

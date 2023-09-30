@@ -64,6 +64,6 @@ export default class client {
   }
 
   setRole(role) {
-    this.wg.socket.sendMessage({ event: "role", payload: { newRole: role } });
+    this.wg.socket.sendMessage({ event: "role", payload: { role } });
   }
 }

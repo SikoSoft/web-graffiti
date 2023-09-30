@@ -110,4 +110,12 @@ export class Config implements ConfigProperties {
 
     Object.assign(this, configProperties);
   }
+
+  getPaintFromRole(role: number): boolean {
+    return this.roles.find((r) => r.id == role)?.infinitePaint || false;
+  }
+
+  roleIsValid(role: number): boolean {
+    return this.roles.filter((r) => r.id === role).length === 1;
+  }
 }
