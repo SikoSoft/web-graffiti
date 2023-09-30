@@ -1,3 +1,4 @@
+import "dotenv/config";
 import pino from "pino";
 import { v4 } from "uuid";
 import http from "http";
@@ -11,27 +12,26 @@ import { Wall } from "./Wall";
 import { Messenger } from "./Messenger";
 import { MessageEvent } from "./MessageSpec";
 
+const STATIC_ROOT = process.env.STATIC_ROOT || "";
+
 export interface ControllerOptions {
-  staticRoot: string;
   config: Config;
   logger: pino.Logger;
   wall: Wall;
 }
 
 export class Controller {
-  private staticRoot: string;
   private config: Config;
   public clients: Client[];
   private paintPerTick: number;
   private logger: pino.Logger;
   public wall: Wall;
-  private secureConfig: https.ServerOptions;
+
   private httpApp: express.Express;
   private router: express.Router;
   private messenger: Messenger;
 
-  constructor({ config, staticRoot, logger, wall }: ControllerOptions) {
-    this.staticRoot = staticRoot;
+  constructor({ config, logger, wall }: ControllerOptions) {
     this.config = config;
     this.paintPerTick =
       (this.config.server.paintRefill / this.config.paintTime) *
@@ -39,7 +39,6 @@ export class Controller {
     this.clients = [];
     this.logger = logger;
     this.wall = wall;
-    this.secureConfig = {};
     this.httpApp = express();
     this.router = express.Router();
     this.messenger = new Messenger({ controller: this, logger });
@@ -47,8 +46,6 @@ export class Controller {
 
   init() {
     this.registerRoutes();
-
-    this.initSecureConfig();
 
     this.startWebServer();
 
@@ -58,7 +55,7 @@ export class Controller {
   }
 
   registerRoutes() {
-    this.httpApp.use(express.static(this.staticRoot));
+    this.httpApp.use(express.static(STATIC_ROOT));
     //app.use(express.static(path.join(__dirname, "/dist")));
 
     this.router.get("/config.json", (req, res) => {
@@ -68,18 +65,9 @@ export class Controller {
     this.httpApp.use(this.router);
   }
 
-  initSecureConfig() {
-    this.secureConfig = this.config.server.secure
-      ? {
-          key: fs.readFileSync(this.config.server.secureKey),
-          cert: fs.readFileSync(this.config.server.secureCert),
-        }
-      : {};
-  }
-
   startWebServer() {
     (this.config.server.secure ? https : http)
-      .createServer(this.secureConfig, this.httpApp)
+      .createServer(this.config.secureConfig, this.httpApp)
       .listen(this.config.server.webPort, () => {
         this.logger.info(
           `Web server listening on port ${this.config.server.webPort}`
@@ -89,7 +77,7 @@ export class Controller {
 
   startWebSocketServer() {
     const httpServer = this.config.server.secure
-      ? https.createServer(this.secureConfig)
+      ? https.createServer(this.config.secureConfig)
       : http.createServer();
 
     new server({

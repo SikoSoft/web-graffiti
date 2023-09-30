@@ -13,7 +13,6 @@ import pino from "pino";
 declare type MessageHander = () => void;
 
 export interface MessengerOptions {
-  //client: Client;
   logger: pino.Logger;
   controller: Controller;
 }
@@ -50,10 +49,9 @@ export class Messenger {
 
   handleLine(client: Client, message: LineMessage) {
     const [x1, y1, x2, y2] = message.payload.line;
-    for (const key in client.ctx) {
-      //ctx[key] = client.ctx[key];
-      //this.logger.debug(`Set context '${key}' to '${client.ctx[key]}'`);
-    }
+
+    this.controller.wall.setContext(client.ctx);
+
     let paintUsed;
     if (client.hasInfinitePaint()) {
       paintUsed = 0;
@@ -103,7 +101,6 @@ export class Messenger {
   }
 
   send(connection: connection, message: Message) {
-    //this.logger.debug(`Send message: ${JSON.stringify(message)}`);
     connection.sendUTF(JSON.stringify(message));
   }
 }

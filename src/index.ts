@@ -1,13 +1,9 @@
-import "dotenv/config";
 import * as pino from "pino";
 import { Config } from "./lib/Config";
-import configJson from "../config.json";
+
 import { Client } from "./lib/Client";
 import { Controller } from "./lib/Controller";
 import { Wall } from "./lib/Wall";
-
-const staticRoot = process.env.STATIC_ROOT || "";
-const config = configJson as Config;
 
 const logger = pino.pino({
   name: "web-graffiti",
@@ -17,10 +13,13 @@ const logger = pino.pino({
 async function main(): Promise<void> {
   logger.info("Starting Web-Graffiti...");
 
+  const config = new Config({ logger });
+  config.init();
+
   const wall = new Wall({ logger, config });
   wall.init();
 
-  const controller = new Controller({ staticRoot, config, logger, wall });
+  const controller = new Controller({ config, logger, wall });
   controller.init();
 }
 
