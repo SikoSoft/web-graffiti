@@ -27,6 +27,7 @@ export interface MessagePayload {
   [MessageEvent.SET_ROLE]: {
     role: number;
   };
+  [MessageEvent.REFILL]: {};
   [MessageEvent.PAINT]: {
     paint: number;
   };
@@ -47,13 +48,25 @@ export interface LineMessage {
   payload: MessagePayload[MessageEvent.LINE];
 }
 
+export interface RefillMessage {
+  event: MessageEvent.REFILL;
+  payload: MessagePayload[MessageEvent.REFILL];
+}
+
 export interface PaintMessage {
   event: MessageEvent.PAINT;
   payload: MessagePayload[MessageEvent.PAINT];
+}
+
+export interface SetRoleMessage {
+  event: MessageEvent.SET_ROLE;
+  payload: MessagePayload[MessageEvent.SET_ROLE];
 }
 
 export type Message =
   | WelcomeMessage
   | SetContextMessage
   | LineMessage
-  | PaintMessage;
+  | PaintMessage
+  | SetRoleMessage
+  | RefillMessage;

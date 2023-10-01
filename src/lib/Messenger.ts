@@ -7,10 +7,11 @@ import {
   MessageEvent,
   MessagePayload,
   SetContextMessage,
+  SetRoleMessage,
 } from "./MessageSpec";
 import pino from "pino";
 
-declare type MessageHander = () => void;
+declare type MessageHander = (client: Client, message: Message) => void;
 
 export interface MessengerOptions {
   logger: pino.Logger;
@@ -20,24 +21,28 @@ export interface MessengerOptions {
 export class Messenger {
   private logger: pino.Logger;
   private controller: Controller;
+  private messageHandlers: Record<string, MessageHander>;
 
   constructor({ logger, controller }: MessengerOptions) {
     this.logger = logger;
     this.controller = controller;
+
+    this.messageHandlers = {
+      [MessageEvent.SET_CONTEXT]: (client, message) =>
+        this.handleSetContext(client, message as SetContextMessage),
+      [MessageEvent.LINE]: (client, message) =>
+        this.handleLine(client, message as LineMessage),
+      [MessageEvent.SET_ROLE]: (client, message) =>
+        this.handleSetRole(client, message as SetRoleMessage),
+    };
   }
 
-  handle(client: Client, rawMessage: Message) {
-    const messageHandlers: Record<string, MessageHander> = {
-      [MessageEvent.SET_CONTEXT]: () =>
-        this.handleSetContext(client, rawMessage as SetContextMessage),
-      [MessageEvent.LINE]: () =>
-        this.handleLine(client, rawMessage as LineMessage),
-    };
-    if (rawMessage.event in messageHandlers) {
-      messageHandlers[rawMessage.event]();
+  handle(client: Client, message: Message) {
+    if (message.event in this.messageHandlers) {
+      this.messageHandlers[message.event](client, message);
     } else {
       this.logger.debug(
-        `Event '${rawMessage.event}' does not have a callback defined`
+        `Event '${message.event}' does not have a callback defined`
       );
     }
   }
@@ -90,6 +95,10 @@ export class Messenger {
         client.id
       );
     }
+  }
+
+  handleSetRole(client: Client, message: SetRoleMessage) {
+    client.setRole(message.payload.role);
   }
 
   broadcast(message: any, ignoreClientId: string | undefined = "") {
