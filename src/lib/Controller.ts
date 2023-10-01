@@ -65,13 +65,14 @@ export class Controller {
   }
 
   startWebServer() {
-    (this.config.server.secure ? https : http)
-      .createServer(this.config.secureConfig, this.httpApp)
-      .listen(this.config.server.webPort, () => {
-        this.logger.info(
-          `Web server listening on port ${this.config.server.webPort}`
-        );
-      });
+    (this.config.server.secure
+      ? https.createServer(this.config.secureConfig, this.httpApp)
+      : http.createServer(this.config.secureConfig, this.httpApp)
+    ).listen(this.config.server.webPort, () => {
+      this.logger.info(
+        `Web server listening on port ${this.config.server.webPort}`
+      );
+    });
   }
 
   startWebSocketServer() {
