@@ -85,6 +85,7 @@ body {
   height: 5rem;
   width: 100%;
   padding: 0.5rem;
+  padding-right: 0;
   background-color: rgb(92, 122, 101);
   border-top: 5px rgb(49, 66, 54) solid;
   transition: all 0.2s;
@@ -123,7 +124,8 @@ body {
   position: relative;
   flex-grow: 2;
   width: 96px;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: #8da293;
+  border-right: 0.5rem rgb(92, 122, 101);
 }
 
 .webGraffiti__editor_paint_meter {
@@ -148,8 +150,10 @@ body {
   flex-grow: 8;
   width: 80%;
   padding: 8px;
+  /*
   overflow-y: hidden;
   overflow-x: auto;
+  */
 }
 
 .webGraffiti__editor_brush_inner {
