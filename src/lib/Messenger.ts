@@ -5,26 +5,31 @@ import {
   LineMessage,
   Message,
   MessageEvent,
+  RefillMessage,
   SetContextMessage,
   SetRoleMessage,
 } from "./MessageSpec";
 import pino from "pino";
+import { Config } from "./Config";
 
 declare type MessageHander = (client: Client, message: Message) => void;
 
 export interface MessengerOptions {
   logger: pino.Logger;
   controller: Controller;
+  config: Config;
 }
 
 export class Messenger {
   private logger: pino.Logger;
   private controller: Controller;
+  private config: Config;
   private messageHandlers: Record<string, MessageHander>;
 
-  constructor({ logger, controller }: MessengerOptions) {
+  constructor({ logger, controller, config }: MessengerOptions) {
     this.logger = logger;
     this.controller = controller;
+    this.config = config;
 
     this.messageHandlers = {
       [MessageEvent.SET_CONTEXT]: (client, message) =>
@@ -39,6 +44,8 @@ export class Messenger {
           client,
           message.payload as SetRoleMessage["payload"]
         ),
+      [MessageEvent.REFILL]: (client, message) =>
+        this.handleRefill(client, message.payload as RefillMessage["payload"]),
     };
   }
 
@@ -104,6 +111,14 @@ export class Messenger {
 
   handleSetRole(client: Client, payload: SetRoleMessage["payload"]) {
     client.setRole(payload.role);
+  }
+
+  handleRefill(client: Client, payload: RefillMessage["payload"]) {
+    client.refillPaint();
+    this.send(client.connection, {
+      event: MessageEvent.PAINT,
+      payload: { paint: this.config.paintVolume },
+    });
   }
 
   broadcast(message: any, ignoreClientId: string | undefined = "") {

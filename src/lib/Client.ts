@@ -49,4 +49,8 @@ export class Client {
       this.role = role;
     }
   }
+
+  refillPaint() {
+    this.paint = this.config.paintVolume;
+  }
 }

@@ -41,7 +41,7 @@ export class Controller {
     this.wall = wall;
     this.httpApp = express();
     this.router = express.Router();
-    this.messenger = new Messenger({ controller: this, logger });
+    this.messenger = new Messenger({ controller: this, config, logger });
   }
 
   init() {
