@@ -139,7 +139,9 @@ export class Controller {
   removeClient(client: Client) {
     this.logger.info(`Client ${client.id} disconnected`);
     this.clients.splice(this.clients.indexOf(client), 1);
-    this.wall.sync();
+    if (this.clients.length === 0) {
+      this.wall.sync();
+    }
   }
 
   startTickTimers() {
@@ -164,5 +166,9 @@ export class Controller {
         `There are ${this.clients.length} clients currently connected`
       );
     }, this.config.server.status);
+
+    setInterval(() => {
+      this.wall.sync();
+    }, this.config.server.autoSave);
   }
 }

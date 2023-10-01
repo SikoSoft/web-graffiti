@@ -23,8 +23,6 @@ async function main(): Promise<void> {
   controller.init();
 }
 
-//setInterval(sync, config.server.autoSave);
-
 main().catch((error) => {
   logger.error(`Encountered an error in main process: ${error}`);
 });
