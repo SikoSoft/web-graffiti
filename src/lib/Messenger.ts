@@ -5,7 +5,6 @@ import {
   LineMessage,
   Message,
   MessageEvent,
-  MessagePayload,
   SetContextMessage,
   SetRoleMessage,
 } from "./MessageSpec";
@@ -29,11 +28,17 @@ export class Messenger {
 
     this.messageHandlers = {
       [MessageEvent.SET_CONTEXT]: (client, message) =>
-        this.handleSetContext(client, message as SetContextMessage),
+        this.handleSetContext(
+          client,
+          message.payload as SetContextMessage["payload"]
+        ),
       [MessageEvent.LINE]: (client, message) =>
-        this.handleLine(client, message as LineMessage),
+        this.handleLine(client, message.payload as LineMessage["payload"]),
       [MessageEvent.SET_ROLE]: (client, message) =>
-        this.handleSetRole(client, message as SetRoleMessage),
+        this.handleSetRole(
+          client,
+          message.payload as SetRoleMessage["payload"]
+        ),
     };
   }
 
@@ -47,13 +52,13 @@ export class Messenger {
     }
   }
 
-  handleSetContext(client: Client, message: SetContextMessage) {
-    this.controller.wall.setContext(message.payload.ctx);
-    client.ctx = message.payload.ctx;
+  handleSetContext(client: Client, payload: SetContextMessage["payload"]) {
+    this.controller.wall.setContext(payload.ctx);
+    client.ctx = payload.ctx;
   }
 
-  handleLine(client: Client, message: LineMessage) {
-    const [x1, y1, x2, y2] = message.payload.line;
+  handleLine(client: Client, payload: LineMessage["payload"]) {
+    const [x1, y1, x2, y2] = payload.line;
 
     this.controller.wall.setContext(client.ctx);
 
@@ -89,7 +94,7 @@ export class Messenger {
           event: MessageEvent.LINE,
           payload: {
             id: client.id,
-            line: message.payload.line,
+            line: payload.line,
           },
         },
         client.id
@@ -97,8 +102,8 @@ export class Messenger {
     }
   }
 
-  handleSetRole(client: Client, message: SetRoleMessage) {
-    client.setRole(message.payload.role);
+  handleSetRole(client: Client, payload: SetRoleMessage["payload"]) {
+    client.setRole(payload.role);
   }
 
   broadcast(message: any, ignoreClientId: string | undefined = "") {
