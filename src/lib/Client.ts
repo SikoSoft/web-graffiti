@@ -57,7 +57,7 @@ export class Client {
     }
   }
 
-  refillPaint() {
+  refillPaint(): void {
     this.paint = this.config.paintVolume;
   }
 }

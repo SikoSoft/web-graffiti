@@ -96,6 +96,7 @@ export class Messenger {
           paint: newVolume,
         },
       });
+
       this.broadcast(
         {
           event: MessageEvent.LINE,
