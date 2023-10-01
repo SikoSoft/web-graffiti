@@ -8,7 +8,7 @@ import {
 } from "canvas";
 import { Config } from "./Config";
 import fs from "fs";
-import SparkMD5 from "spark-md5";
+import { createHash } from "crypto";
 import pino from "pino";
 
 export enum ContextType {
@@ -64,10 +64,10 @@ export class Wall {
     loadImage(`public/${this.config.imageName}`)
       .then((image) => {
         this.ctx.drawImage(image, 0, 0);
-        this.lastHash = SparkMD5.hash(
-          this.canvas.toBuffer("image/png").toString()
-        );
-        this.logger.debug("Initialized image context");
+        this.lastHash = createHash("sha256")
+          .update(this.canvas.toBuffer("image/png").toString())
+          .digest("hex");
+        this.logger.debug(`Initialized image context`);
       })
       .catch((error) => {
         this.logger.debug("Error opening image");
@@ -90,16 +90,21 @@ export class Wall {
     );
   }
 
+  getHash() {
+    return createHash("sha256")
+      .update(this.canvas.toBuffer("image/png").toString())
+      .digest("hex");
+  }
+
   save(buffer: Buffer, hash: string) {
     this.lastHash = hash;
     fs.writeFileSync(`public/${this.config.imageName}`, buffer);
   }
 
   sync() {
-    const buffer = this.canvas.toBuffer("image/png");
-    const hash = SparkMD5.hash(buffer.toString());
+    const hash = this.getHash();
     if (hash !== this.lastHash) {
-      this.save(buffer, hash);
+      this.save(this.canvas.toBuffer("image/png"), hash);
     }
   }
 
