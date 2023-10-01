@@ -1,5 +1,7 @@
 import { connection } from "websocket";
 import { Config } from "./Config";
+import { ContextType } from "./Wall";
+import { Context } from "./MessageSpec";
 
 export interface ClientOptions {
   config: Config;
@@ -18,7 +20,7 @@ export class Client {
   public joinTime: number;
   public paint: number;
   public role: number;
-  public ctx: Record<string, string | number>;
+  public ctx: Context;
   public connection: connection;
 
   constructor({
@@ -36,7 +38,12 @@ export class Client {
     this.joinTime = joinTime;
     this.paint = paint;
     this.role = role;
-    this.ctx = {};
+    this.ctx = {
+      [ContextType.LINE_CAP]: "round",
+      [ContextType.LINE_JOIN]: "round",
+      [ContextType.LINE_WIDTH]: 3,
+      [ContextType.STROKE_STYLE]: "#ffffffff",
+    };
     this.connection = connection;
   }
 

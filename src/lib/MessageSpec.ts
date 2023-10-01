@@ -1,5 +1,7 @@
 import { ContextType } from "./Wall";
 
+export type Context = Record<ContextType, string | number>;
+
 export enum MessageEvent {
   WELCOME = "welcome",
   LINE = "line",
@@ -7,6 +9,7 @@ export enum MessageEvent {
   SET_ROLE = "setRole",
   REFILL = "refill",
   PAINT = "paint",
+  NEW_CLIENT = "newClient",
 }
 
 export interface MessagePayload {
@@ -22,7 +25,7 @@ export interface MessagePayload {
     id?: string;
   };
   [MessageEvent.SET_CONTEXT]: {
-    ctx: Record<ContextType, string | number>;
+    ctx: Context;
   };
   [MessageEvent.SET_ROLE]: {
     role: number;
@@ -30,6 +33,10 @@ export interface MessagePayload {
   [MessageEvent.REFILL]: {};
   [MessageEvent.PAINT]: {
     paint: number;
+  };
+  [MessageEvent.NEW_CLIENT]: {
+    id: string;
+    ctx?: Context;
   };
 }
 
@@ -63,10 +70,16 @@ export interface SetRoleMessage {
   payload: MessagePayload[MessageEvent.SET_ROLE];
 }
 
+export interface NewClientMessage {
+  event: MessageEvent.NEW_CLIENT;
+  payload: MessagePayload[MessageEvent.NEW_CLIENT];
+}
+
 export type Message =
   | WelcomeMessage
   | SetContextMessage
   | LineMessage
   | PaintMessage
   | SetRoleMessage
-  | RefillMessage;
+  | RefillMessage
+  | NewClientMessage;

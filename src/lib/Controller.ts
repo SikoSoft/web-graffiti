@@ -133,7 +133,35 @@ export class Controller {
       },
     });
 
+    this.announceOthersToNewClient(client);
+
+    this.announceNewClientToOthers(client);
+
     return client;
+  }
+
+  announceNewClientToOthers(newClient: Client) {
+    this.messenger.broadcast(
+      {
+        event: "newClient",
+        id: newClient.id,
+      },
+      newClient.id
+    );
+  }
+
+  announceOthersToNewClient(newClient: Client) {
+    this.clients
+      .filter((client) => client.id !== newClient.id)
+      .forEach((client) => {
+        this.messenger.send(newClient.connection, {
+          event: MessageEvent.NEW_CLIENT,
+          payload: {
+            id: client.id,
+            ctx: client.ctx,
+          },
+        });
+      });
   }
 
   removeClient(client: Client) {
