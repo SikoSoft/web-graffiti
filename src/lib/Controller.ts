@@ -1,4 +1,3 @@
-import "dotenv/config";
 import pino from "pino";
 import { v4 } from "uuid";
 import http from "http";
@@ -11,15 +10,17 @@ import { Wall } from "./Wall";
 import { Messenger } from "./Messenger";
 import { MessageEvent } from "./MessageSpec";
 
-const STATIC_ROOT = process.env.STATIC_ROOT || "";
-
 export interface ControllerOptions {
+  publicRoot: string;
+  wcRoot: string;
   config: Config;
   logger: pino.Logger;
   wall: Wall;
 }
 
 export class Controller {
+  public publicRoot: string;
+  public wcRoot: string;
   private config: Config;
   public clients: Client[];
   private paintPerTick: number;
@@ -30,7 +31,9 @@ export class Controller {
   private router: express.Router;
   private messenger: Messenger;
 
-  constructor({ config, logger, wall }: ControllerOptions) {
+  constructor({ publicRoot, wcRoot, config, logger, wall }: ControllerOptions) {
+    this.publicRoot = publicRoot;
+    this.wcRoot = wcRoot;
     this.config = config;
     this.paintPerTick =
       (this.config.server.paintRefill / this.config.paintTime) *
@@ -54,8 +57,8 @@ export class Controller {
   }
 
   registerRoutes() {
-    this.httpApp.use(express.static(STATIC_ROOT));
-    //app.use(express.static(path.join(__dirname, "/dist")));
+    this.httpApp.use(express.static(this.publicRoot));
+    this.httpApp.use(express.static(this.wcRoot));
 
     this.router.get("/config.json", (req, res) => {
       const { server, roles, ...rest } = this.config;

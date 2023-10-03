@@ -1,9 +1,10 @@
 import https from "https";
 import fs from "fs";
-import configJson from "../../config.json";
+import path from "path";
+//import configJson from "../../config.json";
 import pino from "pino";
 
-const configProperties = configJson as ConfigProperties;
+//const configProperties = configJson as ConfigProperties;
 
 export interface Role {
   id: number;
@@ -38,6 +39,7 @@ export interface ConfigProperties {
 }
 
 export interface ConfigOptions {
+  configRoot: string;
   logger: pino.Logger;
 }
 
@@ -68,9 +70,10 @@ export class Config implements ConfigProperties {
   roles: Role[];
 
   secureConfig: https.ServerOptions;
+  configRoot: string;
   logger: pino.Logger;
 
-  constructor({ logger }: ConfigOptions) {
+  constructor({ configRoot, logger }: ConfigOptions) {
     this.server = {
       secure: false,
       secureKey: "",
@@ -97,6 +100,7 @@ export class Config implements ConfigProperties {
     this.roles = [];
 
     this.secureConfig = {};
+    this.configRoot = configRoot;
     this.logger = logger;
   }
 
@@ -108,7 +112,21 @@ export class Config implements ConfigProperties {
         }
       : {};
 
-    Object.assign(this, configProperties);
+    try {
+      const configJson = fs.readFileSync(
+        path.join(this.configRoot, "/config.json"),
+        { encoding: "utf8" }
+      );
+      const configProperties: ConfigProperties = JSON.parse(
+        configJson
+      ) as ConfigProperties;
+
+      Object.assign(this, configProperties);
+    } catch (error) {
+      this.logger.error(
+        `Encountered an error while trying to load config.json: ${error}`
+      );
+    }
   }
 
   getPaintFromRole(role: number): boolean {

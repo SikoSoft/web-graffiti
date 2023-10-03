@@ -10,6 +10,7 @@ import { Config } from "./Config";
 import fs from "fs";
 import { createHash } from "crypto";
 import pino from "pino";
+import path from "path";
 
 export enum ContextType {
   STROKE_STYLE = "strokeStyle",
@@ -19,6 +20,7 @@ export enum ContextType {
 }
 
 export interface WallOptions {
+  publicRoot: string;
   logger: pino.Logger;
   config: Config;
 }
@@ -26,6 +28,7 @@ export interface WallOptions {
 export type ContextHandler = (v: string | number) => void;
 
 export class Wall {
+  private publicRoot: string;
   private logger: pino.Logger;
   private config: Config;
   private lastHash: string;
@@ -33,7 +36,8 @@ export class Wall {
   public ctx: CanvasRenderingContext2D;
   private ctxMap: Record<string, ContextHandler>;
 
-  constructor({ logger, config }: WallOptions) {
+  constructor({ publicRoot, logger, config }: WallOptions) {
+    this.publicRoot = publicRoot;
     this.logger = logger;
     this.config = config;
     this.lastHash = "";
@@ -61,7 +65,7 @@ export class Wall {
   }
 
   load() {
-    loadImage(`public/${this.config.imageName}`)
+    loadImage(path.join(this.publicRoot, this.config.imageName))
       .then((image) => {
         this.ctx.drawImage(image, 0, 0);
         this.lastHash = createHash("sha256")
@@ -77,8 +81,8 @@ export class Wall {
 
   restore() {
     fs.copyFile(
-      `public/new-wall.png`,
-      `public/${this.config.imageName}`,
+      path.join(this.publicRoot, "new-wall.png"),
+      path.join(this.publicRoot, this.config.imageName),
       (error: any) => {
         if (error) {
           this.logger.error("There was a problem restoring the wall");
@@ -98,7 +102,7 @@ export class Wall {
 
   save(buffer: Buffer, hash: string) {
     this.lastHash = hash;
-    fs.writeFileSync(`public/${this.config.imageName}`, buffer);
+    fs.writeFileSync(path.join(this.publicRoot, this.config.imageName), buffer);
   }
 
   sync() {
