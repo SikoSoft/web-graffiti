@@ -14,11 +14,9 @@ const logger = pino.pino({
 async function main(): Promise<void> {
   logger.info("Starting Web-Graffiti...");
 
-  logger.info(`index root: ${__dirname}`);
-
-  const configRoot = path.join(__dirname, "../");
-  const publicRoot = path.join(__dirname, "../public");
-  const wcRoot = path.join(__dirname, "../dist");
+  const configRoot = path.join(__dirname, "../../");
+  const publicRoot = path.join(__dirname, "../../public");
+  const wcRoot = path.join(__dirname, "../../dist");
 
   const config = new Config({ configRoot, logger });
   config.init();
