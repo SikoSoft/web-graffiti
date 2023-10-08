@@ -8,7 +8,7 @@ import {
   RefillMessage,
   SetContextMessage,
   SetRoleMessage,
-} from "./MessageSpec";
+} from "../../spec/MessageSpec";
 import pino from "pino";
 import { Config } from "./Config";
 

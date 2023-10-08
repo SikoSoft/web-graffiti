@@ -1,8 +1,6 @@
 import * as pino from "pino";
 import path from "path";
 import { Config } from "./lib/Config";
-
-import { Client } from "./lib/Client";
 import { Controller } from "./lib/Controller";
 import { Wall } from "./lib/Wall";
 

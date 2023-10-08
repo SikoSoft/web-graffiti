@@ -11,21 +11,13 @@ import fs from "fs";
 import { createHash } from "crypto";
 import pino from "pino";
 import path from "path";
-
-export enum ContextType {
-  STROKE_STYLE = "strokeStyle",
-  LINE_WIDTH = "lineWidth",
-  LINE_CAP = "lineCap",
-  LINE_JOIN = "lineJoin",
-}
+import { ContextHandler, ContextType } from "../../spec/Canvas";
 
 export interface WallOptions {
   publicRoot: string;
   logger: pino.Logger;
   config: Config;
 }
-
-export type ContextHandler = (v: string | number) => void;
 
 export class Wall {
   private publicRoot: string;

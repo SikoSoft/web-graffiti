@@ -1,7 +1,6 @@
 import { connection } from "websocket";
 import { Config } from "./Config";
-import { ContextType } from "./Wall";
-import { Context } from "./MessageSpec";
+import { Context, ContextType, initialContext } from "../../spec/Canvas";
 
 export interface ClientOptions {
   config: Config;
@@ -38,12 +37,7 @@ export class Client {
     this.joinTime = joinTime;
     this.paint = paint;
     this.role = role;
-    this.ctx = {
-      [ContextType.LINE_CAP]: "round",
-      [ContextType.LINE_JOIN]: "round",
-      [ContextType.LINE_WIDTH]: 3,
-      [ContextType.STROKE_STYLE]: "#ffffffff",
-    };
+    this.ctx = Object.assign({}, initialContext);
     this.connection = connection;
   }
 

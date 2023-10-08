@@ -8,7 +8,7 @@ import { Config } from "./Config";
 import { Client } from "./Client";
 import { Wall } from "./Wall";
 import { Messenger } from "./Messenger";
-import { MessageEvent } from "./MessageSpec";
+import { MessageEvent } from "../../spec/MessageSpec";
 
 export interface ControllerOptions {
   publicRoot: string;

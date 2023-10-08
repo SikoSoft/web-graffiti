@@ -1,6 +1,4 @@
-import { ContextType } from "./Wall";
-
-export type Context = Record<ContextType, string | number>;
+import { Context, Line } from "./Canvas";
 
 export enum MessageEvent {
   WELCOME = "welcome",
@@ -21,7 +19,7 @@ export interface MessagePayload {
     join: number;
   };
   [MessageEvent.LINE]: {
-    line: [number, number, number, number];
+    line: Line;
     id?: string;
   };
   [MessageEvent.SET_CONTEXT]: {
