@@ -5,10 +5,13 @@
   "main": "build/server/index.js",
   "scripts": {
     "compile": "tsc",
-    "dev": "NODE_OPTIONS=--enable-source-maps tsc-watch --onSuccess \"node .\"",
+    "compile-scss": "sass src/client:build/client",
+    "dev": "npm-run-all --parallel watch-scss watch-ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
-    "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js"
+    "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
+    "watch-scss": "npm-run-all \"compile-scss -- --watch\"",
+    "watch-ts": "NODE_OPTIONS=--enable-source-maps tsc-watch --onSuccess \"node .\""
   },
   "repository": {
     "type": "git",
@@ -40,9 +43,11 @@
     "eslint-plugin-prettier": "^3.4.0",
     "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.3.0",
     "rollup": "^2.75.4",
     "rollup-plugin-terser": "^7.0.2",
+    "sass": "^1.69.0",
     "tsc-watch": "^6.0.4",
     "typescript": "^5.2.2"
   },
