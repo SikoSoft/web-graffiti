@@ -14,10 +14,10 @@
     "sourceMap": false,
     "strict": true,
     "target": "es2022",
-    "rootDir": "./src",
-    "outDir": "build",
+    "rootDir": "./src/spec",
+    "outDir": "build/client/spec",
     "paths": {}
   },
-  "include": ["src/client/*.ts"],
+  "include": ["src/spec/*ts"],
   "exclude": ["build"]
 }

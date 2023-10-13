@@ -1,16 +1,45 @@
 <html>
+
+
   <head>
+
+
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
+
+
     <title>Web Graffiti</title>
-    <link rel="stylesheet" type="text/css" href="css/webGraffiti.css" />
-    <script src="js/vanilla-picker.min.js"></script>
-    <script src="js/spark-md5.min.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="WebGraffiti.css" />
+
+
+    <script type="importmap">
+      {
+        "imports": {
+          "./Client": "./Client.js",
+          "./Config": "./Config.js",
+          "./Editor": "./Editor.js",
+          "./Input": "./Input.js",
+          "./Loader": "./Loader.js",
+          "./NetworkMonitor": "./NetworkMonitor.js",
+          "./Render": "./Render.js",
+          "./Socket": "./Socket.js",
+          "./WebGraffiti": "./WebGraffiti.js",
+          "../spec/Config": "./spec/Config.js",
+          "../spec/Canvas": "./spec/Canvas.js",
+          "../spec/Client": "./spec/Client.js",
+          "../spec/MessageSpec": "./spec/MessageSpec.js"
+        }
+      }
+    </script>
+
+
     <script type="module">
-      import webGraffiti from "./js/webGraffiti.js";
-      const wg = new webGraffiti();
+      import { WebGraffiti } from "./WebGraffiti.js";
+      const wg = new WebGraffiti();
       window.wg = wg;
       document.onreadystatechange = function () {
         if (document.readyState === "complete") {
@@ -18,8 +47,20 @@
         }
       };
     </script>
+
+
   </head>
+
+
   <body>
+
+
     <div id="webGraffiti"></div>
+
+
   </body>
+
+
 </html>
+
+

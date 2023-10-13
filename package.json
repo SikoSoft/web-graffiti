@@ -6,12 +6,13 @@
   "scripts": {
     "compile": "tsc",
     "compile-scss": "sass src/client:build/client",
-    "dev": "npm-run-all --parallel watch-scss watch-client watch-run-server",
+    "dev": "npm-run-all --parallel watch-scss watch-client watch-spec watch-run-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
     "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
     "watch-client": "tsc --watch --project tsconfig.client.json",
     "watch-server": "tsc --watch --project tsconfig.server.json",
+    "watch-spec": "tsc --watch --project tsconfig.spec.json",
     "watch-scss": "npm-run-all \"compile-scss -- --watch\"",
     "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch --project tsconfig.server.json --onSuccess \"node .\""
   },
