@@ -1,53 +1,37 @@
 import { ClientMode } from "../spec/Client";
-import { ConfigCore } from "../spec/Config";
+import { ConfigCore, ConfigProperties } from "../spec/Config";
 import { WebGraffiti } from "./WebGraffiti";
 
 export interface ConfigOptions {
   wg: WebGraffiti;
 }
 
+export type ConfigProperty = Partial<ConfigProperties>;
+
 export class Config extends ConfigCore {
   private wg: WebGraffiti;
 
   public mode: ClientMode;
-  private allowedInitOverrides: string[];
 
   constructor({ wg }: ConfigOptions) {
     super();
     this.wg = wg;
 
     this.mode = ClientMode.INTERACT;
-    this.allowedInitOverrides = ["width", "height", "mode"];
   }
 
-  process(
-    override: Record<string, string | number>,
-    safeMode: boolean = false
-  ) {
-    for (let key in override) {
-      if (!safeMode || this.overrideisAllowed(key)) {
-        //this[key] = override[key];
-      }
-    }
-  }
-
-  overrideisAllowed(key: string): boolean {
-    return this.allowedInitOverrides.indexOf(key) > -1;
-  }
-
-  async load(initConfig = {}): Promise<boolean> {
+  async load(initConfig: Partial<ConfigProperties> = {}): Promise<boolean> {
     if (Object.keys(initConfig).length) {
-      this.process(initConfig);
+      Object.assign(this, initConfig);
       return true;
     }
     return new Promise((resolve, reject) => {
       fetch("config.json")
         .then((response) => response.json())
-        .then((data) => {
-          this.process(data);
-          if (Object.keys(initConfig).length) {
-            this.process(initConfig, true);
-          }
+        .then((configJson) => {
+          const configProperties: ConfigProperties =
+            configJson as ConfigProperties;
+          Object.assign(this, configProperties);
           resolve(true);
         })
         .catch(() => {

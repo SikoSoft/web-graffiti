@@ -9,6 +9,7 @@ import { Client } from "./Client";
 import { Wall } from "./Wall";
 import { Messenger } from "./Messenger";
 import { MessageEvent } from "../../spec/MessageSpec";
+import path from "path";
 
 export interface ControllerOptions {
   publicRoot: string;
@@ -57,6 +58,11 @@ export class Controller {
   }
 
   registerRoutes() {
+    this.httpApp.use(express.static(path.join(__dirname, `../../client`)));
+    this.httpApp.use(
+      "/spec/",
+      express.static(path.join(__dirname, `../../spec`))
+    );
     this.httpApp.use(express.static(this.publicRoot));
     this.httpApp.use(express.static(this.wcRoot));
 
