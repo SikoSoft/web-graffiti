@@ -8,6 +8,7 @@ export enum MessageEvent {
   REFILL = "refill",
   PAINT = "paint",
   NEW_CLIENT = "newClient",
+  DEV_CLIENT_UPDATE = "devClientUpdate",
 }
 
 export interface MessagePayload {
@@ -24,6 +25,7 @@ export interface MessagePayload {
   };
   [MessageEvent.SET_CONTEXT]: {
     ctx: Context;
+    id?: string;
   };
   [MessageEvent.SET_ROLE]: {
     role: number;
@@ -36,6 +38,7 @@ export interface MessagePayload {
     id: string;
     ctx?: Context;
   };
+  [MessageEvent.DEV_CLIENT_UPDATE]: {};
 }
 
 export interface WelcomeMessage {
@@ -73,6 +76,11 @@ export interface NewClientMessage {
   payload: MessagePayload[MessageEvent.NEW_CLIENT];
 }
 
+export interface DevClientUpdateMessage {
+  event: MessageEvent.DEV_CLIENT_UPDATE;
+  payload: MessagePayload[MessageEvent.DEV_CLIENT_UPDATE];
+}
+
 export type Message =
   | WelcomeMessage
   | SetContextMessage
@@ -80,4 +88,5 @@ export type Message =
   | PaintMessage
   | SetRoleMessage
   | RefillMessage
-  | NewClientMessage;
+  | NewClientMessage
+  | DevClientUpdateMessage;

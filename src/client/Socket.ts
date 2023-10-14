@@ -1,5 +1,16 @@
-import { Message } from "../spec/MessageSpec";
+import {
+  DevClientUpdateMessage,
+  LineMessage,
+  Message,
+  MessageEvent,
+  NewClientMessage,
+  PaintMessage,
+  SetContextMessage,
+  WelcomeMessage,
+} from "../spec/MessageSpec";
 import { WebGraffiti } from "./WebGraffiti";
+
+declare type MessageHander = (message: Message) => void;
 
 export interface SocketOptions {
   wg: WebGraffiti;
@@ -12,6 +23,7 @@ export class Socket {
   private receivedPerSecond: number;
   public connected: boolean;
   private connectionPromise: Promise<void> | null;
+  private messageHandlers: Record<string, MessageHander>;
 
   constructor({ wg }: SocketOptions) {
     this.wg = wg;
@@ -19,6 +31,21 @@ export class Socket {
     this.receivedPerSecond = 0;
     this.connected = false;
     this.connectionPromise = null;
+
+    this.messageHandlers = {
+      [MessageEvent.WELCOME]: (message) =>
+        this.handleWelcome(message.payload as WelcomeMessage["payload"]),
+      [MessageEvent.NEW_CLIENT]: (message) =>
+        this.handleNewClient(message.payload as NewClientMessage["payload"]),
+      [MessageEvent.LINE]: (message) =>
+        this.handleLine(message.payload as LineMessage["payload"]),
+      [MessageEvent.PAINT]: (message) =>
+        this.handlePaint(message.payload as PaintMessage["payload"]),
+      [MessageEvent.DEV_CLIENT_UPDATE]: (message) =>
+        this.handleDevClientUpdate(
+          message.payload as DevClientUpdateMessage["payload"]
+        ),
+    };
   }
 
   async init() {
@@ -40,7 +67,7 @@ export class Socket {
       };
       this.ws.onmessage = (message) => {
         if (this.connected) {
-          this.handleMessage(message); //
+          this.handleMessage(JSON.parse(message.data));
         }
       };
       this.ws.onclose = () => {
@@ -60,40 +87,48 @@ export class Socket {
     this.ws.send(JSON.stringify(message));
   }
 
-  handleMessage(message: MessageEvent<any>): void {
-    this.setReceivedPerSecond(this.receivedPerSecond + 1);
-    setTimeout(() => {
-      this.setReceivedPerSecond(this.receivedPerSecond - 1);
-    }, 1000);
-    const json = JSON.parse(message.data);
-    switch (json.event) {
-      case "welcome":
-        this.wg.client.id = json.payload.id;
-        this.wg.client.setPaint(json.payload.paint);
-        this.wg.client.setDelta(Date.now() - json.payload.join);
-        this.wg.render.setActualWidth(json.payload.width);
-        this.wg.render.setActualHeight(json.payload.height);
-        break;
-      case "newClient":
-        this.wg.registerClient(json.payload.id);
-        if (json.ctx) {
-          this.wg.setClientContext(json.payload.id, json.payload.ctx);
-        }
-        break;
-      case "setContext":
-        this.wg.setClientContext(json.payload.id, json.payload.ctx);
-        break;
-      case "line":
-        this.wg.render.drawLine(
-          json.payload.line,
-          this.wg.clients.filter((client) => client.id === json.payload.id)[0]
-            .ctx
-        );
-        break;
-      case "paint":
-        this.wg.client.setPaint(json.payload.paint);
-        break;
+  handleMessage(message: Message) {
+    if (message.event in this.messageHandlers) {
+      this.messageHandlers[message.event](message);
+    } else {
+      console.log(`Event '${message.event}' does not have a callback defined`);
     }
+  }
+
+  handleWelcome(payload: WelcomeMessage["payload"]) {
+    this.wg.client.id = payload.id;
+    this.wg.client.setPaint(payload.paint);
+    this.wg.client.setDelta(Date.now() - payload.join);
+    this.wg.render.setActualWidth(payload.width);
+    this.wg.render.setActualHeight(payload.height);
+  }
+
+  handleNewClient(payload: NewClientMessage["payload"]) {
+    this.wg.registerClient(payload.id);
+    if (payload.ctx) {
+      this.wg.setClientContext(payload.id, payload.ctx);
+    }
+  }
+
+  handleSetContext(payload: SetContextMessage["payload"]) {
+    if (payload.id) {
+      this.wg.setClientContext(payload.id, payload.ctx);
+    }
+  }
+
+  handleLine(payload: LineMessage["payload"]) {
+    this.wg.render.drawLine(
+      payload.line,
+      this.wg.clients.filter((client) => client.id === payload.id)[0].ctx
+    );
+  }
+
+  handlePaint(payload: PaintMessage["payload"]) {
+    this.wg.client.setPaint(payload.paint);
+  }
+
+  handleDevClientUpdate(payload: DevClientUpdateMessage["payload"]) {
+    this.wg.reload();
   }
 
   setSentPerSecond(number: number): void {
