@@ -56,8 +56,6 @@ export class Socket {
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(this.wg.config.wsServer);
       this.ws.onopen = () => {
-        this.wg.editor.enable();
-        this.wg.input.enable();
         this.connected = true;
         this.connectionPromise = null;
         resolve();
