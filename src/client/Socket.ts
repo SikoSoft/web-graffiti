@@ -96,11 +96,7 @@ export class Socket {
   }
 
   handleWelcome(payload: WelcomeMessage["payload"]) {
-    this.wg.client.id = payload.id;
-    this.wg.client.setPaint(payload.paint);
-    this.wg.client.setDelta(Date.now() - payload.join);
-    this.wg.render.setActualWidth(payload.width);
-    this.wg.render.setActualHeight(payload.height);
+    this.wg.handleWelcome(payload);
   }
 
   handleNewClient(payload: NewClientMessage["payload"]) {

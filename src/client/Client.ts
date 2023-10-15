@@ -1,4 +1,5 @@
 import { Context, initialContext } from "../spec/Canvas";
+import { ClientMode } from "../spec/Client";
 import { MessageEvent } from "../spec/MessageSpec";
 import { WebGraffiti } from "./WebGraffiti";
 
@@ -16,6 +17,7 @@ export class Client {
   public color: string;
   private alpha: number;
   public ctx: Context;
+  public mode: ClientMode;
 
   constructor({ wg, id }: ClientOptions) {
     this.wg = wg;
@@ -26,6 +28,7 @@ export class Client {
     this.color = "";
     this.alpha = 1;
     this.ctx = Object.assign({}, initialContext);
+    this.mode = ClientMode.INTERACT;
   }
 
   init() {
@@ -75,6 +78,10 @@ export class Client {
 
   setDelta(delta: number): void {
     this.delta = delta;
+  }
+
+  setMode(mode: ClientMode) {
+    this.mode = mode;
   }
 
   refill(): void {

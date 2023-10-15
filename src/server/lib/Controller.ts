@@ -139,6 +139,7 @@ export class Controller {
         height: this.config.height,
         paint: client.paint,
         join: client.joinTime,
+        mode: client.role.mode,
       },
     });
 

@@ -1,11 +1,9 @@
 import https from "https";
 import fs from "fs";
 import path from "path";
-//import configJson from "../../config.json";
 import pino from "pino";
 import { ConfigCore, ConfigProperties, Role } from "../../spec/Config";
-
-//const configProperties = configJson as ConfigProperties;
+import { ClientMode } from "../../spec/Client";
 
 export interface ConfigOptions {
   configRoot: string;
@@ -48,6 +46,18 @@ export class Config extends ConfigCore {
         `Encountered an error while trying to load config.json: ${error}`
       );
     }
+  }
+
+  getRole(roleId: number): Role {
+    const role = this.roles.find((r) => r.id == roleId);
+    if (role) {
+      return role;
+    }
+    return {
+      id: -1,
+      infinitePaint: false,
+      mode: ClientMode.INTERACT,
+    };
   }
 
   getPaintFromRole(role: number): boolean {

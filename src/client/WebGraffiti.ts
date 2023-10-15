@@ -10,6 +10,7 @@ import { Client } from "./Client";
 import { ConfigProperties } from "../spec/Config";
 import { Context, ContextType, Coord } from "../spec/Canvas";
 import { ClientMode } from "../spec/Client";
+import { WelcomeMessage } from "../spec/MessageSpec";
 
 export class WebGraffiti {
   public rootElement: HTMLElement;
@@ -91,27 +92,17 @@ export class WebGraffiti {
       this.render.init();
       this.client = new Client({ wg: this });
       this.clients.push(this.client);
-      this.socket
-        .init()
-        .then(() => {
-          if (this.config.mode === ClientMode.INTERACT) {
-            this.editor.init();
-            this.input.init();
-            const role = new URLSearchParams(window.location.search).get(
-              "wgRole"
-            );
-            if (role) {
-              this.client.setRole(parseInt(role));
-            }
-          }
-        })
-        .catch((error) => {
-          console.log(
-            "Encountered an error while establishing connection!",
-            error
-          );
-        });
+      this.socket.init().catch((error) => {
+        console.log(
+          "Encountered an error while establishing connection!",
+          error
+        );
+      });
     });
+  }
+
+  reload() {
+    window.location.reload();
   }
 
   registerClient(id: string): void {
@@ -156,5 +147,22 @@ export class WebGraffiti {
       this.panOffset.y = this.minOffset.y;
     }
     this.render.canvas.style.marginTop = String(this.panOffset.y);
+  }
+
+  handleWelcome(payload: WelcomeMessage["payload"]) {
+    this.client.id = payload.id;
+    this.client.setPaint(payload.paint);
+    this.client.setDelta(Date.now() - payload.join);
+    this.client.setMode(payload.mode);
+    this.render.setActualWidth(payload.width);
+    this.render.setActualHeight(payload.height);
+    if (payload.mode === ClientMode.INTERACT) {
+      this.editor.init();
+      this.input.init();
+      const role = new URLSearchParams(window.location.search).get("wgRole");
+      if (role) {
+        this.client.setRole(parseInt(role));
+      }
+    }
   }
 }

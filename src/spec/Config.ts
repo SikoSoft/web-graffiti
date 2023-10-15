@@ -1,6 +1,9 @@
+import { ClientMode } from "./Client";
+
 export interface Role {
   id: number;
   infinitePaint: boolean;
+  mode: ClientMode;
 }
 
 export interface ConfigProperties {
@@ -27,6 +30,7 @@ export interface ConfigProperties {
   maxBrushSize: number;
   defBrushSize: number;
   defaultColors: string[];
+  defRole: number;
   roles: Role[];
 }
 
@@ -54,6 +58,7 @@ export class ConfigCore implements ConfigProperties {
   maxBrushSize: number;
   defBrushSize: number;
   defaultColors: string[];
+  defRole: number;
   roles: Role[];
 
   constructor() {
@@ -80,6 +85,13 @@ export class ConfigCore implements ConfigProperties {
     this.maxBrushSize = 10;
     this.defBrushSize = 3;
     this.defaultColors = [];
-    this.roles = [];
+    this.defRole = 0;
+    this.roles = [
+      {
+        id: 0,
+        infinitePaint: false,
+        mode: ClientMode.INTERACT,
+      },
+    ];
   }
 }

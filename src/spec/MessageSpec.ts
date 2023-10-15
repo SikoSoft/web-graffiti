@@ -1,4 +1,5 @@
 import { Context, Line } from "./Canvas";
+import { ClientMode } from "./Client";
 
 export enum MessageEvent {
   WELCOME = "welcome",
@@ -18,6 +19,7 @@ export interface MessagePayload {
     height: number;
     paint: number;
     join: number;
+    mode: ClientMode;
   };
   [MessageEvent.LINE]: {
     line: Line;

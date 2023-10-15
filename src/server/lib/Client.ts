@@ -1,6 +1,7 @@
 import { connection } from "websocket";
 import { Config } from "./Config";
 import { Context, ContextType, initialContext } from "../../spec/Canvas";
+import { Role } from "../../spec/Config";
 
 export interface ClientOptions {
   config: Config;
@@ -18,7 +19,7 @@ export class Client {
   private ip: string;
   public joinTime: number;
   public paint: number;
-  public role: number;
+  public role: Role;
   public ctx: Context;
   public connection: connection;
 
@@ -36,18 +37,18 @@ export class Client {
     this.ip = ip;
     this.joinTime = joinTime;
     this.paint = paint;
-    this.role = role;
+    this.role = this.config.getRole(this.config.defRole);
     this.ctx = Object.assign({}, initialContext);
     this.connection = connection;
   }
 
   hasInfinitePaint(): boolean {
-    return this.config.getPaintFromRole(this.role);
+    return this.role.infinitePaint;
   }
 
-  setRole(role: number): void {
-    if (this.config.roleIsValid(role)) {
-      this.role = role;
+  setRole(roleId: number): void {
+    if (this.config.roleIsValid(roleId)) {
+      this.role = this.config.getRole(roleId);
     }
   }
 
