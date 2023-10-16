@@ -10,7 +10,7 @@ export interface RenderOptions {
 export class Render {
   private wg: WebGraffiti;
   private resizeDebounce: ReturnType<typeof setTimeout> | null;
-  private ready: boolean;
+  public ready: boolean;
   public width: number;
   public height: number;
   public actualWidth: number;

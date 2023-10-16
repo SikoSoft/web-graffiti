@@ -10,10 +10,12 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
     "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
+    "build-wc": "rollup --config rollup.config.js build/wc/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
     "watch-client": "tsc --watch --project tsconfig.client.json",
     "watch-server": "tsc --watch --project tsconfig.server.json",
     "watch-spec": "tsc --watch --project tsconfig.spec.json",
     "watch-scss": "npm-run-all \"compile-scss -- --watch\"",
+    "watch-wc": "tsc --watch --project tsconfig.wc.json",
     "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch --project tsconfig.server.json --onSuccess \"node .\""
   },
   "repository": {

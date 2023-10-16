@@ -63,6 +63,10 @@ export class Controller {
       "/spec/",
       express.static(path.join(__dirname, `../../spec`))
     );
+    this.httpApp.use(
+      "/wc/",
+      express.static(path.join(__dirname, `../../../dist`))
+    );
     this.httpApp.use(express.static(this.publicRoot));
     this.httpApp.use(express.static(this.wcRoot));
 
