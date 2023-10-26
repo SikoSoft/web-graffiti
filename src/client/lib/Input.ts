@@ -1,5 +1,5 @@
-import { Line } from "../spec/Canvas";
-import { MessageEvent } from "../spec/MessageSpec";
+import { Line } from "../../spec/Canvas";
+import { MessageEvent } from "../../spec/MessageSpec";
 import { WebGraffiti } from "./WebGraffiti";
 
 declare type MouseHandler = (e: MouseEvent) => void;

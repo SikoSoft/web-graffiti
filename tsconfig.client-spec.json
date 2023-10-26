@@ -3,8 +3,8 @@
     "sourceMap": false,
     "lib": ["ES2022", "DOM"],
     "module": "ES2022",
-    "outDir": "build"
+    "outDir": "build/client"
   },
-  "include": ["src/client/**/*.ts"],
+  "include": ["src/spec/*.ts"],
   "extends": "./tsconfig.json"
 }

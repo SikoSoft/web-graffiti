@@ -4,22 +4,23 @@ import path from "path";
 import pino from "pino";
 import { ConfigCore, ConfigProperties, Role } from "../../spec/Config";
 import { ClientMode } from "../../spec/Client";
+import { Environment } from "./Environment";
 
 export interface ConfigOptions {
-  configRoot: string;
+  env: Environment;
   logger: pino.Logger;
 }
 
 export class Config extends ConfigCore {
   secureConfig: https.ServerOptions;
-  configRoot: string;
+  env: Environment;
   logger: pino.Logger;
 
-  constructor({ configRoot, logger }: ConfigOptions) {
+  constructor({ env, logger }: ConfigOptions) {
     super();
 
     this.secureConfig = {};
-    this.configRoot = configRoot;
+    this.env = env;
     this.logger = logger;
   }
 
@@ -33,7 +34,7 @@ export class Config extends ConfigCore {
 
     try {
       const configJson = fs.readFileSync(
-        path.join(this.configRoot, "/config.json"),
+        path.join(this.env.rootPath.config, "/config.json"),
         { encoding: "utf8" }
       );
       const configProperties: ConfigProperties = JSON.parse(

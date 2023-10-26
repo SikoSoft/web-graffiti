@@ -1,23 +1,9 @@
 {
   "compilerOptions": {
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "declaration": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "lib": ["ES2022", "DOM"],
     "module": "CommonJS",
-    "noEmitOnError": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "pretty": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2022",
-    "rootDir": "./src",
-    "outDir": "build",
-    "paths": {}
+    "outDir": "build"
   },
-  "include": ["src/server/*.ts"],
-  "exclude": ["build"]
+  "include": ["src/server/*.ts", "src/spec/*.ts"],
+  "extends": "./tsconfig.json"
 }

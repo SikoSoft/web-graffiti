@@ -1,5 +1,5 @@
-import { ClientMode } from "../spec/Client";
-import { ConfigCore, ConfigProperties } from "../spec/Config";
+import { ClientMode } from "../../spec/Client";
+import { ConfigCore, ConfigProperties } from "../../spec/Config";
 import { WebGraffiti } from "./WebGraffiti";
 
 export interface ConfigOptions {

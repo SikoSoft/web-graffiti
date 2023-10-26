@@ -10,18 +10,17 @@ import { Wall } from "./Wall";
 import { Messenger } from "./Messenger";
 import { MessageEvent } from "../../spec/MessageSpec";
 import path from "path";
+import { Environment } from "./Environment";
 
 export interface ControllerOptions {
-  publicRoot: string;
-  wcRoot: string;
+  env: Environment;
   config: Config;
   logger: pino.Logger;
   wall: Wall;
 }
 
 export class Controller {
-  public publicRoot: string;
-  public wcRoot: string;
+  public env: Environment;
   private config: Config;
   public clients: Client[];
   private paintPerTick: number;
@@ -32,9 +31,8 @@ export class Controller {
   private router: express.Router;
   private messenger: Messenger;
 
-  constructor({ publicRoot, wcRoot, config, logger, wall }: ControllerOptions) {
-    this.publicRoot = publicRoot;
-    this.wcRoot = wcRoot;
+  constructor({ env, config, logger, wall }: ControllerOptions) {
+    this.env = env;
     this.config = config;
     this.paintPerTick =
       (this.config.server.paintRefill / this.config.paintTime) *
@@ -58,7 +56,7 @@ export class Controller {
   }
 
   registerRoutes() {
-    this.httpApp.use(express.static(path.join(__dirname, `../../client`)));
+    this.httpApp.use(express.static(this.env.rootPath.client));
     this.httpApp.use(
       "/spec/",
       express.static(path.join(__dirname, `../../spec`))
@@ -67,8 +65,8 @@ export class Controller {
       "/wc/",
       express.static(path.join(__dirname, `../../../dist`))
     );
-    this.httpApp.use(express.static(this.publicRoot));
-    this.httpApp.use(express.static(this.wcRoot));
+    this.httpApp.use(express.static(this.env.rootPath.config));
+    //this.httpApp.use(express.static(this.wcRoot));
 
     this.router.get("/config.json", (req, res) => {
       const { server, roles, ...rest } = this.config;

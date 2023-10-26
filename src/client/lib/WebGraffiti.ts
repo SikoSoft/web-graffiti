@@ -7,10 +7,10 @@ import { Loader } from "./Loader";
 import { Input } from "./Input";
 import { Client } from "./Client";
 
-import { ConfigProperties } from "../spec/Config";
-import { Context, ContextType, Coord } from "../spec/Canvas";
-import { ClientMode } from "../spec/Client";
-import { WelcomeMessage } from "../spec/MessageSpec";
+import { ConfigProperties } from "../../spec/Config";
+import { Context, ContextType, Coord } from "../../spec/Canvas";
+import { ClientMode } from "../../spec/Client";
+import { WelcomeMessage } from "../../spec/MessageSpec";
 
 export class WebGraffiti {
   public rootElement: HTMLElement;

@@ -1,5 +1,5 @@
 //import { Canvas } from "canvas";
-import { Context, ContextHandler, ContextType, Line } from "../spec/Canvas";
+import { Context, ContextHandler, ContextType, Line } from "../../spec/Canvas";
 import { Loader } from "./Loader";
 import { WebGraffiti } from "./WebGraffiti";
 

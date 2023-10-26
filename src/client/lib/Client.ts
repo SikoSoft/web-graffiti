@@ -1,6 +1,6 @@
-import { Context, initialContext } from "../spec/Canvas";
-import { ClientMode } from "../spec/Client";
-import { MessageEvent } from "../spec/MessageSpec";
+import { Context, initialContext } from "../../spec/Canvas";
+import { ClientMode } from "../../spec/Client";
+import { MessageEvent } from "../../spec/MessageSpec";
 import { WebGraffiti } from "./WebGraffiti";
 
 export interface ClientOptions {

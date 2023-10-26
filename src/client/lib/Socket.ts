@@ -7,7 +7,7 @@ import {
   PaintMessage,
   SetContextMessage,
   WelcomeMessage,
-} from "../spec/MessageSpec";
+} from "../../spec/MessageSpec";
 import { WebGraffiti } from "./WebGraffiti";
 
 declare type MessageHander = (message: Message) => void;

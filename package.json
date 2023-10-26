@@ -6,17 +6,19 @@
   "scripts": {
     "compile": "tsc",
     "compile-scss": "sass src/client:build/client",
-    "dev": "npm-run-all --parallel watch-scss watch-client watch-spec watch-run-server",
+    "copy-static": "cp -r ./static/ ./build/client/",
+    "dev": "npm-run-all --parallel watch-scss watch-client watch-client-spec watch-run-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
     "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
     "build-wc": "rollup --config rollup.config.js build/wc/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
-    "watch-client": "tsc --watch --project tsconfig.client.json",
-    "watch-server": "tsc --watch --project tsconfig.server.json",
-    "watch-spec": "tsc --watch --project tsconfig.spec.json",
-    "watch-scss": "npm-run-all \"compile-scss -- --watch\"",
-    "watch-wc": "tsc --watch --project tsconfig.wc.json",
-    "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch --project tsconfig.server.json --onSuccess \"node .\""
+    "watch-client-old": "tsc -w -p tsconfig.client.json",
+    "watch-client": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.client.json --onSuccess \"npm run copy-static\"",
+    "watch-client-spec": "tsc -w -p tsconfig.client-spec.json",
+    "watch-server": "tsc -w -p tsconfig.server.json",
+    "watch-scss": "npm-run-all \"compile-scss -- -w\"",
+    "watch-wc": "tsc --watch -p tsconfig.wc.json",
+    "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.server.json --onSuccess \"node .\""
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,7 @@
   "homepage": "https://github.com/SikoSoft/web-graffiti#readme",
   "dependencies": {
     "canvas": "^2.11.1",
+    "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "path": "^0.12.7",
@@ -39,6 +42,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "@types/express": "^4.17.18",
     "@types/spark-md5": "^3.0.2",
     "@types/uuid": "^9.0.4",

@@ -1,23 +1,20 @@
 {
   "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "module": "CommonJS",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2022", "DOM"],
-    "module": "ES2022",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "pretty": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "strict": true,
-    "target": "es2022",
-    "rootDir": "./src/spec",
-    "outDir": "build/client/spec",
-    "paths": {}
+    "rootDir": "./src",
+    "target": "es2022"
   },
-  "include": ["src/spec/*ts"],
   "exclude": ["build"]
 }
