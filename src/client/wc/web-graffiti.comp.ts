@@ -1,5 +1,5 @@
-import { ConfigCore } from "../spec/Config";
-import { WebGraffiti } from "../client/WebGraffiti";
+import { ConfigCore } from "../../spec/Config";
+import { WebGraffiti } from "../lib/WebGraffiti";
 //import config from "./config.js";
 
 const config = new ConfigCore();

@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
     "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
-    "build-wc": "rollup --config rollup.config.js build/wc/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
+    "build-wc": "rollup --config rollup.config.js build/client/wc/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
     "watch-client-old": "tsc -w -p tsconfig.client.json",
     "watch-client": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.client.json --onSuccess \"npm run copy-static\"",
     "watch-client-spec": "tsc -w -p tsconfig.client-spec.json",
