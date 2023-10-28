@@ -109,11 +109,9 @@ export class Editor {
     this.brushSlider.setAttribute("min", String(this.wg.config.minBrushSize));
     this.brushSlider.setAttribute("max", String(this.wg.config.maxBrushSize));
     this.brushSlider.setAttribute("value", String(this.wg.config.defBrushSize));
-    this.brushSlider.addEventListener("input", (e) => {
-      console.log(e.target);
-      this.setBrushSize(
-        0 // e.currentTarget ? parseInt(e.currentTarget?.value) : 0
-      );
+    this.brushSlider.addEventListener("input", (event) => {
+      const e = event as HTMLElementEvent<HTMLInputElement>;
+      this.setBrushSize(e.target ? parseInt(e.target.value) : 0);
     });
     this.brushToolInner.append(this.brushSlider);
     this.containerInner.append(this.brushTool);
