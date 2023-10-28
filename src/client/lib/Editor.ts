@@ -68,6 +68,7 @@ export class Editor {
     this.setupPaintMeter();
     this.setupBrushTool();
     this.selectColor(0);
+    this.updatePaintMeter();
     this.initialized = true;
   }
 
