@@ -1,5 +1,4 @@
 import * as pino from "pino";
-import path from "path";
 import { Config } from "./lib/Config";
 import { Controller } from "./lib/Controller";
 import { Wall } from "./lib/Wall";
@@ -14,10 +13,6 @@ async function main(): Promise<void> {
   logger.info(`Starting Web-Graffiti...`);
 
   const env = new Environment();
-
-  const configRoot = path.join(__dirname, "../../");
-  const publicRoot = path.join(__dirname, "../../public");
-  const wcRoot = path.join(__dirname, "../../dist");
 
   const config = new Config({ env, logger });
   config.init();
