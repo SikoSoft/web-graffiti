@@ -1,9 +1,12 @@
 import { terser } from "rollup-plugin-terser";
 //import { nodeResolve } from "@rollup/plugin-node-resolve";
 import json from "@rollup/plugin-json";
+import configJson from "./config.json";
+import replace from "@rollup/plugin-replace";
 
 const devMode = process.env.NODE_ENV === "development";
 console.log(`${devMode ? "development" : "production"} mode bundle`);
+//console.log("configJson", configJson);
 
 export default [
   {
@@ -25,6 +28,11 @@ export default [
         }),
       ],
     },
-    plugins: [json()],
+    plugins: [
+      json(),
+      replace({
+        "process.env.CONFIG_JSON": JSON.stringify(configJson),
+      }),
+    ],
   },
 ];

@@ -4,21 +4,21 @@
   "description": "",
   "main": "build/server/index.js",
   "scripts": {
+    "build": "npm-run-all compile-scss compile-client copy-static compile-client-spec compile-server",
+    "build-wc": "rollup --config rollup.config.js build/client/wc/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
     "compile": "tsc",
+    "compile-client": "tsc -p tsconfig.client.json",
+    "compile-client-spec": "tsc -p tsconfig.client-spec.json",
+    "compile-server": "tsc -p tsconfig.server.json",
     "compile-scss": "sass src/client:build/client",
     "copy-static": "cp -r ./static/ ./build/client/",
     "dev": "npm-run-all --parallel watch-scss watch-client watch-client-spec watch-run-server",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
-    "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
-    "build-wc": "rollup --config rollup.config.js build/client/wc/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
-    "watch-client-old": "tsc -w -p tsconfig.client.json",
     "watch-client": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.client.json --onSuccess \"npm run copy-static\"",
     "watch-client-spec": "tsc -w -p tsconfig.client-spec.json",
+    "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.server.json --onSuccess \"node .\"",
     "watch-server": "tsc -w -p tsconfig.server.json",
-    "watch-scss": "npm-run-all \"compile-scss -- -w\"",
-    "watch-wc": "tsc --watch -p tsconfig.wc.json",
-    "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.server.json --onSuccess \"node .\""
+    "watch-scss": "npm-run-all \"compile-scss -- -w\""
   },
   "repository": {
     "type": "git",
@@ -43,6 +43,7 @@
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.4",
     "@types/express": "^4.17.18",
     "@types/spark-md5": "^3.0.2",
     "@types/uuid": "^9.0.4",
