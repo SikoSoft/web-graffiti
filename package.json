@@ -5,7 +5,7 @@
   "main": "build/server/index.js",
   "scripts": {
     "build": "npm-run-all compile-scss compile-client copy-static compile-client-spec compile-server",
-    "build-wc": "rollup --config rollup.config.js build/client/wc/web-graffiti.comp.js --file dist/web-graffiti.comp.js",
+    "build-wc": "rollup --config rollup.config.js build/client/wc/web-graffiti.comp.js --file build/client/wc/bundle/web-graffiti.comp.js",
     "compile": "tsc",
     "compile-client": "tsc -p tsconfig.client.json",
     "compile-client-spec": "tsc -p tsconfig.client-spec.json",

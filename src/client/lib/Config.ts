@@ -29,9 +29,7 @@ export class Config extends ConfigCore {
       fetch("config.json")
         .then((response) => response.json())
         .then((configJson) => {
-          const configProperties: ConfigProperties =
-            configJson as ConfigProperties;
-          Object.assign(this, configProperties);
+          this.process(configJson as ConfigProperties);
           resolve(true);
         })
         .catch(() => {

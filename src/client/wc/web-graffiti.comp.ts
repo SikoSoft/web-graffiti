@@ -1,6 +1,5 @@
-import { ConfigCore } from "../../spec/Config";
+import { ConfigCore, ConfigProperties } from "../../spec/Config";
 import { WebGraffiti } from "../lib/WebGraffiti";
-//import config from "./config.js";
 
 const config = new ConfigCore();
 
@@ -10,7 +9,6 @@ export class WebGraffitiComponent extends HTMLElement {
 
   constructor() {
     super();
-    //console.log(`config from process: ${process.env.wgConfig}`);
     this.wg = new WebGraffiti();
     this.attachShadow({ mode: "open" });
     this.rootElement = document.createElement("div");
@@ -28,15 +26,16 @@ export class WebGraffitiComponent extends HTMLElement {
   }
 
   connectedCallback() {
-    /*
+    config.process(process.env.CONFIG_JSON as unknown as ConfigProperties);
     config.width = this.hasAttribute("width")
       ? parseInt(this.getAttribute("width") || "320")
       : config.width;
     config.height = this.hasAttribute("height")
       ? parseInt(this.getAttribute("height") || "240")
       : config.height;
-      */
-    this.wg.init(this.rootElement, config); //, config);
+    this.wg.init(this.rootElement, config);
+    this.rootElement.style.width = `${config.width}px`;
+    this.rootElement.style.height = `${config.height}px`;
   }
 
   disconnectedCallback() {}

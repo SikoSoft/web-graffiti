@@ -94,4 +94,8 @@ export class ConfigCore implements ConfigProperties {
       },
     ];
   }
+
+  process(configProperties: ConfigProperties) {
+    Object.assign(this, configProperties);
+  }
 }

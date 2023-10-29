@@ -37,11 +37,8 @@ export class Config extends ConfigCore {
         path.join(this.env.rootPath.config, "/config.json"),
         { encoding: "utf8" }
       );
-      const configProperties: ConfigProperties = JSON.parse(
-        configJson
-      ) as ConfigProperties;
 
-      Object.assign(this, configProperties);
+      this.process(JSON.parse(configJson) as ConfigProperties);
     } catch (error) {
       this.logger.error(
         `Encountered an error while trying to load config.json: ${error}`
