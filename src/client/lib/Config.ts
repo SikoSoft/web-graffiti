@@ -11,13 +11,9 @@ export type ConfigProperty = Partial<ConfigProperties>;
 export class Config extends ConfigCore {
   private wg: WebGraffiti;
 
-  public mode: ClientMode;
-
   constructor({ wg }: ConfigOptions) {
     super();
     this.wg = wg;
-
-    this.mode = ClientMode.INTERACT;
   }
 
   async load(initConfig: Partial<ConfigProperties> = {}): Promise<boolean> {
