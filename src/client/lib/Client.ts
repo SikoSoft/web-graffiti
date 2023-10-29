@@ -51,7 +51,7 @@ export class Client {
     this.color = color;
     this.ctx.strokeStyle = `${color}${Math.round(this.alpha * 255).toString(
       16
-    )}`; // eslint-disable-line
+    )}`;
     this.syncContext();
     this.wg.render.syncCursor();
   }

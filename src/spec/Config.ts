@@ -32,6 +32,7 @@ export interface ConfigProperties {
   defaultColors: string[];
   defRole: number;
   roles: Role[];
+  mode: ClientMode;
 }
 
 export class ConfigCore implements ConfigProperties {
@@ -60,6 +61,7 @@ export class ConfigCore implements ConfigProperties {
   defaultColors: string[];
   defRole: number;
   roles: Role[];
+  mode: ClientMode;
 
   constructor() {
     this.server = {
@@ -93,9 +95,10 @@ export class ConfigCore implements ConfigProperties {
         mode: ClientMode.INTERACT,
       },
     ];
+    this.mode = ClientMode.INTERACT;
   }
 
-  process(configProperties: ConfigProperties) {
+  process(configProperties: Partial<ConfigProperties>) {
     Object.assign(this, configProperties);
   }
 }

@@ -156,7 +156,10 @@ export class WebGraffiti {
     this.client.setMode(payload.mode);
     this.render.setActualWidth(payload.width);
     this.render.setActualHeight(payload.height);
-    if (payload.mode === ClientMode.INTERACT) {
+    if (
+      this.config.mode === ClientMode.INTERACT &&
+      payload.mode === ClientMode.INTERACT
+    ) {
       this.editor.init();
       this.input.init();
       const role = new URLSearchParams(window.location.search).get("wgRole");

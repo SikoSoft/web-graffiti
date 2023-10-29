@@ -1,3 +1,4 @@
+import { ClientMode } from "../../spec/Client";
 import { ConfigCore, ConfigProperties } from "../../spec/Config";
 import { WebGraffiti } from "../lib/WebGraffiti";
 
@@ -27,6 +28,7 @@ export class WebGraffitiComponent extends HTMLElement {
 
   connectedCallback() {
     config.process(process.env.CONFIG_JSON as unknown as ConfigProperties);
+    config.mode = ClientMode.SPECTATE;
     config.width = this.hasAttribute("width")
       ? parseInt(this.getAttribute("width") || "320")
       : config.width;
