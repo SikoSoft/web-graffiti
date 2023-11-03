@@ -76,9 +76,6 @@ export class Controller {
   }
 
   startWebServer() {
-    this.logger.debug(
-      `startWebServer: ${JSON.stringify(this.config.secureConfig)}`
-    );
     (this.config.server.secure
       ? https.createServer(this.config.secureConfig, this.httpApp)
       : http.createServer(this.config.secureConfig, this.httpApp)

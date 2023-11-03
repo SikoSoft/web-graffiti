@@ -26,19 +26,19 @@ export class Config extends ConfigCore {
 
   init() {
     try {
-      this.secureConfig = this.server.secure
-        ? {
-            key: fs.readFileSync(this.server.secureKey),
-            cert: fs.readFileSync(this.server.secureCert),
-          }
-        : {};
-
       const configJson = fs.readFileSync(
         path.join(this.env.rootPath.config, "/config.json"),
         { encoding: "utf8" }
       );
 
       this.process(JSON.parse(configJson) as ConfigProperties);
+
+      this.secureConfig = this.server.secure
+        ? {
+            key: fs.readFileSync(this.server.secureKey),
+            cert: fs.readFileSync(this.server.secureCert),
+          }
+        : {};
     } catch (error) {
       this.logger.error(
         `Encountered an error while trying to load config.json: ${error}`
