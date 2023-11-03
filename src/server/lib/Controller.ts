@@ -57,16 +57,6 @@ export class Controller {
 
   registerRoutes() {
     this.httpApp.use(express.static(this.env.rootPath.client));
-    this.httpApp.use(
-      "/spec/",
-      express.static(path.join(__dirname, `../../spec`))
-    );
-    this.httpApp.use(
-      "/wc/",
-      express.static(path.join(__dirname, `../../../dist`))
-    );
-    this.httpApp.use(express.static(this.env.rootPath.config));
-    //this.httpApp.use(express.static(this.wcRoot));
 
     this.router.get("/config.json", (req, res) => {
       const { server, roles, ...rest } = this.config;
