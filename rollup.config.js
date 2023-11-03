@@ -1,7 +1,9 @@
 import { terser } from "rollup-plugin-terser";
+import json from "@rollup/plugin-json";
+import configJson from "./config.json";
+import replace from "@rollup/plugin-replace";
 
 const devMode = process.env.NODE_ENV === "development";
-console.log(`${devMode ? "development" : "production"} mode bundle`);
 
 export default [
   {
@@ -16,12 +18,18 @@ export default [
             module: true,
             toplevel: true,
             unsafe_arrows: true,
-            drop_console: !devMode,
+            drop_console: false, //!devMode,
             drop_debugger: !devMode,
           },
           output: { quote_style: 1 },
         }),
       ],
     },
+    plugins: [
+      json(),
+      replace({
+        "process.env.CONFIG_JSON": JSON.stringify(configJson),
+      }),
+    ],
   },
 ];

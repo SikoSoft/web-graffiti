@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "module": "CommonJS",
+    "outDir": "build"
+  },
+  "include": ["src/server/*.ts", "src/spec/*.ts"],
+  "extends": "./tsconfig.json"
+}

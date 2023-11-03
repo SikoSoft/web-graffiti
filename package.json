@@ -1,13 +1,24 @@
 {
   "name": "web-graffiti",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "",
-  "main": "serve.js",
+  "main": "build/server/index.js",
   "scripts": {
-    "dev": "nodemon ./serve.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm-run-all compile-scss compile-client copy-static compile-client-spec compile-server",
+    "build-wc": "rollup --config rollup.config.js build/client/wc/web-graffiti.comp.js --file build/client/wc/bundle/web-graffiti.comp.js",
+    "compile": "tsc",
+    "compile-client": "tsc -p tsconfig.client.json",
+    "compile-client-spec": "tsc -p tsconfig.client-spec.json",
+    "compile-server": "tsc -p tsconfig.server.json",
+    "compile-scss": "sass src/client:build/client",
+    "copy-static": "cp -r ./static/ ./build/client/",
+    "dev": "npm-run-all --parallel watch-scss watch-client watch-client-spec watch-run-server",
     "prepare": "husky install",
-    "build": "rollup --config rollup.config.js public/components/web-graffiti.comp.js --file dist/web-graffiti.comp.js"
+    "watch-client": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.client.json --onSuccess \"npm run copy-static\"",
+    "watch-client-spec": "tsc -w -p tsconfig.client-spec.json",
+    "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.server.json --onSuccess \"node .\"",
+    "watch-server": "tsc -w -p tsconfig.server.json",
+    "watch-scss": "npm-run-all \"compile-scss -- -w\""
   },
   "repository": {
     "type": "git",
@@ -20,25 +31,35 @@
   },
   "homepage": "https://github.com/SikoSoft/web-graffiti#readme",
   "dependencies": {
-    "canvas": "^2.8.0",
+    "canvas": "^2.11.1",
+    "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "path": "^0.12.7",
-    "spark-md5": "^3.0.1",
+    "pino": "^8.15.1",
     "uuid": "^8.3.2",
     "websocket": "^1.0.34"
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^5.0.4",
+    "@types/express": "^4.17.18",
+    "@types/spark-md5": "^3.0.2",
+    "@types/uuid": "^9.0.4",
+    "@types/websocket": "^1.0.7",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
-    "nodemon": "^2.0.16",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.3.0",
     "rollup": "^2.75.4",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "sass": "^1.69.0",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.2.2"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix"
