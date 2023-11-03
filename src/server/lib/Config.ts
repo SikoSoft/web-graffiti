@@ -25,14 +25,14 @@ export class Config extends ConfigCore {
   }
 
   init() {
-    this.secureConfig = this.server.secure
-      ? {
-          key: fs.readFileSync(this.server.secureKey),
-          cert: fs.readFileSync(this.server.secureCert),
-        }
-      : {};
-
     try {
+      this.secureConfig = this.server.secure
+        ? {
+            key: fs.readFileSync(this.server.secureKey),
+            cert: fs.readFileSync(this.server.secureCert),
+          }
+        : {};
+
       const configJson = fs.readFileSync(
         path.join(this.env.rootPath.config, "/config.json"),
         { encoding: "utf8" }
