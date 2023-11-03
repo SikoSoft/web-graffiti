@@ -1,0 +1,66 @@
+<html>
+
+
+  <head>
+
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+
+
+    <title>Web Graffiti</title>
+
+
+    <link rel="stylesheet" type="text/css" href="WebGraffiti.css" />
+
+
+    <script type="importmap">
+      {
+        "imports": {
+          "./lib/Client": "./lib/Client.js",
+          "./lib/Config": "./lib/Config.js",
+          "./lib/Editor": "./lib/Editor.js",
+          "./lib/Input": "./lib/Input.js",
+          "./lib/Loader": "./lib/Loader.js",
+          "./lib/NetworkMonitor": "./lib/NetworkMonitor.js",
+          "./lib/Render": "./lib/Render.js",
+          "./lib/Socket": "./lib/Socket.js",
+          "./lib/WebGraffiti": "./lib/WebGraffiti.js",
+          "../spec/Config": "./spec/Config.js",
+          "../spec/Canvas": "./spec/Canvas.js",
+          "../spec/Client": "./spec/Client.js",
+          "../spec/MessageSpec": "./spec/MessageSpec.js"
+        }
+      }
+    </script>
+
+
+    <script type="module">
+      import { WebGraffiti } from "./lib/WebGraffiti.js";
+      const wg = new WebGraffiti();
+      window.wg = wg;
+      document.onreadystatechange = function () {
+        if (document.readyState === "complete") {
+          wg.init(document.getElementById("webGraffiti"));
+        }
+      };
+    </script>
+
+
+  </head>
+
+
+  <body>
+
+
+    <div id="webGraffiti"></div>
+
+
+  </body>
+
+
+</html>
+
+

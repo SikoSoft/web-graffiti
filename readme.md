@@ -23,3 +23,7 @@ Copy example.config.json to config.json and adjust the values as necessary. Noth
 Access the web page at:
 
 http://localhost
+
+Script naming convention
+
+It can be assumed that scripts beginning with "compile" will transpile Typescript to Javascript, and nothing else. Scripts beginning with "build" will not only perform transpilation, but also might copy files or run additional scripts needed to wrap things up neatly.

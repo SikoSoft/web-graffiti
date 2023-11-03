@@ -1,26 +1,65 @@
-export default class editor {
-  constructor(wg) {
+import { WebGraffiti } from "./WebGraffiti";
+
+type HTMLElementEvent<T extends HTMLElement> = Event & {
+  target: T;
+};
+
+export interface EditorOptions {
+  wg: WebGraffiti;
+}
+
+export class Editor {
+  private wg: WebGraffiti;
+  public selected: number;
+  public initialized: boolean;
+  public enabled: boolean;
+  private colors: string[];
+
+  public container: HTMLDivElement;
+  public containerInner: HTMLDivElement;
+  public paintMeter: HTMLDivElement;
+  public palette: HTMLDivElement;
+  public handle: HTMLDivElement;
+  public paintRemaining: HTMLDivElement;
+  public brushTool: HTMLDivElement;
+  public brushToolInner: HTMLDivElement;
+  public brushPreview: HTMLDivElement;
+  public brushSlider: HTMLInputElement;
+
+  constructor({ wg }: EditorOptions) {
     this.wg = wg;
     this.selected = 0;
     this.initialized = false;
     this.enabled = false;
+    this.colors = [];
+
+    this.container = document.createElement("div");
+    this.containerInner = document.createElement("div");
+    this.paintMeter = document.createElement("div");
+    this.palette = document.createElement("div");
+    this.handle = document.createElement("div");
+    this.paintRemaining = document.createElement("div");
+    this.brushTool = document.createElement("div");
+    this.brushToolInner = document.createElement("div");
+    this.brushPreview = document.createElement("div");
+    this.brushSlider = document.createElement("input");
   }
 
-  init() {
+  init(): void {
     this.colors = [...this.wg.config.defaultColors];
-    this.container = document.createElement("div");
+
     this.container.className = "webGraffiti__editor";
-    this.containerInner = document.createElement("div");
+
     this.containerInner.className = "webGraffiti__editor_inner";
-    this.paintMeter = document.createElement("div");
+
     this.paintMeter.className = "webGraffiti__editor_paint_meter";
     this.containerInner.append(this.paintMeter);
-    this.palette = document.createElement("div");
+
     this.palette.className = "webGraffiti__editor_palette";
     this.containerInner.append(this.palette);
     this.container.append(this.containerInner);
     this.wg.rootElement.append(this.container);
-    this.handle = document.createElement("div");
+
     this.handle.className = "webGraffiti__editor_handle";
     this.containerInner.append(this.handle);
     this.colors.forEach((color, index) => {
@@ -29,25 +68,25 @@ export default class editor {
     this.setupPaintMeter();
     this.setupBrushTool();
     this.selectColor(0);
+    this.updatePaintMeter();
     this.initialized = true;
   }
 
-  enable() {
+  enable(): void {
     if (this.initialized) {
       this.enabled = true;
       this.container.classList.remove("webGraffiti__editor--gone");
     }
   }
 
-  disable() {
+  disable(): void {
     if (this.initialized) {
       this.enabled = false;
       this.container.classList.add("webGraffiti__editor--gone");
     }
   }
 
-  setupPaintMeter() {
-    this.paintRemaining = document.createElement("div");
+  setupPaintMeter(): void {
     this.paintRemaining.className = "webGraffiti__editor_paint_remaining";
     this.paintMeter.append(this.paintRemaining);
     this.wg.input.registerClick(this.paintMeter, () => {
@@ -55,68 +94,46 @@ export default class editor {
     });
   }
 
-  setupBrushTool() {
-    this.brushTool = document.createElement("div");
+  setupBrushTool(): void {
     this.brushTool.className = "webGraffiti__editor_brush";
-    this.brushToolInner = document.createElement("div");
+
     this.brushToolInner.className = "webGraffiti__editor_brush_inner";
     this.brushTool.append(this.brushToolInner);
-    this.brushPreview = document.createElement("div");
+
     this.brushPreview.className = "webGraffiti__editor_brush_preview";
     this.brushToolInner.append(this.brushPreview);
-    this.brushSlider = document.createElement("input");
+
     this.brushSlider.className = "webGraffiti_editor_brush_slider";
     this.brushSlider.setAttribute("type", "range");
     this.brushSlider.setAttribute("orient", "vertical");
-    this.brushSlider.setAttribute("min", this.wg.config.minBrushSize);
-    this.brushSlider.setAttribute("max", this.wg.config.maxBrushSize);
-    this.brushSlider.setAttribute("value", this.wg.config.defBrushSize);
-    this.brushSlider.addEventListener("input", (e) => {
-      this.setBrushSize(e.target.value);
+    this.brushSlider.setAttribute("min", String(this.wg.config.minBrushSize));
+    this.brushSlider.setAttribute("max", String(this.wg.config.maxBrushSize));
+    this.brushSlider.setAttribute("value", String(this.wg.config.defBrushSize));
+    this.brushSlider.addEventListener("input", (event) => {
+      const e = event as HTMLElementEvent<HTMLInputElement>;
+      this.setBrushSize(e.target ? parseInt(e.target.value) : 0);
     });
     this.brushToolInner.append(this.brushSlider);
     this.containerInner.append(this.brushTool);
   }
 
-  setupButton(buttonColor, index) {
+  setupButton(buttonColor: string, index: number): Node {
     const button = document.createElement("button");
     button.className = "webGraffiti__color";
     button.setAttribute("data-color", buttonColor);
-    button.setAttribute("data-index", index);
+    button.setAttribute("data-index", String(index));
     button.style.backgroundColor = buttonColor;
-    if (window.Picker) {
-      const picker = new window.Picker({
-        color: buttonColor,
-        parent: button,
-        alpha: false,
-        editor: false,
-        popup: "top",
-        onDone: (color) => {
-          const hexValue = color.hex.substr(0, 7);
-          button.setAttribute("data-color", hexValue);
-          button.style.backgroundColor = hexValue;
-          this.colors[index] = hexValue;
-          this.selectColor(index);
-        },
-      });
-      picker.openHandler = () => {
-        this.selectColor(index);
-        if (this.wg.input.doubleClick) {
-          picker.show();
-        }
-      };
-    }
     button.addEventListener("touchstart", () => {
       this.selectColor(index);
     });
     return button;
   }
 
-  selectColor(index) {
+  selectColor(index: number) {
     this.selected = index;
     this.wg.client.setColor(this.colors[index]);
     document.querySelectorAll(".webGraffiti__color").forEach((button) => {
-      if (parseInt(button.getAttribute("data-index")) === index) {
+      if (parseInt(button.getAttribute("data-index") || "") === index) {
         button.classList.add("webGraffiti__color--active");
       } else {
         button.classList.remove("webGraffiti__color--active");
@@ -126,7 +143,7 @@ export default class editor {
     this.paintRemaining.style.backgroundColor = this.colors[this.selected];
   }
 
-  setBrushSize(size) {
+  setBrushSize(size: number) {
     this.wg.client.setLineWidth(size);
     this.updateBrushPreview();
   }
