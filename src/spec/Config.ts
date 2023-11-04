@@ -6,6 +6,11 @@ export interface Role {
   mode: ClientMode;
 }
 
+export interface ChannelConfig {
+  id: number;
+  imageName: string;
+}
+
 export interface ConfigProperties {
   server: {
     secure: boolean;
@@ -33,6 +38,8 @@ export interface ConfigProperties {
   defRole: number;
   roles: Role[];
   mode: ClientMode;
+  channels: ChannelConfig[];
+  defChannel: number;
 }
 
 export class ConfigCore implements ConfigProperties {
@@ -62,6 +69,8 @@ export class ConfigCore implements ConfigProperties {
   defRole: number;
   roles: Role[];
   mode: ClientMode;
+  channels: ChannelConfig[];
+  defChannel: number;
 
   constructor() {
     this.server = {
@@ -96,6 +105,13 @@ export class ConfigCore implements ConfigProperties {
       },
     ];
     this.mode = ClientMode.INTERACT;
+    this.channels = [
+      {
+        id: 0,
+        imageName: "",
+      },
+    ];
+    this.defChannel = 0;
   }
 
   process(configProperties: Partial<ConfigProperties>) {

@@ -9,8 +9,8 @@ import { Client } from "./Client";
 import { Wall } from "./Wall";
 import { Messenger } from "./Messenger";
 import { MessageEvent } from "../../spec/MessageSpec";
-import path from "path";
 import { Environment } from "./Environment";
+import { Channel } from "./Channel";
 
 export interface ControllerOptions {
   env: Environment;
@@ -22,7 +22,8 @@ export interface ControllerOptions {
 export class Controller {
   public env: Environment;
   private config: Config;
-  public clients: Client[];
+  //public clients: Client[];
+  public channels: Channel[];
   private paintPerTick: number;
   private logger: pino.Logger;
   public wall: Wall;
@@ -37,7 +38,8 @@ export class Controller {
     this.paintPerTick =
       (this.config.server.paintRefill / this.config.paintTime) *
       this.config.paintVolume;
-    this.clients = [];
+    //this.clients = [];
+    this.channels = [];
     this.logger = logger;
     this.wall = wall;
     this.httpApp = express();
@@ -46,6 +48,8 @@ export class Controller {
   }
 
   init() {
+    this.registerChannels();
+
     this.registerRoutes();
 
     this.startWebServer();
@@ -53,6 +57,14 @@ export class Controller {
     this.startWebSocketServer();
 
     this.startTickTimers();
+  }
+
+  registerChannels() {
+    this.channels = this.config.channels.map((channel) => ({
+      id: channel.id,
+      config: channel,
+      clients: [],
+    }));
   }
 
   registerRoutes() {
@@ -86,7 +98,11 @@ export class Controller {
     }).on("request", (request) => {
       const connection = request.accept(null, request.origin);
 
-      const client = this.registerClient(request.remoteAddress, connection);
+      const client = this.registerClient(
+        this.config.defChannel,
+        request.remoteAddress,
+        connection
+      );
 
       connection.on("message", (message) => {
         if (message.type === "utf8") {
@@ -106,7 +122,11 @@ export class Controller {
     });
   }
 
-  registerClient(ip: string, connection: connection): Client {
+  registerClient(
+    channelId: number,
+    ip: string,
+    connection: connection
+  ): Client {
     const id = v4();
 
     this.logger.info(`New connection for ${id}`);
@@ -119,31 +139,37 @@ export class Controller {
       ip,
       paint: this.config.paintVolume,
       connection,
+      channelId,
     });
 
-    this.clients.push(client);
+    const channel = this.getChannel(channelId);
+    if (channel) {
+      this.logger.debug(`Channel exists for new client: ${channel.id}`);
+      channel.clients.push(client);
 
-    this.messenger.send(connection, {
-      event: MessageEvent.WELCOME,
-      payload: {
-        id,
-        width: this.config.width,
-        height: this.config.height,
-        paint: client.paint,
-        join: client.joinTime,
-        mode: client.role.mode,
-      },
-    });
+      this.messenger.send(connection, {
+        event: MessageEvent.WELCOME,
+        payload: {
+          id,
+          width: this.config.width,
+          height: this.config.height,
+          paint: client.paint,
+          join: client.joinTime,
+          mode: client.role.mode,
+        },
+      });
 
-    this.announceOthersToNewClient(client);
+      this.announceOthersToNewClient(client);
 
-    this.announceNewClientToOthers(client);
+      this.announceNewClientToOthers(client);
+    }
 
     return client;
   }
 
   announceNewClientToOthers(newClient: Client) {
     this.messenger.broadcast(
+      newClient.channelId,
       {
         event: "newClient",
         id: newClient.id,
@@ -153,52 +179,71 @@ export class Controller {
   }
 
   announceOthersToNewClient(newClient: Client) {
-    this.clients
-      .filter((client) => client.id !== newClient.id)
-      .forEach((client) => {
-        this.messenger.send(newClient.connection, {
-          event: MessageEvent.NEW_CLIENT,
-          payload: {
-            id: client.id,
-            ctx: client.ctx,
-          },
+    const channel = this.getChannel(newClient.channelId);
+    if (channel) {
+      channel.clients
+        .filter((client) => client.id !== newClient.id)
+        .forEach((client) => {
+          this.messenger.send(newClient.connection, {
+            event: MessageEvent.NEW_CLIENT,
+            payload: {
+              id: client.id,
+              ctx: client.ctx,
+            },
+          });
         });
-      });
+    }
   }
 
   removeClient(client: Client) {
     this.logger.info(`Client ${client.id} disconnected`);
-    this.clients.splice(this.clients.indexOf(client), 1);
-    if (this.clients.length === 0) {
-      this.wall.sync();
+    const channel = this.getChannel(client.channelId);
+    if (channel) {
+      channel.clients.splice(channel.clients.indexOf(client), 1);
+      if (channel.clients.length === 0) {
+        this.wall.sync();
+      }
     }
   }
 
   startTickTimers() {
     setInterval(() => {
-      this.clients.forEach((client) => {
-        if (client.paint < this.config.paintVolume) {
-          const newPaint =
-            client.paint + this.paintPerTick < this.config.paintVolume
-              ? client.paint + this.paintPerTick
-              : this.config.paintVolume;
-          client.paint = newPaint;
-          this.messenger.send(client.connection, {
-            event: MessageEvent.PAINT,
-            payload: { paint: client.paint },
-          });
-        }
+      this.channels.forEach((channel) => {
+        channel.clients.forEach((client) => {
+          if (client.paint < this.config.paintVolume) {
+            const newPaint =
+              client.paint + this.paintPerTick < this.config.paintVolume
+                ? client.paint + this.paintPerTick
+                : this.config.paintVolume;
+            client.paint = newPaint;
+            this.messenger.send(client.connection, {
+              event: MessageEvent.PAINT,
+              payload: { paint: client.paint },
+            });
+          }
+        });
       });
     }, this.config.server.paintRefill);
 
     setInterval(() => {
       this.logger.debug(
-        `There are ${this.clients.length} clients currently connected`
+        `There are ${this.getTotalClients()} clients currently connected`
       );
     }, this.config.server.status);
 
     setInterval(() => {
       this.wall.sync();
     }, this.config.server.autoSave);
+  }
+
+  getTotalClients(): number {
+    return this.channels.reduce(
+      (acc, channel) => acc + channel.clients.length,
+      0
+    );
+  }
+
+  getChannel(channelId: number): Channel | undefined {
+    return this.channels.find((channel) => channel.id === channelId);
   }
 }

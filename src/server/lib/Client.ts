@@ -11,6 +11,7 @@ export interface ClientOptions {
   paint: number;
   role: number;
   connection: connection;
+  channelId: number;
 }
 
 export class Client {
@@ -22,6 +23,7 @@ export class Client {
   public role: Role;
   public ctx: Context;
   public connection: connection;
+  public channelId: number;
 
   constructor({
     config,
@@ -31,6 +33,7 @@ export class Client {
     paint,
     role,
     connection,
+    channelId,
   }: ClientOptions) {
     this.config = config;
     this.id = id;
@@ -40,6 +43,7 @@ export class Client {
     this.role = this.config.getRole(this.config.defRole);
     this.ctx = Object.assign({}, initialContext);
     this.connection = connection;
+    this.channelId = this.config.defChannel;
   }
 
   hasInfinitePaint(): boolean {

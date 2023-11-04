@@ -98,6 +98,7 @@ export class Messenger {
       });
 
       this.broadcast(
+        client.channelId,
         {
           event: MessageEvent.LINE,
           payload: {
@@ -122,12 +123,19 @@ export class Messenger {
     });
   }
 
-  broadcast(message: any, ignoreClientId: string | undefined = "") {
-    this.controller.clients
-      .filter((client) => !ignoreClientId || client.id !== ignoreClientId)
-      .forEach((client) => {
-        this.send(client.connection, message);
-      });
+  broadcast(
+    channelId: number,
+    message: any,
+    ignoreClientId: string | undefined = ""
+  ) {
+    const channel = this.controller.getChannel(channelId);
+    if (channel) {
+      channel.clients
+        .filter((client) => !ignoreClientId || client.id !== ignoreClientId)
+        .forEach((client) => {
+          this.send(client.connection, message);
+        });
+    }
   }
 
   send(connection: connection, message: Message) {
