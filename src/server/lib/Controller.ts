@@ -188,8 +188,10 @@ export class Controller {
     this.messenger.broadcast(
       newClient.channel.id,
       {
-        event: "newClient",
-        id: newClient.id,
+        event: MessageEvent.NEW_CLIENT,
+        payload: {
+          id: newClient.id,
+        },
       },
       newClient.id
     );

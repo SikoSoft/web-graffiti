@@ -125,7 +125,7 @@ export class Messenger {
 
   broadcast(
     channelId: number,
-    message: any,
+    message: Message,
     ignoreClientId: string | undefined = ""
   ) {
     const channel = this.controller.getChannel(channelId);
