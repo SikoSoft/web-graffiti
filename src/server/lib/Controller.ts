@@ -22,7 +22,6 @@ export interface ControllerOptions {
 export class Controller {
   public env: Environment;
   private config: Config;
-  //public clients: Client[];
   public channels: Channel[];
   private paintPerTick: number;
   private logger: pino.Logger;
@@ -38,7 +37,6 @@ export class Controller {
     this.paintPerTick =
       (this.config.server.paintRefill / this.config.paintTime) *
       this.config.paintVolume;
-    //this.clients = [];
     this.channels = [];
     this.logger = logger;
     this.walls = walls;
@@ -191,6 +189,7 @@ export class Controller {
         event: MessageEvent.NEW_CLIENT,
         payload: {
           id: newClient.id,
+          ctx: newClient.ctx,
         },
       },
       newClient.id

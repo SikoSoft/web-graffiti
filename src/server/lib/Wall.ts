@@ -98,6 +98,7 @@ export class Wall {
   }
 
   save(buffer: Buffer, hash: string) {
+    this.logger.info(`Saving image (hash: ${hash})`);
     this.lastHash = hash;
     fs.writeFileSync(
       path.join(this.env.rootPath.client, this.channelConfig.imageName),
@@ -115,6 +116,7 @@ export class Wall {
   setContext(ctx: Record<string, string | number>) {
     for (const key in ctx) {
       if (key in this.ctxMap) {
+        //this.logger.debug(`${key} exists in ctxMap: ${ctx[key]}`);
         this.ctxMap[key](ctx[key]);
       }
     }

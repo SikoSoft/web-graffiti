@@ -62,6 +62,17 @@ export class Messenger {
   handleSetContext(client: Client, payload: SetContextMessage["payload"]) {
     client.channel.wall.setContext(payload.ctx);
     client.ctx = payload.ctx;
+    this.broadcast(
+      client.channel.id,
+      {
+        event: MessageEvent.SET_CONTEXT,
+        payload: {
+          id: client.id,
+          ctx: payload.ctx,
+        },
+      },
+      client.id
+    );
   }
 
   handleLine(client: Client, payload: LineMessage["payload"]) {

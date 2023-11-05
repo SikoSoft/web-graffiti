@@ -123,6 +123,9 @@ export class Editor {
     button.setAttribute("data-color", buttonColor);
     button.setAttribute("data-index", String(index));
     button.style.backgroundColor = buttonColor;
+    button.addEventListener("mousedown", () => {
+      this.selectColor(index);
+    });
     button.addEventListener("touchstart", () => {
       this.selectColor(index);
     });

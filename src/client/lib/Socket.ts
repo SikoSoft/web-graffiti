@@ -45,6 +45,8 @@ export class Socket {
         this.handleDevClientUpdate(
           message.payload as DevClientUpdateMessage["payload"]
         ),
+      [MessageEvent.SET_CONTEXT]: (message) =>
+        this.handleSetContext(message.payload as SetContextMessage["payload"]),
     };
   }
 
