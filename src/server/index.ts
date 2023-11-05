@@ -7,6 +7,9 @@ import { Environment } from "./lib/Environment";
 const logger = pino.pino({
   name: "web-graffiti",
   level: "debug",
+  formatters: {
+    bindings: (bindings) => ({}),
+  },
 });
 
 async function main(): Promise<void> {
