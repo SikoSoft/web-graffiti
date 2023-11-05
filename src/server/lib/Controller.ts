@@ -114,7 +114,7 @@ export class Controller {
 
       const channelId = url.searchParams.has("channelId")
         ? parseInt(
-            url.searchParams.get("channel") || `${this.config.defChannel}`
+            url.searchParams.get("channelId") || `${this.config.defChannel}`
           )
         : this.config.defChannel;
 
@@ -149,7 +149,7 @@ export class Controller {
   registerClient(channel: Channel, ip: string, connection: connection): Client {
     const id = v4();
 
-    this.logger.info(`New connection for ${id}`);
+    this.logger.info(`New connection for ${id} (channel: ${channel.id})`);
 
     const client = new Client({
       config: this.config,
