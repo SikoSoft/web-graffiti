@@ -33,6 +33,7 @@ export class WebGraffiti {
   public initConfig: Partial<ConfigProperties>;
   public panOffset: Coord;
   public minOffset: Coord;
+  public channelId: number;
 
   constructor() {
     this.rootElement = document.createElement("div");
@@ -55,9 +56,16 @@ export class WebGraffiti {
     this.panOffset = { x: 0, y: 0 };
     this.minOffset = { x: 0, y: 0 };
     this.client = new Client({ wg: this });
+    this.channelId = 0;
   }
 
   init(element: HTMLElement, initConfig: Partial<ConfigProperties> = {}): void {
+    const channelId = new URLSearchParams(window.location.search).get(
+      "channelId"
+    );
+    if (channelId !== null && channelId !== undefined) {
+      this.channelId = parseInt(channelId);
+    }
     this.initConfig = initConfig;
     this.rootElement = element;
     this.rootElement.classList.add("webGraffiti");

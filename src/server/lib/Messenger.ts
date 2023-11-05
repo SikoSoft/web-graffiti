@@ -60,20 +60,20 @@ export class Messenger {
   }
 
   handleSetContext(client: Client, payload: SetContextMessage["payload"]) {
-    this.controller.wall.setContext(payload.ctx);
+    client.channel.wall.setContext(payload.ctx);
     client.ctx = payload.ctx;
   }
 
   handleLine(client: Client, payload: LineMessage["payload"]) {
     const [x1, y1, x2, y2] = payload.line;
 
-    this.controller.wall.setContext(client.ctx);
+    client.channel.wall.setContext(client.ctx);
 
     let paintUsed;
     if (client.hasInfinitePaint()) {
       paintUsed = 0;
     } else {
-      paintUsed = this.controller.wall.ctx.lineWidth * Math.PI;
+      paintUsed = client.channel.wall.ctx.lineWidth * Math.PI;
     }
 
     let newVolume = client.paint - paintUsed;
@@ -85,11 +85,11 @@ export class Messenger {
     if (!exceeded) {
       this.logger.debug(`Line: x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`);
       client.paint = newVolume;
-      this.controller.wall.ctx.beginPath();
-      this.controller.wall.ctx.moveTo(x1, y1);
-      this.controller.wall.ctx.lineTo(x2, y2);
-      this.controller.wall.ctx.stroke();
-      this.controller.wall.ctx.closePath();
+      client.channel.wall.ctx.beginPath();
+      client.channel.wall.ctx.moveTo(x1, y1);
+      client.channel.wall.ctx.lineTo(x2, y2);
+      client.channel.wall.ctx.stroke();
+      client.channel.wall.ctx.closePath();
       this.send(client.connection, {
         event: MessageEvent.PAINT,
         payload: {
@@ -98,7 +98,7 @@ export class Messenger {
       });
 
       this.broadcast(
-        client.channelId,
+        client.channel.id,
         {
           event: MessageEvent.LINE,
           payload: {

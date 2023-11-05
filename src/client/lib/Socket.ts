@@ -54,7 +54,9 @@ export class Socket {
 
   async connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.ws = new WebSocket(this.wg.config.wsServer);
+      this.ws = new WebSocket(
+        `${this.wg.config.wsServer}?channelId=${this.wg.channelId}`
+      );
       this.ws.onopen = () => {
         this.connected = true;
         this.connectionPromise = null;

@@ -17,14 +17,17 @@ async function main(): Promise<void> {
   const config = new Config({ env, logger });
   config.init();
 
-  const wall = new Wall({ env, logger, config });
-  wall.init();
+  const walls = config.channels.map((channelConfig) => {
+    const wall = new Wall({ env, logger, config, channelConfig });
+    wall.init();
+    return wall;
+  });
 
   const controller = new Controller({
     env,
     config,
     logger,
-    wall,
+    walls,
   });
   controller.init();
 }

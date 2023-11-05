@@ -2,6 +2,7 @@ import { connection } from "websocket";
 import { Config } from "./Config";
 import { Context, ContextType, initialContext } from "../../spec/Canvas";
 import { Role } from "../../spec/Config";
+import { Channel } from "./Channel";
 
 export interface ClientOptions {
   config: Config;
@@ -11,7 +12,7 @@ export interface ClientOptions {
   paint: number;
   role: number;
   connection: connection;
-  channelId: number;
+  channel: Channel;
 }
 
 export class Client {
@@ -23,7 +24,7 @@ export class Client {
   public role: Role;
   public ctx: Context;
   public connection: connection;
-  public channelId: number;
+  public channel: Channel;
 
   constructor({
     config,
@@ -33,7 +34,7 @@ export class Client {
     paint,
     role,
     connection,
-    channelId,
+    channel,
   }: ClientOptions) {
     this.config = config;
     this.id = id;
@@ -43,7 +44,7 @@ export class Client {
     this.role = this.config.getRole(this.config.defRole);
     this.ctx = Object.assign({}, initialContext);
     this.connection = connection;
-    this.channelId = this.config.defChannel;
+    this.channel = channel;
   }
 
   hasInfinitePaint(): boolean {

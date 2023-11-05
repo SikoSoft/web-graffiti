@@ -16,7 +16,7 @@ export interface ControllerOptions {
   env: Environment;
   config: Config;
   logger: pino.Logger;
-  wall: Wall;
+  walls: Wall[];
 }
 
 export class Controller {
@@ -26,13 +26,13 @@ export class Controller {
   public channels: Channel[];
   private paintPerTick: number;
   private logger: pino.Logger;
-  public wall: Wall;
+  public walls: Wall[];
 
   private httpApp: express.Express;
   private router: express.Router;
   private messenger: Messenger;
 
-  constructor({ env, config, logger, wall }: ControllerOptions) {
+  constructor({ env, config, logger, walls }: ControllerOptions) {
     this.env = env;
     this.config = config;
     this.paintPerTick =
@@ -41,7 +41,7 @@ export class Controller {
     //this.clients = [];
     this.channels = [];
     this.logger = logger;
-    this.wall = wall;
+    this.walls = walls;
     this.httpApp = express();
     this.router = express.Router();
     this.messenger = new Messenger({ controller: this, config, logger });
@@ -60,19 +60,32 @@ export class Controller {
   }
 
   registerChannels() {
-    this.channels = this.config.channels.map((channel) => ({
-      id: channel.id,
-      config: channel,
-      clients: [],
-    }));
+    this.channels = [];
+    this.config.channels.forEach((channelConfig) => {
+      const wall = this.getWall(channelConfig.id);
+      if (wall) {
+        this.channels.push({
+          id: channelConfig.id,
+          config: channelConfig,
+          clients: [],
+          wall,
+        });
+      }
+    });
   }
 
   registerRoutes() {
     this.httpApp.use(express.static(this.env.rootPath.client));
 
-    this.router.get("/config.json", (req, res) => {
-      const { server, roles, ...rest } = this.config;
-      res.send(JSON.stringify(rest));
+    this.router.get("/config/:channelId", (req, res) => {
+      const { server, channels, roles, ...rest } = this.config;
+      const channel = this.getChannel(parseInt(req.params.channelId));
+      res.send(
+        JSON.stringify({
+          ...rest,
+          channel: channel?.config,
+        })
+      );
     });
     this.httpApp.use(this.router);
   }
@@ -97,22 +110,33 @@ export class Controller {
       httpServer,
     }).on("request", (request) => {
       const connection = request.accept(null, request.origin);
+      const url = new URL(request.resource, request.origin);
 
-      const client = this.registerClient(
-        this.config.defChannel,
-        request.remoteAddress,
-        connection
-      );
+      const channelId = url.searchParams.has("channelId")
+        ? parseInt(
+            url.searchParams.get("channel") || `${this.config.defChannel}`
+          )
+        : this.config.defChannel;
 
-      connection.on("message", (message) => {
-        if (message.type === "utf8") {
-          this.messenger.handle(client, JSON.parse(message.utf8Data));
-        }
-      });
+      const channel = this.getChannel(channelId);
 
-      connection.on("close", () => {
-        this.removeClient(client);
-      });
+      if (channel) {
+        const client = this.registerClient(
+          channel,
+          request.remoteAddress,
+          connection
+        );
+
+        connection.on("message", (message) => {
+          if (message.type === "utf8") {
+            this.messenger.handle(client, JSON.parse(message.utf8Data));
+          }
+        });
+
+        connection.on("close", () => {
+          this.removeClient(client);
+        });
+      }
     });
 
     httpServer.listen(this.config.server.webSocketPort, () => {
@@ -122,11 +146,7 @@ export class Controller {
     });
   }
 
-  registerClient(
-    channelId: number,
-    ip: string,
-    connection: connection
-  ): Client {
+  registerClient(channel: Channel, ip: string, connection: connection): Client {
     const id = v4();
 
     this.logger.info(`New connection for ${id}`);
@@ -139,37 +159,34 @@ export class Controller {
       ip,
       paint: this.config.paintVolume,
       connection,
-      channelId,
+      channel,
     });
 
-    const channel = this.getChannel(channelId);
-    if (channel) {
-      this.logger.debug(`Channel exists for new client: ${channel.id}`);
-      channel.clients.push(client);
+    this.logger.debug(`Channel exists for new client: ${channel.id}`);
+    channel.clients.push(client);
 
-      this.messenger.send(connection, {
-        event: MessageEvent.WELCOME,
-        payload: {
-          id,
-          width: this.config.width,
-          height: this.config.height,
-          paint: client.paint,
-          join: client.joinTime,
-          mode: client.role.mode,
-        },
-      });
+    this.messenger.send(connection, {
+      event: MessageEvent.WELCOME,
+      payload: {
+        id,
+        width: this.config.width,
+        height: this.config.height,
+        paint: client.paint,
+        join: client.joinTime,
+        mode: client.role.mode,
+      },
+    });
 
-      this.announceOthersToNewClient(client);
+    this.announceOthersToNewClient(client);
 
-      this.announceNewClientToOthers(client);
-    }
+    this.announceNewClientToOthers(client);
 
     return client;
   }
 
   announceNewClientToOthers(newClient: Client) {
     this.messenger.broadcast(
-      newClient.channelId,
+      newClient.channel.id,
       {
         event: "newClient",
         id: newClient.id,
@@ -179,7 +196,7 @@ export class Controller {
   }
 
   announceOthersToNewClient(newClient: Client) {
-    const channel = this.getChannel(newClient.channelId);
+    const channel = this.getChannel(newClient.channel.id);
     if (channel) {
       channel.clients
         .filter((client) => client.id !== newClient.id)
@@ -197,11 +214,11 @@ export class Controller {
 
   removeClient(client: Client) {
     this.logger.info(`Client ${client.id} disconnected`);
-    const channel = this.getChannel(client.channelId);
+    const channel = this.getChannel(client.channel.id);
     if (channel) {
       channel.clients.splice(channel.clients.indexOf(client), 1);
       if (channel.clients.length === 0) {
-        this.wall.sync();
+        channel.wall.sync();
       }
     }
   }
@@ -232,7 +249,7 @@ export class Controller {
     }, this.config.server.status);
 
     setInterval(() => {
-      this.wall.sync();
+      this.walls.forEach((wall) => wall.sync());
     }, this.config.server.autoSave);
   }
 
@@ -245,5 +262,9 @@ export class Controller {
 
   getChannel(channelId: number): Channel | undefined {
     return this.channels.find((channel) => channel.id === channelId);
+  }
+
+  getWall(channelId: number): Wall | undefined {
+    return this.walls.find((wall) => wall.channelConfig.id === channelId);
   }
 }

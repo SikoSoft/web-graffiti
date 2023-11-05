@@ -13,26 +13,30 @@ import pino from "pino";
 import path from "path";
 import { ContextHandler, ContextType } from "../../spec/Canvas";
 import { Environment } from "./Environment";
+import { ChannelConfig } from "../../spec/Config";
 
 export interface WallOptions {
   env: Environment;
   logger: pino.Logger;
   config: Config;
+  channelConfig: ChannelConfig;
 }
 
 export class Wall {
   private env: Environment;
   private logger: pino.Logger;
   private config: Config;
+  public channelConfig: ChannelConfig;
   private lastHash: string;
   private canvas: Canvas;
   public ctx: CanvasRenderingContext2D;
   private ctxMap: Record<string, ContextHandler>;
 
-  constructor({ env, logger, config }: WallOptions) {
+  constructor({ env, logger, config, channelConfig }: WallOptions) {
     this.env = env;
     this.logger = logger;
     this.config = config;
+    this.channelConfig = channelConfig;
     this.lastHash = "";
     this.canvas = createCanvas(this.config.width, this.config.height);
     this.ctx = this.canvas.getContext("2d");
@@ -58,7 +62,7 @@ export class Wall {
   }
 
   load() {
-    loadImage(path.join(this.env.rootPath.client, this.config.imageName))
+    loadImage(path.join(this.env.rootPath.client, this.channelConfig.imageName))
       .then((image) => {
         this.ctx.drawImage(image, 0, 0);
         this.lastHash = createHash("sha256")
@@ -75,7 +79,7 @@ export class Wall {
   restore() {
     fs.copyFile(
       path.join(this.env.rootPath.client, "new-wall.png"),
-      path.join(this.env.rootPath.client, this.config.imageName),
+      path.join(this.env.rootPath.client, this.channelConfig.imageName),
       (error: any) => {
         if (error) {
           this.logger.error("There was a problem restoring the wall");
@@ -96,7 +100,7 @@ export class Wall {
   save(buffer: Buffer, hash: string) {
     this.lastHash = hash;
     fs.writeFileSync(
-      path.join(this.env.rootPath.client, this.config.imageName),
+      path.join(this.env.rootPath.client, this.channelConfig.imageName),
       buffer
     );
   }
