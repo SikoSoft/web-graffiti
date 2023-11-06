@@ -116,9 +116,16 @@ export class Wall {
   setContext(ctx: Record<string, string | number>) {
     for (const key in ctx) {
       if (key in this.ctxMap) {
-        //this.logger.debug(`${key} exists in ctxMap: ${ctx[key]}`);
         this.ctxMap[key](ctx[key]);
       }
     }
+  }
+
+  drawLine(x1: number, y1: number, x2: number, y2: number) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.stroke();
+    this.ctx.closePath();
   }
 }
