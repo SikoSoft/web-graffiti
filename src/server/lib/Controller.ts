@@ -218,8 +218,8 @@ export class Controller {
     const channel = this.getChannel(client.channel.id);
     if (channel) {
       channel.clients.splice(channel.clients.indexOf(client), 1);
-      if (channel.clients.length === 0) {
-        channel.wall.sync();
+      if (channel.clients.length === 0 || client.hasUnsavedEdits) {
+        this.syncWall(channel.wall);
       }
     }
   }
@@ -250,8 +250,20 @@ export class Controller {
     }, this.config.server.status);
 
     setInterval(() => {
-      this.walls.forEach((wall) => wall.sync());
+      this.walls.forEach((wall) => {
+        this.syncWall(wall);
+      });
     }, this.config.server.autoSave);
+  }
+
+  syncWall(wall: Wall) {
+    wall.sync();
+    const channel = this.getChannel(wall.channelConfig.id);
+    if (channel) {
+      channel.clients.forEach((client) => {
+        client.hasUnsavedEdits = false;
+      });
+    }
   }
 
   getTotalClients(): number {

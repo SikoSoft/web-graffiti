@@ -96,6 +96,7 @@ export class Messenger {
     if (!exceeded) {
       this.logger.debug(`Line: x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`);
       client.paint = newVolume;
+      client.hasUnsavedEdits = true;
       client.channel.wall.drawLine(x1, y1, x2, y2);
       this.send(client.connection, {
         event: MessageEvent.PAINT,

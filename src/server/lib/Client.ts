@@ -25,6 +25,7 @@ export class Client {
   public ctx: Context;
   public connection: connection;
   public channel: Channel;
+  public hasUnsavedEdits: boolean;
 
   constructor({
     config,
@@ -45,6 +46,7 @@ export class Client {
     this.ctx = Object.assign({}, initialContext);
     this.connection = connection;
     this.channel = channel;
+    this.hasUnsavedEdits = false;
   }
 
   hasInfinitePaint(): boolean {
