@@ -23,7 +23,7 @@ export class WebGraffitiComponent extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["width", "height"];
+    return ["width", "height", "channel", "server"];
   }
 
   connectedCallback() {
@@ -35,6 +35,11 @@ export class WebGraffitiComponent extends HTMLElement {
     config.height = this.hasAttribute("height")
       ? parseInt(this.getAttribute("height") || "240")
       : config.height;
+    const channelId = this.getChannelId();
+    const channel = config.channels.find((channel) => channel.id === channelId);
+    if (channel) {
+      this.wg.config.channel = channel;
+    }
     this.wg.init(this.rootElement, config);
     this.rootElement.style.width = `${config.width}px`;
     this.rootElement.style.height = `${config.height}px`;
@@ -59,6 +64,12 @@ export class WebGraffitiComponent extends HTMLElement {
   setHeight(height: string) {
     this.wg.config.height = parseInt(height);
     this.wg.render.setHeight(parseInt(height));
+  }
+
+  getChannelId(): number {
+    return this.hasAttribute("channel")
+      ? parseInt(this.getAttribute("channel") as string)
+      : this.wg.config.defChannel;
   }
 
   template() {
