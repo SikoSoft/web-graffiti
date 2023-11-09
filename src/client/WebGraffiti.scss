@@ -153,10 +153,8 @@ body {
   flex-grow: 8;
   width: 80%;
   padding: 8px;
-  /*
   overflow-y: hidden;
   overflow-x: auto;
-  */
 }
 
 .webGraffiti__editor_brush_inner {
@@ -203,12 +201,14 @@ body {
   transition: all 0.1s;
   box-sizing: border-box;
   position: relative;
+  z-index: 1;
   top: 50%;
   transform: translateY(-50%);
-}
 
-.webGraffiti__color:hover {
-  transform: translateY(-50%) scale(1.25);
+  &:hover {
+    transform: translateY(-50%) scale(1.25);
+    z-index: 2;
+  }
 }
 
 .webGraffiti__color--active {
