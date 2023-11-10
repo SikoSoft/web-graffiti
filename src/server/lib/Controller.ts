@@ -59,15 +59,17 @@ export class Controller {
 
   registerChannels() {
     this.channels = [];
-    this.config.channels.forEach((channelConfig) => {
-      const wall = this.getWall(channelConfig.id);
+    this.config.channels.forEach((config) => {
+      const wall = this.getWall(config.id);
       if (wall) {
-        this.channels.push({
-          id: channelConfig.id,
-          config: channelConfig,
-          clients: [],
-          wall,
-        });
+        this.channels.push(
+          new Channel({
+            logger: this.logger,
+            messenger: this.messenger,
+            config,
+            wall,
+          })
+        );
       }
     });
   }
@@ -119,8 +121,8 @@ export class Controller {
       const channel = this.getChannel(channelId);
 
       if (channel) {
-        const client = this.registerClient(
-          channel,
+        const client = channel.registerClient(
+          this.config,
           request.remoteAddress,
           connection
         );
@@ -132,7 +134,7 @@ export class Controller {
         });
 
         connection.on("close", () => {
-          this.removeClient(client);
+          channel.removeClient(client);
         });
       }
     });
@@ -142,86 +144,6 @@ export class Controller {
         `WebSocket server is listening on port ${this.config.server.webSocketPort}`
       );
     });
-  }
-
-  registerClient(channel: Channel, ip: string, connection: connection): Client {
-    const id = v4();
-
-    this.logger.info(`New connection for ${id} (channel: ${channel.id})`);
-
-    const client = new Client({
-      config: this.config,
-      id,
-      joinTime: Date.now(),
-      role: 0,
-      ip,
-      paint: this.config.paintVolume,
-      connection,
-      channel,
-    });
-
-    this.logger.debug(`Channel exists for new client: ${channel.id}`);
-    channel.clients.push(client);
-
-    this.messenger.send(connection, {
-      event: MessageEvent.WELCOME,
-      payload: {
-        id,
-        width: this.config.width,
-        height: this.config.height,
-        paint: client.paint,
-        join: client.joinTime,
-        mode: client.role.mode,
-      },
-    });
-
-    this.announceOthersToNewClient(client);
-
-    this.announceNewClientToOthers(client);
-
-    return client;
-  }
-
-  announceNewClientToOthers(newClient: Client) {
-    this.messenger.broadcast(
-      newClient.channel.id,
-      {
-        event: MessageEvent.NEW_CLIENT,
-        payload: {
-          id: newClient.id,
-          ctx: newClient.ctx,
-        },
-      },
-      newClient.id
-    );
-  }
-
-  announceOthersToNewClient(newClient: Client) {
-    const channel = this.getChannel(newClient.channel.id);
-    if (channel) {
-      channel.clients
-        .filter((client) => client.id !== newClient.id)
-        .forEach((client) => {
-          this.messenger.send(newClient.connection, {
-            event: MessageEvent.NEW_CLIENT,
-            payload: {
-              id: client.id,
-              ctx: client.ctx,
-            },
-          });
-        });
-    }
-  }
-
-  removeClient(client: Client) {
-    this.logger.info(`Client ${client.id} disconnected`);
-    const channel = this.getChannel(client.channel.id);
-    if (channel) {
-      channel.clients.splice(channel.clients.indexOf(client), 1);
-      if (channel.clients.length === 0 || client.hasUnsavedEdits) {
-        this.syncWall(channel.wall);
-      }
-    }
   }
 
   startTickTimers() {
@@ -250,25 +172,15 @@ export class Controller {
     }, this.config.server.status);
 
     setInterval(() => {
-      this.walls.forEach((wall) => {
-        this.syncWall(wall);
+      this.channels.forEach((channel) => {
+        channel.syncWall();
       });
     }, this.config.server.autoSave);
   }
 
-  syncWall(wall: Wall) {
-    wall.sync();
-    const channel = this.getChannel(wall.channelConfig.id);
-    if (channel) {
-      channel.clients.forEach((client) => {
-        client.hasUnsavedEdits = false;
-      });
-    }
-  }
-
   getTotalClients(): number {
     return this.channels.reduce(
-      (acc, channel) => acc + channel.clients.length,
+      (acc, channel) => acc + channel.getTotalClients(),
       0
     );
   }
