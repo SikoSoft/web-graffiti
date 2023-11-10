@@ -1,6 +1,6 @@
 import { connection } from "websocket";
 import { Config } from "./Config";
-import { Context, ContextType, initialContext } from "../../spec/Canvas";
+import { Context, initialContext } from "../../spec/Canvas";
 import { Role } from "../../spec/Config";
 import { Channel } from "./Channel";
 
@@ -60,6 +60,6 @@ export class Client {
   }
 
   refillPaint(): void {
-    this.paint = this.config.paintVolume;
+    this.paint = this.channel.config.paintVolume;
   }
 }

@@ -158,7 +158,8 @@ export class Editor {
   }
 
   updatePaintMeter() {
-    const height = (this.wg.client.paint / this.wg.config.paintVolume) * 100;
+    const height =
+      (this.wg.client.paint / this.wg.config.channel.paintVolume) * 100;
     this.paintRemaining.style.height = `${height}%`;
   }
 }

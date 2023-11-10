@@ -1,13 +1,10 @@
 import pino from "pino";
-import { v4 } from "uuid";
 import http from "http";
 import https from "https";
-import { connection, server } from "websocket";
+import { server } from "websocket";
 import express from "express";
 import { Config } from "./Config";
-import { Client } from "./Client";
 import { Wall } from "./Wall";
-import { Messenger } from "./Messenger";
 import { MessageEvent } from "../../spec/MessageSpec";
 import { Environment } from "./Environment";
 import { Channel } from "./Channel";
@@ -23,26 +20,20 @@ export class Controller {
   public env: Environment;
   private config: Config;
   public channels: Channel[];
-  private paintPerTick: number;
   private logger: pino.Logger;
   public walls: Wall[];
 
   private httpApp: express.Express;
   private router: express.Router;
-  private messenger: Messenger;
 
   constructor({ env, config, logger, walls }: ControllerOptions) {
     this.env = env;
     this.config = config;
-    this.paintPerTick =
-      (this.config.server.paintRefill / this.config.paintTime) *
-      this.config.paintVolume;
     this.channels = [];
     this.logger = logger;
     this.walls = walls;
     this.httpApp = express();
     this.router = express.Router();
-    this.messenger = new Messenger({ controller: this, config, logger });
   }
 
   init() {
@@ -65,7 +56,6 @@ export class Controller {
         this.channels.push(
           new Channel({
             logger: this.logger,
-            messenger: this.messenger,
             config,
             wall,
           })
@@ -129,7 +119,7 @@ export class Controller {
 
         connection.on("message", (message) => {
           if (message.type === "utf8") {
-            this.messenger.handle(client, JSON.parse(message.utf8Data));
+            channel.messenger.handle(client, JSON.parse(message.utf8Data));
           }
         });
 
@@ -147,23 +137,28 @@ export class Controller {
   }
 
   startTickTimers() {
-    setInterval(() => {
-      this.channels.forEach((channel) => {
+    this.channels.forEach((channel) => {
+      this.logger.debug(
+        `start tick timer for channel (${channel.id}): ${JSON.stringify(
+          channel.config
+        )}`
+      );
+      setInterval(() => {
         channel.clients.forEach((client) => {
-          if (client.paint < this.config.paintVolume) {
+          if (client.paint < channel.config.paintVolume) {
             const newPaint =
-              client.paint + this.paintPerTick < this.config.paintVolume
-                ? client.paint + this.paintPerTick
-                : this.config.paintVolume;
+              client.paint + channel.paintPerTick < channel.config.paintVolume
+                ? client.paint + channel.paintPerTick
+                : channel.config.paintVolume;
             client.paint = newPaint;
-            this.messenger.send(client.connection, {
+            channel.messenger.send(client.connection, {
               event: MessageEvent.PAINT,
               payload: { paint: client.paint },
             });
           }
         });
-      });
-    }, this.config.server.paintRefill);
+      }, channel.config.paintRefill);
+    });
 
     setInterval(() => {
       this.logger.debug(
@@ -180,7 +175,7 @@ export class Controller {
 
   getTotalClients(): number {
     return this.channels.reduce(
-      (acc, channel) => acc + channel.getTotalClients(),
+      (acc, channel) => acc + channel.stats.totalClients,
       0
     );
   }

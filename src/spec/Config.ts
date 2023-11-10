@@ -9,6 +9,9 @@ export interface Role {
 export interface ChannelConfig {
   id: number;
   imageName: string;
+  paintVolume: number;
+  paintTime: number;
+  paintRefill: number;
 }
 
 export interface ConfigProperties {
@@ -19,7 +22,6 @@ export interface ConfigProperties {
     webPort: number;
     webSocketPort: number;
     autoSave: number;
-    paintRefill: number;
     status: number;
   };
   imageName: string;
@@ -28,8 +30,6 @@ export interface ConfigProperties {
   webServer: string;
   wsServer: string;
   doubleClick: number;
-  paintVolume: number;
-  paintTime: number;
   defAlpha: number;
   minBrushSize: number;
   maxBrushSize: number;
@@ -50,7 +50,6 @@ export class ConfigCore implements ConfigProperties {
     webPort: number;
     webSocketPort: number;
     autoSave: number;
-    paintRefill: number;
     status: number;
   };
   imageName: string;
@@ -59,8 +58,6 @@ export class ConfigCore implements ConfigProperties {
   webServer: string;
   wsServer: string;
   doubleClick: number;
-  paintVolume: number;
-  paintTime: number;
   defAlpha: number;
   minBrushSize: number;
   maxBrushSize: number;
@@ -80,7 +77,6 @@ export class ConfigCore implements ConfigProperties {
       webPort: 80,
       webSocketPort: 8666,
       autoSave: 3600000,
-      paintRefill: 333,
       status: 300000,
     };
     this.imageName = "";
@@ -89,8 +85,6 @@ export class ConfigCore implements ConfigProperties {
     this.webServer = "";
     this.wsServer = "http://localhost:8666";
     this.doubleClick = 100;
-    this.paintVolume = 10000;
-    this.paintTime = 10000;
     this.defAlpha = 1;
     this.minBrushSize = 1;
     this.maxBrushSize = 10;
@@ -109,6 +103,9 @@ export class ConfigCore implements ConfigProperties {
       {
         id: 0,
         imageName: "",
+        paintVolume: 10000,
+        paintTime: 10000,
+        paintRefill: 333,
       },
     ];
     this.defChannel = 0;

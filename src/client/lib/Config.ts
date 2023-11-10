@@ -15,7 +15,7 @@ export class Config extends ConfigCore {
   constructor({ wg }: ConfigOptions) {
     super();
     this.wg = wg;
-    this.channel = { id: this.defChannel, imageName: "" };
+    this.channel = this.channels[0];
   }
 
   async load(initConfig: Partial<ConfigProperties> = {}): Promise<boolean> {

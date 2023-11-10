@@ -4,15 +4,18 @@ import { connection } from "websocket";
 import { ChannelConfig } from "../../spec/Config";
 import { Client } from "./Client";
 import { Messenger } from "./Messenger";
-import { MessageEvent } from "../../spec/MessageSpec";
+import { MessageEvent, Message } from "../../spec/MessageSpec";
 import { Wall } from "./Wall";
 import { Config } from "./Config";
 
-export interface ChannelStats {}
+export interface ChannelStats {
+  totalClients: number;
+  lastConnectionTime: Date | undefined;
+  lastDisconnectionTime: Date | undefined;
+}
 
 export interface ChannelOptions {
   logger: pino.Logger;
-  messenger: Messenger;
   config: ChannelConfig;
   wall: Wall;
 }
@@ -22,15 +25,28 @@ export class Channel {
   public config: ChannelConfig;
   public clients: Client[];
   public wall: Wall;
-  private messenger: Messenger;
+  public messenger: Messenger;
+  public stats: ChannelStats;
+  public paintPerTick: number;
 
-  constructor({ logger, messenger, config, wall }: ChannelOptions) {
+  constructor({ logger, config, wall }: ChannelOptions) {
+    const clients: Client[] = [];
     this.logger = logger;
-    this.messenger = messenger;
+    this.messenger = new Messenger({ channel: this, config, logger });
     this.config = config;
     this.id = config.id;
-    this.clients = [];
+    this.clients = clients;
     this.wall = wall;
+    this.stats = {
+      get totalClients() {
+        return clients.length;
+      },
+      lastConnectionTime: undefined,
+      lastDisconnectionTime: undefined,
+    };
+    this.paintPerTick =
+      (this.config.paintRefill / this.config.paintTime) *
+      this.config.paintVolume;
   }
 
   registerClient(config: Config, ip: string, connection: connection): Client {
@@ -44,7 +60,7 @@ export class Channel {
       joinTime: Date.now(),
       role: 0,
       ip,
-      paint: config.paintVolume,
+      paint: this.config.paintVolume,
       connection,
       channel: this,
     });
@@ -67,12 +83,13 @@ export class Channel {
 
     this.announceNewClientToOthers(client);
 
+    this.stats.lastConnectionTime = new Date();
+
     return client;
   }
 
   announceNewClientToOthers(newClient: Client) {
-    this.messenger.broadcast(
-      newClient.channel.id,
+    this.broadcast(
       {
         event: MessageEvent.NEW_CLIENT,
         payload: {
@@ -104,6 +121,7 @@ export class Channel {
     if (this.clients.length === 0 || client.hasUnsavedEdits) {
       this.syncWall();
     }
+    this.stats.lastDisconnectionTime = new Date();
   }
 
   syncWall() {
@@ -113,7 +131,11 @@ export class Channel {
     });
   }
 
-  getTotalClients(): number {
-    return this.clients.length;
+  broadcast(message: Message, ignoreClientId: string | undefined = "") {
+    this.clients
+      .filter((client) => !ignoreClientId || client.id !== ignoreClientId)
+      .forEach((client) => {
+        this.messenger.send(client.connection, message);
+      });
   }
 }

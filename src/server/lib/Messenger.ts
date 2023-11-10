@@ -1,6 +1,5 @@
 import { connection } from "websocket";
 import { Client } from "./Client";
-import { Controller } from "./Controller";
 import {
   LineMessage,
   Message,
@@ -10,25 +9,26 @@ import {
   SetRoleMessage,
 } from "../../spec/MessageSpec";
 import pino from "pino";
-import { Config } from "./Config";
+import { Channel } from "./Channel";
+import { ChannelConfig } from "../../spec/Config";
 
 declare type MessageHander = (client: Client, message: Message) => void;
 
 export interface MessengerOptions {
   logger: pino.Logger;
-  controller: Controller;
-  config: Config;
+  channel: Channel;
+  config: ChannelConfig;
 }
 
 export class Messenger {
   private logger: pino.Logger;
-  private controller: Controller;
-  private config: Config;
+  private channel: Channel;
+  private config: ChannelConfig;
   private messageHandlers: Record<string, MessageHander>;
 
-  constructor({ logger, controller, config }: MessengerOptions) {
+  constructor({ logger, channel, config }: MessengerOptions) {
     this.logger = logger;
-    this.controller = controller;
+    this.channel = channel;
     this.config = config;
 
     this.messageHandlers = {
@@ -62,8 +62,7 @@ export class Messenger {
   handleSetContext(client: Client, payload: SetContextMessage["payload"]) {
     client.channel.wall.setContext(payload.ctx);
     client.ctx = payload.ctx;
-    this.broadcast(
-      client.channel.id,
+    this.channel.broadcast(
       {
         event: MessageEvent.SET_CONTEXT,
         payload: {
@@ -105,8 +104,7 @@ export class Messenger {
         },
       });
 
-      this.broadcast(
-        client.channel.id,
+      this.channel.broadcast(
         {
           event: MessageEvent.LINE,
           payload: {
@@ -129,21 +127,6 @@ export class Messenger {
       event: MessageEvent.PAINT,
       payload: { paint: this.config.paintVolume },
     });
-  }
-
-  broadcast(
-    channelId: number,
-    message: Message,
-    ignoreClientId: string | undefined = ""
-  ) {
-    const channel = this.controller.getChannel(channelId);
-    if (channel) {
-      channel.clients
-        .filter((client) => !ignoreClientId || client.id !== ignoreClientId)
-        .forEach((client) => {
-          this.send(client.connection, message);
-        });
-    }
   }
 
   send(connection: connection, message: Message) {
