@@ -1,76 +1,114 @@
 import { ClientMode } from "./Client";
 
-export interface Role {
-  id: number;
-  infinitePaint: boolean;
-  mode: ClientMode;
+export enum RoleConfigProperty {
+  ID = "id",
+  INFINITE_PAINT = "infinitePaint",
+  MODE = "mode",
+}
+
+export interface RoleConfig {
+  [RoleConfigProperty.ID]: number;
+  [RoleConfigProperty.INFINITE_PAINT]: boolean;
+  [RoleConfigProperty.MODE]: ClientMode;
+}
+
+export enum ServerConfigProperty {
+  SECURE = "secure",
+  SECURE_KEY = "secureKey",
+  SECURE_CERT = "secureCert",
+  WEB_PORT = "webPort",
+  WEB_SOCKET_PORT = "webSocketPort",
+  AUTO_SAVE = "autoSave",
+  STATUS = "status",
+}
+
+export interface ServerConfig {
+  [ServerConfigProperty.SECURE]: boolean;
+  [ServerConfigProperty.SECURE_KEY]: string;
+  [ServerConfigProperty.SECURE_CERT]: string;
+  [ServerConfigProperty.WEB_PORT]: number;
+  [ServerConfigProperty.WEB_SOCKET_PORT]: number;
+  [ServerConfigProperty.AUTO_SAVE]: number;
+  [ServerConfigProperty.STATUS]: number;
+}
+
+export enum ChannelConfigProperty {
+  ID = "id",
+  IMAGE_NAME = "imageName",
+  PAINT_VOLUME = "paintVolume",
+  PAINT_TIME = "paintTime",
+  PAINT_REFILL = "paintRefill",
 }
 
 export interface ChannelConfig {
-  id: number;
-  imageName: string;
-  paintVolume: number;
-  paintTime: number;
-  paintRefill: number;
+  [ChannelConfigProperty.ID]: number;
+  [ChannelConfigProperty.IMAGE_NAME]: string;
+  [ChannelConfigProperty.PAINT_VOLUME]: number;
+  [ChannelConfigProperty.PAINT_TIME]: number;
+  [ChannelConfigProperty.PAINT_REFILL]: number;
+}
+
+export enum ConfigProperty {
+  SERVER = "server",
+  IMAGE_NAME = "imageName",
+  WIDTH = "width",
+  HEIGHT = "height",
+  WEB_SERVER = "webServer",
+  WS_SERVER = "wsServer",
+  DOUBLE_CLICK = "doubleClick",
+  DEF_ALPHA = "defAlpha",
+  MIN_BRUSH_SIZE = "minBrushSize",
+  MAX_BRUSH_SIZE = "maxBrushSize",
+  DEF_BRUSH_SIZE = "defBrushSize",
+  DEF_COLORS = "defColors",
+  DEF_ROLE = "defRole",
+  ROLES = "roles",
+  MODE = "mode",
+  CHANNELS = "channels",
+  DEF_CHANNEL = "defChannel",
 }
 
 export interface ConfigProperties {
-  server: {
-    secure: boolean;
-    secureKey: string;
-    secureCert: string;
-    webPort: number;
-    webSocketPort: number;
-    autoSave: number;
-    status: number;
-  };
-  imageName: string;
-  width: number;
-  height: number;
-  webServer: string;
-  wsServer: string;
-  doubleClick: number;
-  defAlpha: number;
-  minBrushSize: number;
-  maxBrushSize: number;
-  defBrushSize: number;
-  defaultColors: string[];
-  defRole: number;
-  roles: Role[];
-  mode: ClientMode;
-  channels: ChannelConfig[];
-  defChannel: number;
+  [ConfigProperty.SERVER]: ServerConfig;
+  [ConfigProperty.IMAGE_NAME]: string;
+  [ConfigProperty.WIDTH]: number;
+  [ConfigProperty.HEIGHT]: number;
+  [ConfigProperty.WEB_SERVER]: string;
+  [ConfigProperty.WS_SERVER]: string;
+  [ConfigProperty.DOUBLE_CLICK]: number;
+  [ConfigProperty.DEF_ALPHA]: number;
+  [ConfigProperty.MIN_BRUSH_SIZE]: number;
+  [ConfigProperty.MAX_BRUSH_SIZE]: number;
+  [ConfigProperty.DEF_BRUSH_SIZE]: number;
+  [ConfigProperty.DEF_COLORS]: string[];
+  [ConfigProperty.DEF_ROLE]: number;
+  [ConfigProperty.ROLES]: RoleConfig[];
+  [ConfigProperty.MODE]: ClientMode;
+  [ConfigProperty.CHANNELS]: ChannelConfig[];
+  [ConfigProperty.DEF_CHANNEL]: number;
 }
 
 export class ConfigCore implements ConfigProperties {
-  server: {
-    secure: boolean;
-    secureKey: string;
-    secureCert: string;
-    webPort: number;
-    webSocketPort: number;
-    autoSave: number;
-    status: number;
-  };
-  imageName: string;
-  width: number;
-  height: number;
-  webServer: string;
-  wsServer: string;
-  doubleClick: number;
-  defAlpha: number;
-  minBrushSize: number;
-  maxBrushSize: number;
-  defBrushSize: number;
-  defaultColors: string[];
-  defRole: number;
-  roles: Role[];
-  mode: ClientMode;
-  channels: ChannelConfig[];
-  defChannel: number;
+  [ConfigProperty.SERVER]: ServerConfig;
+  [ConfigProperty.IMAGE_NAME]: string;
+  [ConfigProperty.WIDTH]: number;
+  [ConfigProperty.HEIGHT]: number;
+  [ConfigProperty.WEB_SERVER]: string;
+  [ConfigProperty.WS_SERVER]: string;
+  [ConfigProperty.DOUBLE_CLICK]: number;
+  [ConfigProperty.DEF_ALPHA]: number;
+  [ConfigProperty.MIN_BRUSH_SIZE]: number;
+  [ConfigProperty.MAX_BRUSH_SIZE]: number;
+  [ConfigProperty.DEF_BRUSH_SIZE]: number;
+  [ConfigProperty.DEF_COLORS]: string[];
+  [ConfigProperty.DEF_ROLE]: number;
+  [ConfigProperty.ROLES]: RoleConfig[];
+  [ConfigProperty.MODE]: ClientMode;
+  [ConfigProperty.CHANNELS]: ChannelConfig[];
+  [ConfigProperty.DEF_CHANNEL]: number;
 
   constructor() {
-    this.server = {
+    this[ConfigProperty.SERVER] = {
       secure: false,
       secureKey: "",
       secureCert: "",
@@ -79,36 +117,36 @@ export class ConfigCore implements ConfigProperties {
       autoSave: 3600000,
       status: 300000,
     };
-    this.imageName = "";
-    this.width = 1920;
-    this.height = 1080;
-    this.webServer = "";
-    this.wsServer = "http://localhost:8666";
-    this.doubleClick = 100;
-    this.defAlpha = 1;
-    this.minBrushSize = 1;
-    this.maxBrushSize = 10;
-    this.defBrushSize = 3;
-    this.defaultColors = [];
-    this.defRole = 0;
-    this.roles = [
+    this[ConfigProperty.IMAGE_NAME] = "";
+    this[ConfigProperty.WIDTH] = 1920;
+    this[ConfigProperty.HEIGHT] = 1080;
+    this[ConfigProperty.WEB_SERVER] = "";
+    this[ConfigProperty.WS_SERVER] = "http://localhost:8666";
+    this[ConfigProperty.DOUBLE_CLICK] = 100;
+    this[ConfigProperty.DEF_ALPHA] = 1;
+    this[ConfigProperty.MIN_BRUSH_SIZE] = 1;
+    this[ConfigProperty.MAX_BRUSH_SIZE] = 10;
+    this[ConfigProperty.DEF_BRUSH_SIZE] = 3;
+    this[ConfigProperty.DEF_COLORS] = [];
+    this[ConfigProperty.DEF_ROLE] = 0;
+    this[ConfigProperty.ROLES] = [
       {
-        id: 0,
-        infinitePaint: false,
-        mode: ClientMode.INTERACT,
+        [RoleConfigProperty.ID]: 0,
+        [RoleConfigProperty.INFINITE_PAINT]: false,
+        [RoleConfigProperty.MODE]: ClientMode.INTERACT,
       },
     ];
-    this.mode = ClientMode.INTERACT;
-    this.channels = [
+    this[ConfigProperty.MODE] = ClientMode.INTERACT;
+    this[ConfigProperty.CHANNELS] = [
       {
-        id: 0,
-        imageName: "",
-        paintVolume: 10000,
-        paintTime: 10000,
-        paintRefill: 333,
+        [ChannelConfigProperty.ID]: 0,
+        [ChannelConfigProperty.IMAGE_NAME]: "",
+        [ChannelConfigProperty.PAINT_VOLUME]: 10000,
+        [ChannelConfigProperty.PAINT_TIME]: 10000,
+        [ChannelConfigProperty.PAINT_REFILL]: 333,
       },
     ];
-    this.defChannel = 0;
+    this[ConfigProperty.DEF_CHANNEL] = 0;
   }
 
   process(configProperties: Partial<ConfigProperties>) {

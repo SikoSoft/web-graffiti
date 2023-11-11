@@ -8,6 +8,7 @@ import { Wall } from "./Wall";
 import { MessageEvent } from "../../spec/MessageSpec";
 import { Environment } from "./Environment";
 import { Channel } from "./Channel";
+import { ConfigProperties } from "../../spec/Config";
 
 export interface ControllerOptions {
   env: Environment;
@@ -68,8 +69,10 @@ export class Controller {
     this.httpApp.use(express.static(this.env.rootPath.client));
 
     this.router.get("/config/:channelId", (req, res) => {
-      const { server, channels, roles, ...rest } = this.config;
+      const configValues = this.config as ConfigProperties;
+      const { server, channels, roles, ...rest } = configValues;
       const channel = this.getChannel(parseInt(req.params.channelId));
+      res.setHeader("content-type", "application/json");
       res.send(
         JSON.stringify({
           ...rest,

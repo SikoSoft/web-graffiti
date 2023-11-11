@@ -1,7 +1,7 @@
 import { connection } from "websocket";
 import { Config } from "./Config";
 import { Context, initialContext } from "../../spec/Canvas";
-import { Role } from "../../spec/Config";
+import { RoleConfig } from "../../spec/Config";
 import { Channel } from "./Channel";
 
 export interface ClientOptions {
@@ -21,7 +21,7 @@ export class Client {
   private ip: string;
   public joinTime: number;
   public paint: number;
-  public role: Role;
+  public role: RoleConfig;
   public ctx: Context;
   public connection: connection;
   public channel: Channel;

@@ -46,7 +46,7 @@ export class Editor {
   }
 
   init(): void {
-    this.colors = [...this.wg.config.defaultColors];
+    this.colors = [...this.wg.config.defColors];
 
     this.container.className = "webGraffiti__editor";
 

@@ -19,7 +19,7 @@
   "minBrushSize": 1,
   "maxBrushSize": 50,
   "defBrushSize": 3,
-  "defaultColors": [
+  "defColors": [
     "#000000",
     "#444444",
     "#888888",

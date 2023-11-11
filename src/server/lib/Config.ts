@@ -2,7 +2,7 @@ import https from "https";
 import fs from "fs";
 import path from "path";
 import pino from "pino";
-import { ConfigCore, ConfigProperties, Role } from "../../spec/Config";
+import { ConfigCore, ConfigProperties, RoleConfig } from "../../spec/Config";
 import { ClientMode } from "../../spec/Client";
 import { Environment } from "./Environment";
 
@@ -46,7 +46,7 @@ export class Config extends ConfigCore {
     }
   }
 
-  getRole(roleId: number): Role {
+  getRole(roleId: number): RoleConfig {
     const role = this.roles.find((r) => r.id == roleId);
     if (role) {
       return role;
