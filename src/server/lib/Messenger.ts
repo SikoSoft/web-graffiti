@@ -50,6 +50,7 @@ export class Messenger {
   }
 
   handle(client: Client, message: Message) {
+    this.channel.stats.totalIncomingMessages++;
     if (message.event in this.messageHandlers) {
       this.messageHandlers[message.event](client, message);
     } else {
@@ -130,6 +131,7 @@ export class Messenger {
   }
 
   send(connection: connection, message: Message) {
+    this.channel.stats.totalOutgoingMessages++;
     connection.sendUTF(JSON.stringify(message));
   }
 }

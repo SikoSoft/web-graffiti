@@ -77,6 +77,16 @@ export class Controller {
         })
       );
     });
+
+    this.router.get("/channel/:channelId/stats", (req, res) => {
+      const channel = this.getChannel(parseInt(req.params.channelId));
+      res.setHeader("content-type", "application/json");
+      res.send(
+        JSON.stringify({
+          ...channel?.stats,
+        })
+      );
+    });
     this.httpApp.use(this.router);
   }
 

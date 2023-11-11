@@ -12,6 +12,8 @@ export interface ChannelStats {
   totalClients: number;
   lastConnectionTime: Date | undefined;
   lastDisconnectionTime: Date | undefined;
+  totalIncomingMessages: number;
+  totalOutgoingMessages: number;
 }
 
 export interface ChannelOptions {
@@ -43,6 +45,8 @@ export class Channel {
       },
       lastConnectionTime: undefined,
       lastDisconnectionTime: undefined,
+      totalIncomingMessages: 0,
+      totalOutgoingMessages: 0,
     };
     this.paintPerTick =
       (this.config.paintRefill / this.config.paintTime) *
