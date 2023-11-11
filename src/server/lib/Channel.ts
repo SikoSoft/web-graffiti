@@ -10,6 +10,7 @@ import { Config } from "./Config";
 
 export interface ChannelStats {
   totalClients: number;
+  upTime: Date;
   lastConnectionTime: Date | undefined;
   lastDisconnectionTime: Date | undefined;
   totalIncomingMessages: number;
@@ -43,6 +44,7 @@ export class Channel {
       get totalClients() {
         return clients.length;
       },
+      upTime: new Date(),
       lastConnectionTime: undefined,
       lastDisconnectionTime: undefined,
       totalIncomingMessages: 0,
