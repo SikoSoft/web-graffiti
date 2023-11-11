@@ -88,6 +88,11 @@ export interface ConfigProperties {
   [ConfigProperty.DEF_CHANNEL]: number;
 }
 
+export interface ConfigValidationResult {
+  isValid: boolean;
+  missingProperties: string[];
+}
+
 export class ConfigCore implements ConfigProperties {
   [ConfigProperty.SERVER]: ServerConfig;
   [ConfigProperty.IMAGE_NAME]: string;
@@ -151,5 +156,19 @@ export class ConfigCore implements ConfigProperties {
 
   process(configProperties: Partial<ConfigProperties>) {
     Object.assign(this, configProperties);
+  }
+
+  validateInput(input: Partial<ConfigProperties>): ConfigValidationResult {
+    const result: ConfigValidationResult = {
+      isValid: false,
+      missingProperties: [],
+    };
+    Object.values(ConfigProperty).forEach((property) => {
+      if (typeof input[property] === "undefined") {
+        result.missingProperties.push(property);
+      }
+    });
+    result.isValid = result.missingProperties.length === 0;
+    return result;
   }
 }

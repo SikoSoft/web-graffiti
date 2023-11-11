@@ -31,7 +31,17 @@ export class Config extends ConfigCore {
         { encoding: "utf8" }
       );
 
-      this.process(JSON.parse(configJson) as ConfigProperties);
+      const configProperties = JSON.parse(configJson) as ConfigProperties;
+
+      const verification = this.validateInput(configProperties);
+      if (!verification.isValid) {
+        verification.missingProperties.forEach((property) => {
+          this.logger.warn(`Property '${property}' is missing from config`);
+        });
+        throw new Error(`config.json is invalid`);
+      }
+
+      this.process(configProperties);
 
       this.secureConfig = this.server.secure
         ? {
