@@ -22,10 +22,8 @@ export class Input {
   private mouse: Point;
 
   private mouseDown: boolean;
-  private lastClickTime: number;
-  private lastClickNode: EventTarget | null;
 
-  private doubleClick: boolean;
+  public doubleClick: boolean;
   private multiGesture: boolean;
   private enabled: boolean;
 
@@ -54,8 +52,6 @@ export class Input {
       y: 0,
     };
     this.mouseDown = false;
-    this.lastClickTime = 0;
-    this.lastClickNode = null;
     this.doubleClick = false;
     this.multiGesture = false;
     this.enabled = false;
@@ -132,16 +128,10 @@ export class Input {
 
   setupMouseEvents(): void {
     this.doubleClickListener = (e) => {
-      if (
-        Date.now() - this.lastClickTime < this.wg.config.doubleClick &&
-        this.lastClickNode === e.target
-      ) {
-        this.doubleClick = true;
-      } else {
+      this.doubleClick = true;
+      setTimeout(() => {
         this.doubleClick = false;
-      }
-      this.lastClickTime = Date.now();
-      this.lastClickNode = e.target;
+      }, this.wg.config.doubleClick);
     };
     document.addEventListener("mousedown", this.doubleClickListener);
 
