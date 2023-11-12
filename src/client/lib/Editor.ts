@@ -62,6 +62,7 @@ export class Editor {
 
     this.handle.className = "webGraffiti__editor_handle";
     this.containerInner.append(this.handle);
+    this.palette.innerHTML = "";
     this.colors.forEach((color, index) => {
       this.palette.append(this.setupButton(color, index));
     });
