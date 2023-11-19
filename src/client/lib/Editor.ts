@@ -74,7 +74,6 @@ export class Editor {
 
     this.palette.className = "webGraffiti__editor_palette";
     this.palette.addEventListener("scroll", (e) => {
-      //console.log("scroll", this.palette.scrollLeft);
       this.state.palettePosition = this.palette.scrollLeft;
       if (this.scrollTimeout) {
         clearTimeout(this.scrollTimeout);
@@ -260,5 +259,15 @@ export class Editor {
 
   save(): void {
     localStorage.setItem(STORAGE_KEY_EDITOR_STATE, JSON.stringify(this.state));
+  }
+
+  reset() {
+    this.state = {
+      selected: 0,
+      colors: [],
+      palettePosition: 0,
+    };
+    this.save();
+    this.init();
   }
 }
