@@ -1,5 +1,7 @@
 import { WebGraffiti } from "./WebGraffiti";
 
+export const STORAGE_KEY_EDITOR_STATE = "wgEditorState";
+
 type HTMLElementEvent<T extends HTMLElement> = Event & {
   target: T;
 };
@@ -8,13 +10,20 @@ export interface EditorOptions {
   wg: WebGraffiti;
 }
 
+export interface EditorState {
+  selected: number;
+  colors: string[];
+  palettePosition: number;
+}
+
 export class Editor {
   private wg: WebGraffiti;
-  public selected: number;
+  private state: EditorState;
   public initialized: boolean;
   public enabled: boolean;
-  private colors: string[];
   private buttons: HTMLButtonElement[];
+
+  private scrollTimeout: NodeJS.Timeout | undefined;
 
   public container: HTMLDivElement;
   public containerInner: HTMLDivElement;
@@ -29,10 +38,13 @@ export class Editor {
 
   constructor({ wg }: EditorOptions) {
     this.wg = wg;
-    this.selected = 0;
+    this.state = {
+      selected: 0,
+      colors: [],
+      palettePosition: 0,
+    };
     this.initialized = false;
     this.enabled = false;
-    this.colors = [];
     this.buttons = [];
 
     this.container = document.createElement("div");
@@ -48,7 +60,10 @@ export class Editor {
   }
 
   init(): void {
-    this.colors = [...this.wg.config.defColors];
+    this.restore();
+    if (!this.state.colors.length) {
+      this.state.colors = [...this.wg.config.defColors];
+    }
 
     this.container.className = "webGraffiti__editor";
 
@@ -58,6 +73,16 @@ export class Editor {
     this.containerInner.append(this.paintMeter);
 
     this.palette.className = "webGraffiti__editor_palette";
+    this.palette.addEventListener("scroll", (e) => {
+      //console.log("scroll", this.palette.scrollLeft);
+      this.state.palettePosition = this.palette.scrollLeft;
+      if (this.scrollTimeout) {
+        clearTimeout(this.scrollTimeout);
+      }
+      this.scrollTimeout = setTimeout(() => {
+        this.save();
+      }, 100);
+    });
     this.containerInner.append(this.palette);
     this.container.append(this.containerInner);
     this.wg.rootElement.append(this.container);
@@ -65,13 +90,15 @@ export class Editor {
     this.handle.className = "webGraffiti__editor_handle";
     this.containerInner.append(this.handle);
     this.palette.innerHTML = "";
-    this.colors.forEach((color, index) => {
+    this.state.colors.forEach((color, index) => {
       this.palette.append(this.setupButton(color, index));
     });
     this.setupPaintMeter();
     this.setupBrushTool();
-    this.selectColor(0);
+    this.selectColor(this.state.selected);
     this.updatePaintMeter();
+
+    this.palette.scrollLeft = this.state.palettePosition;
     this.initialized = true;
   }
 
@@ -157,7 +184,6 @@ export class Editor {
     button.addEventListener("mousedown", () => {
       this.selectColor(index);
       if (this.wg.input.doubleClick) {
-        console.log("caught a double click");
         showColorPicker();
       }
     });
@@ -170,16 +196,15 @@ export class Editor {
   }
 
   setButtonColor(index: number, color: string) {
-    console.log("setButtonColor", index, color);
-    this.colors[index] = color;
+    this.state.colors[index] = color;
     this.buttons[index].style.backgroundColor = color;
     this.buttons[index].setAttribute("data-color", color);
     this.selectColor(index);
   }
 
   selectColor(index: number) {
-    this.selected = index;
-    this.wg.client.setColor(this.colors[index]);
+    this.state.selected = index;
+    this.wg.client.setColor(this.state.colors[index]);
     document.querySelectorAll(".webGraffiti__color").forEach((button) => {
       if (parseInt(button.getAttribute("data-index") || "") === index) {
         button.classList.add("webGraffiti__color--active");
@@ -188,7 +213,9 @@ export class Editor {
       }
     });
     this.updateBrushPreview();
-    this.paintRemaining.style.backgroundColor = this.colors[this.selected];
+    this.paintRemaining.style.backgroundColor =
+      this.state.colors[this.state.selected];
+    this.save();
   }
 
   setBrushSize(size: number) {
@@ -197,7 +224,8 @@ export class Editor {
   }
 
   updateBrushPreview() {
-    this.brushPreview.style.backgroundColor = this.colors[this.selected];
+    this.brushPreview.style.backgroundColor =
+      this.state.colors[this.state.selected];
     this.brushPreview.style.width = `${this.wg.client.ctx.lineWidth}px`;
     this.brushPreview.style.height = `${this.wg.client.ctx.lineWidth}px`;
   }
@@ -209,8 +237,28 @@ export class Editor {
   }
 
   hideAllColorPickers() {
-    this.buttons.forEach((button) => {
-      //button.
-    });
+    this.buttons.forEach((button) => {});
+  }
+
+  restore(): void {
+    const storageState = localStorage.getItem(STORAGE_KEY_EDITOR_STATE);
+    if (storageState) {
+      const state = JSON.parse(storageState) as EditorState;
+      if (state.colors) {
+        this.state.colors = state.colors;
+      }
+
+      if (state.selected) {
+        this.state.selected = state.selected;
+      }
+
+      if (state.palettePosition) {
+        this.state.palettePosition = state.palettePosition;
+      }
+    }
+  }
+
+  save(): void {
+    localStorage.setItem(STORAGE_KEY_EDITOR_STATE, JSON.stringify(this.state));
   }
 }
