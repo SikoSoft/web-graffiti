@@ -226,6 +226,17 @@ body {
   .webGraffiti__color {
     width: 10vh;
     height: 10vh;
+
+    .webGraffiti__colorPicker {
+      display: none;
+
+      &.webGraffiti__colorPicker--active {
+        display: initial;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+      }
+    }
   }
 
   .webGraffiti__editor_brush {

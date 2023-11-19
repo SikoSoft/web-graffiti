@@ -14,6 +14,7 @@ export class Editor {
   public initialized: boolean;
   public enabled: boolean;
   private colors: string[];
+  private buttons: HTMLButtonElement[];
 
   public container: HTMLDivElement;
   public containerInner: HTMLDivElement;
@@ -32,6 +33,7 @@ export class Editor {
     this.initialized = false;
     this.enabled = false;
     this.colors = [];
+    this.buttons = [];
 
     this.container = document.createElement("div");
     this.containerInner = document.createElement("div");
@@ -124,13 +126,55 @@ export class Editor {
     button.setAttribute("data-color", buttonColor);
     button.setAttribute("data-index", String(index));
     button.style.backgroundColor = buttonColor;
+
+    const colorPicker = document.createElement("input");
+    colorPicker.className = "webGraffiti__colorPicker";
+    colorPicker.setAttribute("type", "color");
+    colorPicker.setAttribute("value", buttonColor.substring(0, 7));
+
+    const showColorPicker = () => {
+      colorPicker.classList.add("webGraffiti__colorPicker--active");
+      colorPicker.showPicker();
+      setTimeout(() => {
+        colorPicker.showPicker();
+      }, 1);
+    };
+    const hideColorPicker = () => {
+      colorPicker.classList.remove("webGraffiti__colorPicker--active");
+    };
+
+    colorPicker.addEventListener("change", (event) => {
+      const e = event as HTMLElementEvent<HTMLInputElement>;
+      this.setButtonColor(index, e.target.value);
+      hideColorPicker();
+    });
+    colorPicker.addEventListener("blur", () => {
+      hideColorPicker();
+    });
+
+    button.append(colorPicker);
+
     button.addEventListener("mousedown", () => {
       this.selectColor(index);
+      if (this.wg.input.doubleClick) {
+        console.log("caught a double click");
+        showColorPicker();
+      }
     });
     button.addEventListener("touchstart", () => {
       this.selectColor(index);
     });
+
+    this.buttons[index] = button;
     return button;
+  }
+
+  setButtonColor(index: number, color: string) {
+    console.log("setButtonColor", index, color);
+    this.colors[index] = color;
+    this.buttons[index].style.backgroundColor = color;
+    this.buttons[index].setAttribute("data-color", color);
+    this.selectColor(index);
   }
 
   selectColor(index: number) {
@@ -162,5 +206,11 @@ export class Editor {
     const height =
       (this.wg.client.paint / this.wg.config.channel.paintVolume) * 100;
     this.paintRemaining.style.height = `${height}%`;
+  }
+
+  hideAllColorPickers() {
+    this.buttons.forEach((button) => {
+      //button.
+    });
   }
 }
