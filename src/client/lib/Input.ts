@@ -197,7 +197,7 @@ export class Input {
     );
 
     this.touchEndListener = (e) => {
-      let mouseEvent = new MouseEvent("mouseup", {});
+      let mouseEvent = new MouseEvent("mouseup", { bubbles: true });
       this.wg.render.canvas.dispatchEvent(mouseEvent);
       if (e.cancelable) {
         e.preventDefault();
