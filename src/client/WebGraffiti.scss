@@ -209,6 +209,17 @@ body {
     transform: translateY(-50%) scale(1.25);
     z-index: 2;
   }
+
+  .webGraffiti__colorPicker {
+    display: none;
+
+    &.webGraffiti__colorPicker--active {
+      display: initial;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+    }
+  }
 }
 
 .webGraffiti__color--active {
@@ -226,17 +237,6 @@ body {
   .webGraffiti__color {
     width: 10vh;
     height: 10vh;
-
-    .webGraffiti__colorPicker {
-      display: none;
-
-      &.webGraffiti__colorPicker--active {
-        display: initial;
-        width: 100%;
-        height: 100%;
-        padding: 0;
-      }
-    }
   }
 
   .webGraffiti__editor_brush {
