@@ -102,7 +102,7 @@ export class Wall {
     this.lastHash = hash;
     fs.writeFileSync(
       path.join(this.env.rootPath.client, this.channelConfig.imageName),
-      buffer
+      new Uint8Array(buffer)
     );
   }
 
