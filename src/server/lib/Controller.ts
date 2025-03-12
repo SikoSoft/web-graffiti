@@ -9,12 +9,14 @@ import { MessageEvent } from "../../spec/MessageSpec";
 import { Environment } from "./Environment";
 import { Channel } from "./Channel";
 import { ConfigProperties, ConfigProperty } from "../../spec/Config";
+import { Access } from "./Access";
 
 export interface ControllerOptions {
   env: Environment;
   config: Config;
   logger: pino.Logger;
   walls: Wall[];
+  access: Access;
 }
 
 export class Controller {
@@ -23,16 +25,18 @@ export class Controller {
   public channels: Channel[];
   private logger: pino.Logger;
   public walls: Wall[];
+  private access: Access;
 
   private httpApp: express.Express;
   private router: express.Router;
 
-  constructor({ env, config, logger, walls }: ControllerOptions) {
+  constructor({ env, config, logger, walls, access }: ControllerOptions) {
     this.env = env;
     this.config = config;
     this.channels = [];
     this.logger = logger;
     this.walls = walls;
+    this.access = access;
     this.httpApp = express();
     this.router = express.Router();
   }
@@ -59,6 +63,7 @@ export class Controller {
             logger: this.logger,
             config,
             wall,
+            access: this.access,
           })
         );
       }
@@ -121,7 +126,7 @@ export class Controller {
 
     new server({
       httpServer,
-    }).on("request", (request) => {
+    }).on("request", async (request) => {
       const connection = request.accept(null, request.origin);
       const url = new URL(request.resource, request.origin);
 
@@ -133,11 +138,14 @@ export class Controller {
 
       const channel = this.getChannel(channelId);
 
+      const accessToken = url.searchParams.get("accessToken");
+
       if (channel) {
-        const client = channel.registerClient(
+        const client = await channel.registerClient(
           this.config,
           request.remoteAddress,
-          connection
+          connection,
+          accessToken
         );
 
         connection.on("message", (message) => {

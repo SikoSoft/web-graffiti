@@ -4,6 +4,6 @@
     "module": "CommonJS",
     "outDir": "build"
   },
-  "include": ["src/server/*.ts", "src/spec/*.ts"],
+  "include": ["src/server/**/*.ts", "src/spec/*.ts"],
   "extends": "./tsconfig.json"
 }

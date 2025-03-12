@@ -7,6 +7,51 @@ import { Messenger } from "./Messenger";
 import { MessageEvent, Message } from "../../spec/MessageSpec";
 import { Wall } from "./Wall";
 import { Config } from "./Config";
+import { Access } from "./Access";
+
+/*
+function delegateSource() {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    for (let i = 0; i < storageDelegates.length; i++) {
+      const storageDelegate = storageDelegates[i];
+      const delegateMethods = Object.getOwnPropertyNames(
+        Object.getPrototypeOf(storageDelegate),
+      );
+      if (delegateMethods.includes(propertyKey)) {
+        const methodName = propertyKey as keyof StorageSchema;
+        if (!storageDelegate || !storageDelegate[methodName]) {
+          return;
+        }
+        descriptor.value = storageDelegate[methodName];
+      }
+    }
+  };
+}
+  */
+
+function upgradeClient() {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function (...args: any[]) {
+      const client = originalMethod.apply(this, args);
+      client.upgraded = true;
+      console.log("########## CLIENT UPGRADE IN DECORATOR #########");
+      //this.logger.info(`Client ${client.id} has been upgraded`);
+      return client;
+    };
+
+    return descriptor;
+  };
+}
 
 export interface ChannelStats {
   totalClients: number;
@@ -21,6 +66,7 @@ export interface ChannelOptions {
   logger: pino.Logger;
   config: ChannelConfig;
   wall: Wall;
+  access: Access;
 }
 export class Channel {
   private logger: pino.Logger;
@@ -31,8 +77,9 @@ export class Channel {
   public messenger: Messenger;
   public stats: ChannelStats;
   public paintPerTick: number;
+  public access: Access;
 
-  constructor({ logger, config, wall }: ChannelOptions) {
+  constructor({ logger, config, wall, access }: ChannelOptions) {
     const clients: Client[] = [];
     this.logger = logger;
     this.messenger = new Messenger({ channel: this, config, logger });
@@ -40,6 +87,7 @@ export class Channel {
     this.id = config.id;
     this.clients = clients;
     this.wall = wall;
+    this.access = access;
     this.stats = {
       get totalClients() {
         return clients.length;
@@ -55,16 +103,23 @@ export class Channel {
       this.config.paintVolume;
   }
 
-  registerClient(config: Config, ip: string, connection: connection): Client {
+  async registerClient(
+    config: Config,
+    ip: string,
+    connection: connection,
+    accessToken: string | null
+  ): Promise<Client> {
     const id = v4();
 
     this.logger.info(`New connection for ${id} (channel: ${this.id})`);
+
+    let role = 0;
 
     const client = new Client({
       config,
       id,
       joinTime: Date.now(),
-      role: 0,
+      role,
       ip,
       paint: this.config.paintVolume,
       connection,
