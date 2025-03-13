@@ -15,6 +15,11 @@ export interface ClientOptions {
   channel: Channel;
 }
 
+export type SimpleClientOptions = Omit<
+  ClientOptions,
+  "config" | "channel" | "connection"
+>;
+
 export class Client {
   private config: Config;
   public id: string;
@@ -42,7 +47,7 @@ export class Client {
     this.ip = ip;
     this.joinTime = joinTime;
     this.paint = paint;
-    this.role = this.config.getRole(this.config.defRole);
+    this.role = this.config.getRole(role);
     this.ctx = Object.assign({}, initialContext);
     this.connection = connection;
     this.channel = channel;

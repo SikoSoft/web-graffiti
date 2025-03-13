@@ -10,6 +10,7 @@ import { Environment } from "./Environment";
 import { Channel } from "./Channel";
 import { ConfigProperties, ConfigProperty } from "../../spec/Config";
 import { Access } from "./Access";
+import { Middleware } from "./Middleware";
 
 export interface ControllerOptions {
   env: Environment;
@@ -17,6 +18,7 @@ export interface ControllerOptions {
   logger: pino.Logger;
   walls: Wall[];
   access: Access;
+  middleware: Middleware;
 }
 
 export class Controller {
@@ -26,17 +28,26 @@ export class Controller {
   private logger: pino.Logger;
   public walls: Wall[];
   private access: Access;
+  private middleware: Middleware;
 
   private httpApp: express.Express;
   private router: express.Router;
 
-  constructor({ env, config, logger, walls, access }: ControllerOptions) {
+  constructor({
+    env,
+    config,
+    logger,
+    walls,
+    access,
+    middleware,
+  }: ControllerOptions) {
     this.env = env;
     this.config = config;
     this.channels = [];
     this.logger = logger;
     this.walls = walls;
     this.access = access;
+    this.middleware = middleware;
     this.httpApp = express();
     this.router = express.Router();
   }
@@ -64,6 +75,7 @@ export class Controller {
             config,
             wall,
             access: this.access,
+            middleware: this.middleware,
           })
         );
       }

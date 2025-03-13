@@ -2,12 +2,13 @@ import pino from "pino";
 import { v4 } from "uuid";
 import { connection } from "websocket";
 import { ChannelConfig } from "../../spec/Config";
-import { Client } from "./Client";
+import { Client, SimpleClientOptions } from "./Client";
 import { Messenger } from "./Messenger";
 import { MessageEvent, Message } from "../../spec/MessageSpec";
 import { Wall } from "./Wall";
 import { Config } from "./Config";
 import { Access } from "./Access";
+import { Middleware, MiddlewareTrigger } from "./Middleware";
 
 /*
 function delegateSource() {
@@ -67,6 +68,7 @@ export interface ChannelOptions {
   config: ChannelConfig;
   wall: Wall;
   access: Access;
+  middleware: Middleware;
 }
 export class Channel {
   private logger: pino.Logger;
@@ -78,8 +80,9 @@ export class Channel {
   public stats: ChannelStats;
   public paintPerTick: number;
   public access: Access;
+  private middleware: Middleware;
 
-  constructor({ logger, config, wall, access }: ChannelOptions) {
+  constructor({ logger, config, wall, access, middleware }: ChannelOptions) {
     const clients: Client[] = [];
     this.logger = logger;
     this.messenger = new Messenger({ channel: this, config, logger });
@@ -88,6 +91,7 @@ export class Channel {
     this.clients = clients;
     this.wall = wall;
     this.access = access;
+    this.middleware = middleware;
     this.stats = {
       get totalClients() {
         return clients.length;
@@ -113,15 +117,31 @@ export class Channel {
 
     this.logger.info(`New connection for ${id} (channel: ${this.id})`);
 
-    let role = 0;
+    const clientOptions = await this.middleware.runHandlers(
+      MiddlewareTrigger.CLIENT_CONNECTED,
+      {
+        config,
+        ip,
+        connection,
+        accessToken,
+        client: {
+          id,
+          ip,
+          joinTime: Date.now(),
+          paint: this.config.paintVolume,
+          role: config.defRole,
+        },
+      }
+    );
+
+    console.log(
+      "#######################",
+      JSON.stringify(clientOptions.client, null, 2)
+    );
 
     const client = new Client({
+      ...clientOptions.client,
       config,
-      id,
-      joinTime: Date.now(),
-      role,
-      ip,
-      paint: this.config.paintVolume,
       connection,
       channel: this,
     });

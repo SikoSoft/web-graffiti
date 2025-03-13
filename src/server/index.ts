@@ -28,8 +28,8 @@ async function loadMiddlewares(app: App): Promise<void> {
       console.log(`Loading middleware: ${file}`);
       const middleware = await import(path.join(middlewareDir, file));
       if (typeof middleware.default === "function") {
-        app.use(middleware.default);
-        middleware.default();
+        //app.use(middleware.default);
+        middleware.default(app);
       }
     }
   }
@@ -59,6 +59,7 @@ async function main(): Promise<void> {
     logger,
     walls,
     access,
+    middleware,
   });
   controller.init();
 
@@ -68,8 +69,8 @@ async function main(): Promise<void> {
     access,
     logger,
     middleware,
-    use: (middleware: any) => {
-      logger.info(`Using middleware: ${middleware.name}`);
+    use: (module: any) => {
+      logger.info(`Using middleware: ${module.name}`);
     },
   };
 
