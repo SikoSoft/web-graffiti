@@ -176,4 +176,8 @@ export class WebGraffiti {
       }
     }
   }
+
+  reconnect(accessToken = "") {
+    this.socket.reconnect(accessToken);
+  }
 }

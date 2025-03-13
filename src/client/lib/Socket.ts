@@ -54,10 +54,10 @@ export class Socket {
     return this.connect();
   }
 
-  async connect(): Promise<void> {
+  async connect(accessToken = ""): Promise<void> {
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(
-        `${this.wg.config.wsServer}?channelId=${this.wg.channelId}`
+        `${this.wg.config.wsServer}?channelId=${this.wg.channelId}&accessToken=${accessToken}`
       );
       this.ws.onopen = () => {
         this.connected = true;
@@ -79,6 +79,13 @@ export class Socket {
         this.connected = false;
       };
     });
+  }
+
+  async reconnect(accessToken = ""): Promise<void> {
+    if (this.ws.OPEN) {
+      this.ws.close();
+    }
+    await this.connect(accessToken);
   }
 
   sendMessage(message: Message): void {

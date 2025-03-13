@@ -1,20 +1,15 @@
 <html>
-
-
   <head>
-
-
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
     />
 
-
     <title>Web Graffiti</title>
-
 
     <link rel="stylesheet" type="text/css" href="WebGraffiti.css" />
 
+    <script src="http://localhost:8080/assets/index-pdP0hnXz.js"></script>
 
     <script type="importmap">
       {
@@ -36,7 +31,6 @@
       }
     </script>
 
-
     <script type="module">
       import { WebGraffiti } from "./lib/WebGraffiti.js";
       const wg = new WebGraffiti();
@@ -46,21 +40,17 @@
           wg.init(document.getElementById("webGraffiti"));
         }
       };
+
+      window.addEventListener("user-logged-in", (e) => {
+        const user = e.detail;
+        console.log("User logged in", user);
+        wg.reconnect(e.detail.authToken);
+      });
     </script>
-
-
   </head>
 
-
   <body>
-
-
     <div id="webGraffiti"></div>
-
-
+    <user-portal></user-portal>
   </body>
-
-
 </html>
-
-
