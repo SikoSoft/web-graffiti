@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/SikoSoft/web-graffiti#readme",
   "dependencies": {
+    "api-spec": "github:SikoSoft/api-spec#1.13.1",
     "canvas": "^2.11.1",
     "dotenv": "^16.3.1",
     "express": "^4.17.1",
