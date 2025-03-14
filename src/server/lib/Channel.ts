@@ -202,6 +202,13 @@ export class Channel {
   removeClient(client: Client) {
     this.logger.info(`Client ${client.id} disconnected`);
     this.clients.splice(this.clients.indexOf(client), 1);
+    this.broadcast({
+      event: MessageEvent.CLIENT_DISCONNECTED,
+      payload: {
+        id: client.id,
+        totalClients: this.stats.totalClients,
+      },
+    });
     if (this.clients.length === 0 || client.hasUnsavedEdits) {
       this.syncWall();
     }

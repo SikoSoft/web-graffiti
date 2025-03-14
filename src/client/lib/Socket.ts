@@ -1,4 +1,5 @@
 import {
+  ClientDisconnectedMessage,
   DevClientUpdateMessage,
   LineMessage,
   Message,
@@ -47,6 +48,10 @@ export class Socket {
         ),
       [MessageEvent.SET_CONTEXT]: (message) =>
         this.handleSetContext(message.payload as SetContextMessage["payload"]),
+      [MessageEvent.CLIENT_DISCONNECTED]: (message) =>
+        this.handleClientDisconnected(
+          message.payload as ClientDisconnectedMessage["payload"]
+        ),
     };
   }
 
@@ -114,6 +119,11 @@ export class Socket {
     if (payload.ctx) {
       this.wg.setClientContext(payload.id, payload.ctx);
     }
+  }
+
+  handleClientDisconnected(payload: ClientDisconnectedMessage["payload"]) {
+    this.wg.removeClient(payload.id);
+    this.wg.menu.setTotalClients(payload.totalClients);
   }
 
   handleSetContext(payload: SetContextMessage["payload"]) {

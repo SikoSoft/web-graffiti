@@ -125,6 +125,10 @@ export class WebGraffiti {
     this.clients.push(client);
   }
 
+  removeClient(id: string): void {
+    this.clients = this.clients.filter((client) => client.id !== id);
+  }
+
   setClientContext(id: string, context: Context): void {
     if (context[ContextType.LINE_WIDTH]) {
       //context.lineWidth = parseInt(context.lineWidth);

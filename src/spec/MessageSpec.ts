@@ -10,6 +10,7 @@ export enum MessageEvent {
   PAINT = "paint",
   NEW_CLIENT = "newClient",
   DEV_CLIENT_UPDATE = "devClientUpdate",
+  CLIENT_DISCONNECTED = "clientDisconnected",
 }
 
 export interface MessagePayload {
@@ -43,6 +44,10 @@ export interface MessagePayload {
     totalClients: number;
   };
   [MessageEvent.DEV_CLIENT_UPDATE]: {};
+  [MessageEvent.CLIENT_DISCONNECTED]: {
+    id: string;
+    totalClients: number;
+  };
 }
 
 export interface WelcomeMessage {
@@ -85,6 +90,11 @@ export interface DevClientUpdateMessage {
   payload: MessagePayload[MessageEvent.DEV_CLIENT_UPDATE];
 }
 
+export interface ClientDisconnectedMessage {
+  event: MessageEvent.CLIENT_DISCONNECTED;
+  payload: MessagePayload[MessageEvent.CLIENT_DISCONNECTED];
+}
+
 export type Message =
   | WelcomeMessage
   | SetContextMessage
@@ -93,4 +103,5 @@ export type Message =
   | SetRoleMessage
   | RefillMessage
   | NewClientMessage
-  | DevClientUpdateMessage;
+  | DevClientUpdateMessage
+  | ClientDisconnectedMessage;
