@@ -162,7 +162,7 @@ export class WebGraffiti {
   }
 
   handleWelcome(payload: WelcomeMessage["payload"]) {
-    this.client.id = payload.id;
+    this.client.setId(payload.id);
     this.client.setPaint(payload.paint);
     this.client.setDelta(Date.now() - payload.join);
     this.client.setMode(payload.mode);

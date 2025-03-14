@@ -94,4 +94,8 @@ export class Client {
       payload: { role },
     });
   }
+
+  setId(id: string): void {
+    this.id = id;
+  }
 }
