@@ -143,7 +143,7 @@ export interface IntrospectionAnonymous {
 export type Introspection = IntrospectionUser | IntrospectionAnonymous;
 
 export default function (app: App) {
-  console.log("access middleware entry...");
+  app.logger.info("access middleware entry...");
   app.middleware.register(
     MiddlewareTrigger.CLIENT_CONNECTED,
     async (
@@ -159,7 +159,6 @@ export default function (app: App) {
       let newRole = payload.config.defRole;
 
       if (result && result.response) {
-        console.log("user is logged in...", result.response);
         if (
           result.response.introspection.isLoggedIn &&
           result.response.introspection.user.roles.includes("webgraffiti-admin")
@@ -167,11 +166,6 @@ export default function (app: App) {
           newRole = 1;
         }
       }
-      /*
-      .then((response) => {
-        console.log("INTROSPECT", response);
-      });
-      */
 
       return {
         ...payload,
