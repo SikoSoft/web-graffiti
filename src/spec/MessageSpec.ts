@@ -20,6 +20,7 @@ export interface MessagePayload {
     paint: number;
     join: number;
     mode: ClientMode;
+    totalClients: number;
   };
   [MessageEvent.LINE]: {
     line: Line;
@@ -39,6 +40,7 @@ export interface MessagePayload {
   [MessageEvent.NEW_CLIENT]: {
     id: string;
     ctx?: Context;
+    totalClients: number;
   };
   [MessageEvent.DEV_CLIENT_UPDATE]: {};
 }

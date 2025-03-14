@@ -109,7 +109,8 @@ export class Socket {
   }
 
   handleNewClient(payload: NewClientMessage["payload"]) {
-    this.wg.registerClient(payload.id);
+    this.wg.registerClient(this.wg.createClient(payload.id));
+    this.wg.menu.setTotalClients(payload.totalClients);
     if (payload.ctx) {
       this.wg.setClientContext(payload.id, payload.ctx);
     }

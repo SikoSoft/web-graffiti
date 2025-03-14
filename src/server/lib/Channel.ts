@@ -157,6 +157,7 @@ export class Channel {
         paint: client.paint,
         join: client.joinTime,
         mode: client.role.mode,
+        totalClients: this.stats.totalClients,
       },
     });
 
@@ -176,6 +177,7 @@ export class Channel {
         payload: {
           id: newClient.id,
           ctx: newClient.ctx,
+          totalClients: this.stats.totalClients,
         },
       },
       newClient.id
@@ -191,6 +193,7 @@ export class Channel {
           payload: {
             id: client.id,
             ctx: client.ctx,
+            totalClients: this.stats.totalClients,
           },
         });
       });

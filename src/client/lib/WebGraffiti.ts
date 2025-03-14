@@ -102,8 +102,8 @@ export class WebGraffiti {
     this.load().then(() => {
       this.menu.init();
       this.render.init();
-      this.client = new Client({ wg: this });
-      this.clients.push(this.client);
+      this.client = this.createClient();
+      this.registerClient(this.client);
       this.socket.init().catch((error) => {
         console.log(
           "Encountered an error while establishing connection!",
@@ -117,8 +117,12 @@ export class WebGraffiti {
     window.location.reload();
   }
 
-  registerClient(id: string): void {
-    this.clients.push(new Client({ wg: this, id }));
+  createClient(id?: string): Client {
+    return new Client({ wg: this, id });
+  }
+
+  registerClient(client: Client): void {
+    this.clients.push(client);
   }
 
   setClientContext(id: string, context: Context): void {
@@ -162,6 +166,7 @@ export class WebGraffiti {
   }
 
   handleWelcome(payload: WelcomeMessage["payload"]) {
+    this.menu.setTotalClients(payload.totalClients);
     this.client.setId(payload.id);
     this.client.setPaint(payload.paint);
     this.client.setDelta(Date.now() - payload.join);
