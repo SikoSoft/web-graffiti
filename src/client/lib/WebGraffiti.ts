@@ -6,6 +6,7 @@ import { Render } from "./Render";
 import { Loader } from "./Loader";
 import { Input } from "./Input";
 import { Client } from "./Client";
+import { Menu } from "./Menu";
 
 import { ConfigProperties } from "../../spec/Config";
 import { Context, ContextType, Coord } from "../../spec/Canvas";
@@ -20,6 +21,7 @@ export class WebGraffiti {
   public networkMonitor: NetworkMonitor;
   public render: Render;
   public loader: Loader;
+  public menu: Menu;
   public input: Input;
   public chunkSize: number;
   public chunkMap: number[];
@@ -44,6 +46,7 @@ export class WebGraffiti {
     this.render = new Render({ wg: this });
     this.loader = new Loader({ wg: this });
     this.input = new Input({ wg: this });
+    this.menu = new Menu({ wg: this });
     this.chunkSize = 16;
     this.chunkMap = [];
     this.pixelMap = [];
@@ -97,6 +100,7 @@ export class WebGraffiti {
       this.networkMonitor.init();
     }
     this.load().then(() => {
+      this.menu.init();
       this.render.init();
       this.client = new Client({ wg: this });
       this.clients.push(this.client);

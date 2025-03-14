@@ -13,6 +13,18 @@ body {
   margin-top: 0px;
   position: relative;
 
+  .webGraffiti__menu {
+    position: relative;
+    height: 3rem;
+    width: 100%;
+    background-color: rgb(92, 122, 101);
+    border-bottom: 5px rgb(49, 66, 54) solid;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    box-sizing: border-box;
+  }
+
   .webGraffiti__canvas {
     background-color: #fff;
   }
