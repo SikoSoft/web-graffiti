@@ -62,7 +62,10 @@ export class WebGraffiti {
     this.channelId = 0;
   }
 
-  init(element: HTMLElement, initConfig: Partial<ConfigProperties> = {}): void {
+  async init(
+    element: HTMLElement,
+    initConfig: Partial<ConfigProperties> = {}
+  ): Promise<void> {
     const channelId = new URLSearchParams(window.location.search).get(
       "channelId"
     );
@@ -72,7 +75,7 @@ export class WebGraffiti {
     this.initConfig = initConfig;
     this.rootElement = element;
     this.rootElement.classList.add("webGraffiti");
-    this.run();
+    await this.run();
   }
 
   async load(): Promise<void> {
@@ -95,22 +98,27 @@ export class WebGraffiti {
     });
   }
 
-  run() {
+  async run() {
     if (this.useNetworkMonitor) {
       this.networkMonitor.init();
     }
-    this.load().then(() => {
-      this.menu.init();
-      this.render.init();
-      this.client = this.createClient();
-      this.registerClient(this.client);
-      this.socket.init().catch((error) => {
-        console.log(
-          "Encountered an error while establishing connection!",
-          error
-        );
-      });
-    });
+    try {
+      await this.load();
+    } catch (error) {
+      console.error("Encountered an error while loading!", error);
+    }
+    this.menu.init();
+    this.render.init();
+    this.client = this.createClient();
+    this.registerClient(this.client);
+    try {
+      await this.socket.init();
+    } catch (error) {
+      console.error(
+        "Encountered an error while establishing connection!",
+        error
+      );
+    }
   }
 
   reload() {

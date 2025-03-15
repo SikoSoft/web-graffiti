@@ -14,6 +14,7 @@ body {
   position: relative;
 
   .webGraffiti__menu {
+    color: #fff;
     position: relative;
     height: 3rem;
     width: 100%;
@@ -23,6 +24,20 @@ body {
     justify-content: space-between;
     padding: 0.5rem;
     box-sizing: border-box;
+
+    .webGraffiti__menu_totalClients {
+
+      font-size: 1.5rem;
+      margin: auto 0;
+
+      &.singular::after {
+        content: " client";
+      }
+
+      &.plural::after {
+        content: " clients";
+      }
+    }
   }
 
   .webGraffiti__canvas {

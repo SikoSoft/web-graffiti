@@ -9,7 +9,7 @@
 
     <link rel="stylesheet" type="text/css" href="WebGraffiti.css" />
 
-    <script src="http://localhost:8080/assets/index-CXDIEYZ5.js"></script>
+    <script src="http://localhost:8080/assets/index.js"></script>
 
     <script type="importmap">
       {
@@ -34,17 +34,27 @@
 
     <script type="module">
       import { WebGraffiti } from "./lib/WebGraffiti.js";
+
+      const userNode = document.createElement("div");
+
       const wg = new WebGraffiti();
       window.wg = wg;
-      document.onreadystatechange = function () {
+      document.onreadystatechange = async function () {
         if (document.readyState === "complete") {
-          wg.init(document.getElementById("webGraffiti"));
+          await wg.init(document.getElementById("webGraffiti"));
+
+          userNode.textContent = "Anonymous";
+          userNode.addEventListener("click", () => {
+            document.querySelector("user-portal")?.showLoginForm();
+          });
+          wg.menu.registerOption(userNode);
         }
       };
 
       window.addEventListener("user-logged-in", (e) => {
         const user = e.detail;
         console.log("User logged in", user);
+        userNode.textContent = "Admin";
         wg.reconnect(e.detail.authToken);
       });
     </script>
