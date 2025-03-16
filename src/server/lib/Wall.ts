@@ -80,9 +80,9 @@ export class Wall {
     fs.copyFile(
       path.join(this.env.rootPath.client, "new-wall.png"),
       path.join(this.env.rootPath.client, this.channelConfig.imageName),
-      (error: any) => {
-        if (error) {
-          this.logger.error("There was a problem restoring the wall");
+      (err: any) => {
+        if (err) {
+          this.logger.error({ err }, "There was a problem restoring the wall");
         } else {
           this.logger.info("Wall was missing, but has been restored");
           this.load();
