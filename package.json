@@ -11,7 +11,7 @@
     "compile-client-spec": "tsc -p tsconfig.client-spec.json",
     "compile-server": "tsc -p tsconfig.server.json",
     "compile-scss": "sass src/client:build/client",
-    "copy-static": "cp -r ./static/ ./build/client/",
+    "copy-static": "cp -r ./static/. ./build/client/",
     "dev": "npm-run-all --parallel watch-scss watch-client watch-client-spec watch-run-server",
     "prepare": "husky install",
     "watch-client": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.client.json --onSuccess \"npm run copy-static\"",
