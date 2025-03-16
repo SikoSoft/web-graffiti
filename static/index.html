@@ -7,9 +7,25 @@
 
     <title>Web Graffiti</title>
 
-    <link rel="stylesheet" type="text/css" href="WebGraffiti.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
 
-    <script src="http://localhost:8080/assets/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="WebGraffiti.css" />
+    <style>
+      ss-icon {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        vertical-align: middle;
+        cursor: pointer;
+      }
+    </style>
+
+    <script src="/ss-user-bundle.js"></script>
 
     <script type="importmap">
       {
@@ -36,6 +52,7 @@
       import { WebGraffiti } from "./lib/WebGraffiti.js";
 
       const userNode = document.createElement("div");
+      userNode.className = "webGraffiti__menu_user";
 
       const wg = new WebGraffiti();
       window.wg = wg;
@@ -43,9 +60,12 @@
         if (document.readyState === "complete") {
           await wg.init(document.getElementById("webGraffiti"));
 
-          userNode.textContent = "Anonymous";
-          userNode.addEventListener("click", () => {
-            document.querySelector("user-portal")?.showLoginForm();
+          userNode.appendChild(
+            document.getElementById("user-template").content.cloneNode(true)
+          );
+
+          userNode.querySelector("ss-icon").addEventListener("click", (e) => {
+            document.querySelector("user-portal").showLoginForm();
           });
           wg.menu.registerOption(userNode);
         }
@@ -53,8 +73,7 @@
 
       window.addEventListener("user-logged-in", (e) => {
         const user = e.detail;
-        console.log("User logged in", user);
-        userNode.textContent = "Admin";
+        userNode.querySelector(".name").textContent = user.username;
         wg.reconnect(e.detail.authToken);
       });
     </script>
@@ -63,5 +82,9 @@
   <body>
     <div id="webGraffiti"></div>
     <user-portal></user-portal>
+    <template id="user-template">
+      <span class="name">Anonymous</span>
+      <ss-icon class="profile" size="24" color="#fff"></ss-icon>
+    </template>
   </body>
 </html>
