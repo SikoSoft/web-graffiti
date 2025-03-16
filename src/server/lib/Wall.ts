@@ -62,13 +62,17 @@ export class Wall {
   }
 
   load() {
-    loadImage(path.join(this.env.rootPath.client, this.channelConfig.imageName))
+    const imgPath = path.join(
+      this.env.rootPath.client,
+      this.channelConfig.imageName
+    );
+    loadImage(imgPath)
       .then((image) => {
         this.ctx.drawImage(image, 0, 0);
         this.lastHash = createHash("sha256")
           .update(this.canvas.toBuffer("image/png").toString())
           .digest("hex");
-        this.logger.debug(`Initialized image context`);
+        this.logger.debug({ imgPath }, `Initialized image context`);
       })
       .catch((error) => {
         this.logger.debug("Error opening image");
