@@ -59,7 +59,11 @@ export class Socket {
     return this.connect();
   }
 
-  async connect(accessToken = ""): Promise<void> {
+  async connect(_accessToken = ""): Promise<void> {
+    let accessToken = _accessToken;
+    if (!accessToken) {
+      accessToken = sessionStorage.getItem("accessToken") || "";
+    }
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(
         `${this.wg.config.wsServer}?channelId=${this.wg.channelId}&accessToken=${accessToken}`
