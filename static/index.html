@@ -73,6 +73,7 @@
 
       window.addEventListener("user-logged-in", (e) => {
         const user = e.detail;
+        sessionStorage.setItem("accessToken", user.authToken);
         userNode.querySelector(".name").textContent = user.username;
         wg.reconnect(e.detail.authToken);
       });

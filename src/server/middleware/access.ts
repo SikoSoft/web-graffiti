@@ -143,13 +143,14 @@ export interface IntrospectionAnonymous {
 export type Introspection = IntrospectionUser | IntrospectionAnonymous;
 
 export default function (app: App) {
-  app.logger.info("access middleware entry...");
   app.middleware.register(
     MiddlewareTrigger.CLIENT_CONNECTED,
     async (
       payload: MiddlewarePayload[MiddlewareTrigger.CLIENT_CONNECTED]
     ): Promise<MiddlewarePayload[MiddlewareTrigger.CLIENT_CONNECTED]> => {
-      app.logger.info("client connected middleware handler...!");
+      app.logger.info(
+        `${MiddlewareTrigger.CLIENT_CONNECTED} middleware handler triggered`
+      );
 
       await Promise.resolve();
 
