@@ -115,7 +115,9 @@ export class Channel {
   ): Promise<Client> {
     const id = v4();
 
-    this.logger.info(`New connection for ${id} (channel: ${this.id})`);
+    this.logger.info(
+      `Establishing connection for new client ${id} (channel: ${this.id})`
+    );
 
     const clientOptions = await this.middleware.runHandlers(
       MiddlewareTrigger.CLIENT_CONNECTED,
@@ -132,11 +134,6 @@ export class Channel {
           role: config.defRole,
         },
       }
-    );
-
-    console.log(
-      "#######################",
-      JSON.stringify(clientOptions.client, null, 2)
     );
 
     const client = new Client({
@@ -166,6 +163,8 @@ export class Channel {
     this.announceNewClientToOthers(client);
 
     this.stats.lastConnectionTime = new Date();
+
+    this.logger.info({ clientOptions }, "Client connected");
 
     return client;
   }

@@ -18,17 +18,15 @@ const logger = pino.pino({
 });
 
 async function loadMiddlewares(app: App): Promise<void> {
-  console.log("Loading middlewares...");
-  const middlewareDir = path.join(app.env.rootPath.server, "/middleware");
-  console.log(`Middleware directory: ${middlewareDir}`);
-  const files = fs.readdirSync(middlewareDir);
+  const directory = path.join(app.env.rootPath.server, "/middleware");
+  app.logger.debug({ directory }, "Scanning for middleware files");
+  const files = fs.readdirSync(directory);
 
   for (const file of files) {
     if (file.endsWith(".js")) {
-      console.log(`Loading middleware: ${file}`);
-      const middleware = await import(path.join(middlewareDir, file));
+      app.logger.debug(`Loading middleware: ${file}`);
+      const middleware = await import(path.join(directory, file));
       if (typeof middleware.default === "function") {
-        //app.use(middleware.default);
         middleware.default(app);
       }
     }
