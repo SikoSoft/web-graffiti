@@ -1,5 +1,7 @@
 import { WebGraffiti } from "./WebGraffiti";
 
+export const STORAGE_KEY_EDITOR_STATE = "wgEditorState";
+
 type HTMLElementEvent<T extends HTMLElement> = Event & {
   target: T;
 };
@@ -8,12 +10,20 @@ export interface EditorOptions {
   wg: WebGraffiti;
 }
 
+export interface EditorState {
+  selected: number;
+  colors: string[];
+  palettePosition: number;
+}
+
 export class Editor {
   private wg: WebGraffiti;
-  public selected: number;
+  private state: EditorState;
   public initialized: boolean;
   public enabled: boolean;
-  private colors: string[];
+  private buttons: HTMLButtonElement[];
+
+  private scrollTimeout: NodeJS.Timeout | undefined;
 
   public container: HTMLDivElement;
   public containerInner: HTMLDivElement;
@@ -28,10 +38,14 @@ export class Editor {
 
   constructor({ wg }: EditorOptions) {
     this.wg = wg;
-    this.selected = 0;
+    this.state = {
+      selected: 0,
+      colors: [],
+      palettePosition: 0,
+    };
     this.initialized = false;
     this.enabled = false;
-    this.colors = [];
+    this.buttons = [];
 
     this.container = document.createElement("div");
     this.containerInner = document.createElement("div");
@@ -46,7 +60,10 @@ export class Editor {
   }
 
   init(): void {
-    this.colors = [...this.wg.config.defaultColors];
+    this.restore();
+    if (!this.state.colors.length) {
+      this.state.colors = [...this.wg.config.defColors];
+    }
 
     this.container.className = "webGraffiti__editor";
 
@@ -56,19 +73,31 @@ export class Editor {
     this.containerInner.append(this.paintMeter);
 
     this.palette.className = "webGraffiti__editor_palette";
+    this.palette.addEventListener("scroll", (e) => {
+      this.state.palettePosition = this.palette.scrollLeft;
+      if (this.scrollTimeout) {
+        clearTimeout(this.scrollTimeout);
+      }
+      this.scrollTimeout = setTimeout(() => {
+        this.save();
+      }, 100);
+    });
     this.containerInner.append(this.palette);
     this.container.append(this.containerInner);
     this.wg.rootElement.append(this.container);
 
     this.handle.className = "webGraffiti__editor_handle";
     this.containerInner.append(this.handle);
-    this.colors.forEach((color, index) => {
+    this.palette.innerHTML = "";
+    this.state.colors.forEach((color, index) => {
       this.palette.append(this.setupButton(color, index));
     });
     this.setupPaintMeter();
     this.setupBrushTool();
-    this.selectColor(0);
+    this.selectColor(this.state.selected);
     this.updatePaintMeter();
+
+    this.palette.scrollLeft = this.state.palettePosition;
     this.initialized = true;
   }
 
@@ -123,15 +152,58 @@ export class Editor {
     button.setAttribute("data-color", buttonColor);
     button.setAttribute("data-index", String(index));
     button.style.backgroundColor = buttonColor;
+
+    const colorPicker = document.createElement("input");
+    colorPicker.className = "webGraffiti__colorPicker";
+    colorPicker.setAttribute("type", "color");
+    colorPicker.setAttribute("value", buttonColor.substring(0, 7));
+
+    const showColorPicker = () => {
+      colorPicker.classList.add("webGraffiti__colorPicker--active");
+      colorPicker.showPicker();
+      setTimeout(() => {
+        colorPicker.showPicker();
+      }, 1);
+    };
+    const hideColorPicker = () => {
+      colorPicker.classList.remove("webGraffiti__colorPicker--active");
+    };
+
+    colorPicker.addEventListener("change", (event) => {
+      const e = event as HTMLElementEvent<HTMLInputElement>;
+      this.setButtonColor(index, e.target.value);
+      hideColorPicker();
+    });
+    colorPicker.addEventListener("blur", () => {
+      hideColorPicker();
+    });
+
+    button.append(colorPicker);
+
+    button.addEventListener("mousedown", () => {
+      this.selectColor(index);
+      if (this.wg.input.doubleClick) {
+        showColorPicker();
+      }
+    });
     button.addEventListener("touchstart", () => {
       this.selectColor(index);
     });
+
+    this.buttons[index] = button;
     return button;
   }
 
+  setButtonColor(index: number, color: string) {
+    this.state.colors[index] = color;
+    this.buttons[index].style.backgroundColor = color;
+    this.buttons[index].setAttribute("data-color", color);
+    this.selectColor(index);
+  }
+
   selectColor(index: number) {
-    this.selected = index;
-    this.wg.client.setColor(this.colors[index]);
+    this.state.selected = index;
+    this.wg.client.setColor(this.state.colors[index]);
     document.querySelectorAll(".webGraffiti__color").forEach((button) => {
       if (parseInt(button.getAttribute("data-index") || "") === index) {
         button.classList.add("webGraffiti__color--active");
@@ -140,7 +212,9 @@ export class Editor {
       }
     });
     this.updateBrushPreview();
-    this.paintRemaining.style.backgroundColor = this.colors[this.selected];
+    this.paintRemaining.style.backgroundColor =
+      this.state.colors[this.state.selected];
+    this.save();
   }
 
   setBrushSize(size: number) {
@@ -149,13 +223,51 @@ export class Editor {
   }
 
   updateBrushPreview() {
-    this.brushPreview.style.backgroundColor = this.colors[this.selected];
+    this.brushPreview.style.backgroundColor =
+      this.state.colors[this.state.selected];
     this.brushPreview.style.width = `${this.wg.client.ctx.lineWidth}px`;
     this.brushPreview.style.height = `${this.wg.client.ctx.lineWidth}px`;
   }
 
   updatePaintMeter() {
-    const height = (this.wg.client.paint / this.wg.config.paintVolume) * 100;
+    const height =
+      (this.wg.client.paint / this.wg.config.channel.paintVolume) * 100;
     this.paintRemaining.style.height = `${height}%`;
+  }
+
+  hideAllColorPickers() {
+    this.buttons.forEach((button) => {});
+  }
+
+  restore(): void {
+    const storageState = localStorage.getItem(STORAGE_KEY_EDITOR_STATE);
+    if (storageState) {
+      const state = JSON.parse(storageState) as EditorState;
+      if (state.colors) {
+        this.state.colors = state.colors;
+      }
+
+      if (state.selected) {
+        this.state.selected = state.selected;
+      }
+
+      if (state.palettePosition) {
+        this.state.palettePosition = state.palettePosition;
+      }
+    }
+  }
+
+  save(): void {
+    localStorage.setItem(STORAGE_KEY_EDITOR_STATE, JSON.stringify(this.state));
+  }
+
+  reset() {
+    this.state = {
+      selected: 0,
+      colors: [],
+      palettePosition: 0,
+    };
+    this.save();
+    this.init();
   }
 }

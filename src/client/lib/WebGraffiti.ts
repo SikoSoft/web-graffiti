@@ -6,6 +6,7 @@ import { Render } from "./Render";
 import { Loader } from "./Loader";
 import { Input } from "./Input";
 import { Client } from "./Client";
+import { Menu } from "./Menu";
 
 import { ConfigProperties } from "../../spec/Config";
 import { Context, ContextType, Coord } from "../../spec/Canvas";
@@ -20,6 +21,7 @@ export class WebGraffiti {
   public networkMonitor: NetworkMonitor;
   public render: Render;
   public loader: Loader;
+  public menu: Menu;
   public input: Input;
   public chunkSize: number;
   public chunkMap: number[];
@@ -33,6 +35,7 @@ export class WebGraffiti {
   public initConfig: Partial<ConfigProperties>;
   public panOffset: Coord;
   public minOffset: Coord;
+  public channelId: number;
 
   constructor() {
     this.rootElement = document.createElement("div");
@@ -43,6 +46,7 @@ export class WebGraffiti {
     this.render = new Render({ wg: this });
     this.loader = new Loader({ wg: this });
     this.input = new Input({ wg: this });
+    this.menu = new Menu({ wg: this });
     this.chunkSize = 16;
     this.chunkMap = [];
     this.pixelMap = [];
@@ -55,13 +59,23 @@ export class WebGraffiti {
     this.panOffset = { x: 0, y: 0 };
     this.minOffset = { x: 0, y: 0 };
     this.client = new Client({ wg: this });
+    this.channelId = 0;
   }
 
-  init(element: HTMLElement, initConfig: Partial<ConfigProperties> = {}): void {
+  async init(
+    element: HTMLElement,
+    initConfig: Partial<ConfigProperties> = {}
+  ): Promise<void> {
+    const channelId = new URLSearchParams(window.location.search).get(
+      "channelId"
+    );
+    if (channelId !== null && channelId !== undefined) {
+      this.channelId = parseInt(channelId);
+    }
     this.initConfig = initConfig;
     this.rootElement = element;
     this.rootElement.classList.add("webGraffiti");
-    this.run();
+    await this.run();
   }
 
   async load(): Promise<void> {
@@ -84,29 +98,43 @@ export class WebGraffiti {
     });
   }
 
-  run() {
+  async run() {
     if (this.useNetworkMonitor) {
       this.networkMonitor.init();
     }
-    this.load().then(() => {
-      this.render.init();
-      this.client = new Client({ wg: this });
-      this.clients.push(this.client);
-      this.socket.init().catch((error) => {
-        console.log(
-          "Encountered an error while establishing connection!",
-          error
-        );
-      });
-    });
+    try {
+      await this.load();
+    } catch (error) {
+      console.error("Encountered an error while loading!", error);
+    }
+    this.menu.init();
+    this.render.init();
+    this.client = this.createClient();
+    this.registerClient(this.client);
+    try {
+      await this.socket.init();
+    } catch (error) {
+      console.error(
+        "Encountered an error while establishing connection!",
+        error
+      );
+    }
   }
 
   reload() {
     window.location.reload();
   }
 
-  registerClient(id: string): void {
-    this.clients.push(new Client({ wg: this, id }));
+  createClient(id?: string): Client {
+    return new Client({ wg: this, id });
+  }
+
+  registerClient(client: Client): void {
+    this.clients.push(client);
+  }
+
+  removeClient(id: string): void {
+    this.clients = this.clients.filter((client) => client.id !== id);
   }
 
   setClientContext(id: string, context: Context): void {
@@ -150,7 +178,8 @@ export class WebGraffiti {
   }
 
   handleWelcome(payload: WelcomeMessage["payload"]) {
-    this.client.id = payload.id;
+    this.menu.setTotalClients(payload.totalClients);
+    this.client.setId(payload.id);
     this.client.setPaint(payload.paint);
     this.client.setDelta(Date.now() - payload.join);
     this.client.setMode(payload.mode);
@@ -167,5 +196,9 @@ export class WebGraffiti {
         this.client.setRole(parseInt(role));
       }
     }
+  }
+
+  reconnect(accessToken = "") {
+    this.socket.reconnect(accessToken);
   }
 }

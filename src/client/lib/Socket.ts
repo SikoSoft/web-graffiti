@@ -1,4 +1,5 @@
 import {
+  ClientDisconnectedMessage,
   DevClientUpdateMessage,
   LineMessage,
   Message,
@@ -45,6 +46,12 @@ export class Socket {
         this.handleDevClientUpdate(
           message.payload as DevClientUpdateMessage["payload"]
         ),
+      [MessageEvent.SET_CONTEXT]: (message) =>
+        this.handleSetContext(message.payload as SetContextMessage["payload"]),
+      [MessageEvent.CLIENT_DISCONNECTED]: (message) =>
+        this.handleClientDisconnected(
+          message.payload as ClientDisconnectedMessage["payload"]
+        ),
     };
   }
 
@@ -52,9 +59,15 @@ export class Socket {
     return this.connect();
   }
 
-  async connect(): Promise<void> {
+  async connect(_accessToken = ""): Promise<void> {
+    let accessToken = _accessToken;
+    if (!accessToken) {
+      accessToken = sessionStorage.getItem("accessToken") || "";
+    }
     return new Promise((resolve, reject) => {
-      this.ws = new WebSocket(this.wg.config.wsServer);
+      this.ws = new WebSocket(
+        `${this.wg.config.wsServer}?channelId=${this.wg.channelId}&accessToken=${accessToken}`
+      );
       this.ws.onopen = () => {
         this.connected = true;
         this.connectionPromise = null;
@@ -75,6 +88,13 @@ export class Socket {
         this.connected = false;
       };
     });
+  }
+
+  async reconnect(accessToken = ""): Promise<void> {
+    if (this.ws.OPEN) {
+      this.ws.close();
+    }
+    await this.connect(accessToken);
   }
 
   sendMessage(message: Message): void {
@@ -98,10 +118,16 @@ export class Socket {
   }
 
   handleNewClient(payload: NewClientMessage["payload"]) {
-    this.wg.registerClient(payload.id);
+    this.wg.registerClient(this.wg.createClient(payload.id));
+    this.wg.menu.setTotalClients(payload.totalClients);
     if (payload.ctx) {
       this.wg.setClientContext(payload.id, payload.ctx);
     }
+  }
+
+  handleClientDisconnected(payload: ClientDisconnectedMessage["payload"]) {
+    this.wg.removeClient(payload.id);
+    this.wg.menu.setTotalClients(payload.totalClients);
   }
 
   handleSetContext(payload: SetContextMessage["payload"]) {

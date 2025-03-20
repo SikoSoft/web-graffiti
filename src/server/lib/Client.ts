@@ -1,7 +1,8 @@
 import { connection } from "websocket";
 import { Config } from "./Config";
-import { Context, ContextType, initialContext } from "../../spec/Canvas";
-import { Role } from "../../spec/Config";
+import { Context, initialContext } from "../../spec/Canvas";
+import { RoleConfig } from "../../spec/Config";
+import { Channel } from "./Channel";
 
 export interface ClientOptions {
   config: Config;
@@ -11,7 +12,13 @@ export interface ClientOptions {
   paint: number;
   role: number;
   connection: connection;
+  channel: Channel;
 }
+
+export type SimpleClientOptions = Omit<
+  ClientOptions,
+  "config" | "channel" | "connection"
+>;
 
 export class Client {
   private config: Config;
@@ -19,9 +26,11 @@ export class Client {
   private ip: string;
   public joinTime: number;
   public paint: number;
-  public role: Role;
+  public role: RoleConfig;
   public ctx: Context;
   public connection: connection;
+  public channel: Channel;
+  public hasUnsavedEdits: boolean;
 
   constructor({
     config,
@@ -31,15 +40,18 @@ export class Client {
     paint,
     role,
     connection,
+    channel,
   }: ClientOptions) {
     this.config = config;
     this.id = id;
     this.ip = ip;
     this.joinTime = joinTime;
     this.paint = paint;
-    this.role = this.config.getRole(this.config.defRole);
+    this.role = this.config.getRole(role);
     this.ctx = Object.assign({}, initialContext);
     this.connection = connection;
+    this.channel = channel;
+    this.hasUnsavedEdits = false;
   }
 
   hasInfinitePaint(): boolean {
@@ -53,6 +65,6 @@ export class Client {
   }
 
   refillPaint(): void {
-    this.paint = this.config.paintVolume;
+    this.paint = this.channel.config.paintVolume;
   }
 }

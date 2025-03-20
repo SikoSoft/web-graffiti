@@ -13,7 +13,7 @@ export const initialContext: Context = {
   [ContextType.LINE_CAP]: "round",
   [ContextType.LINE_JOIN]: "round",
   [ContextType.LINE_WIDTH]: 3,
-  [ContextType.STROKE_STYLE]: "#ffffffff",
+  [ContextType.STROKE_STYLE]: "#000000",
 };
 
 export interface Coord {

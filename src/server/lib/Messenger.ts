@@ -1,6 +1,5 @@
 import { connection } from "websocket";
 import { Client } from "./Client";
-import { Controller } from "./Controller";
 import {
   LineMessage,
   Message,
@@ -10,25 +9,26 @@ import {
   SetRoleMessage,
 } from "../../spec/MessageSpec";
 import pino from "pino";
-import { Config } from "./Config";
+import { Channel } from "./Channel";
+import { ChannelConfig } from "../../spec/Config";
 
 declare type MessageHander = (client: Client, message: Message) => void;
 
 export interface MessengerOptions {
   logger: pino.Logger;
-  controller: Controller;
-  config: Config;
+  channel: Channel;
+  config: ChannelConfig;
 }
 
 export class Messenger {
   private logger: pino.Logger;
-  private controller: Controller;
-  private config: Config;
+  private channel: Channel;
+  private config: ChannelConfig;
   private messageHandlers: Record<string, MessageHander>;
 
-  constructor({ logger, controller, config }: MessengerOptions) {
+  constructor({ logger, channel, config }: MessengerOptions) {
     this.logger = logger;
-    this.controller = controller;
+    this.channel = channel;
     this.config = config;
 
     this.messageHandlers = {
@@ -50,6 +50,7 @@ export class Messenger {
   }
 
   handle(client: Client, message: Message) {
+    this.channel.stats.totalIncomingMessages++;
     if (message.event in this.messageHandlers) {
       this.messageHandlers[message.event](client, message);
     } else {
@@ -60,20 +61,30 @@ export class Messenger {
   }
 
   handleSetContext(client: Client, payload: SetContextMessage["payload"]) {
-    this.controller.wall.setContext(payload.ctx);
+    client.channel.wall.setContext(payload.ctx);
     client.ctx = payload.ctx;
+    this.channel.broadcast(
+      {
+        event: MessageEvent.SET_CONTEXT,
+        payload: {
+          id: client.id,
+          ctx: payload.ctx,
+        },
+      },
+      client.id
+    );
   }
 
   handleLine(client: Client, payload: LineMessage["payload"]) {
     const [x1, y1, x2, y2] = payload.line;
 
-    this.controller.wall.setContext(client.ctx);
+    client.channel.wall.setContext(client.ctx);
 
     let paintUsed;
     if (client.hasInfinitePaint()) {
       paintUsed = 0;
     } else {
-      paintUsed = this.controller.wall.ctx.lineWidth * Math.PI;
+      paintUsed = client.channel.wall.ctx.lineWidth * Math.PI;
     }
 
     let newVolume = client.paint - paintUsed;
@@ -85,11 +96,8 @@ export class Messenger {
     if (!exceeded) {
       this.logger.debug(`Line: x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`);
       client.paint = newVolume;
-      this.controller.wall.ctx.beginPath();
-      this.controller.wall.ctx.moveTo(x1, y1);
-      this.controller.wall.ctx.lineTo(x2, y2);
-      this.controller.wall.ctx.stroke();
-      this.controller.wall.ctx.closePath();
+      client.hasUnsavedEdits = true;
+      client.channel.wall.drawLine(x1, y1, x2, y2);
       this.send(client.connection, {
         event: MessageEvent.PAINT,
         payload: {
@@ -97,7 +105,7 @@ export class Messenger {
         },
       });
 
-      this.broadcast(
+      this.channel.broadcast(
         {
           event: MessageEvent.LINE,
           payload: {
@@ -122,15 +130,8 @@ export class Messenger {
     });
   }
 
-  broadcast(message: any, ignoreClientId: string | undefined = "") {
-    this.controller.clients
-      .filter((client) => !ignoreClientId || client.id !== ignoreClientId)
-      .forEach((client) => {
-        this.send(client.connection, message);
-      });
-  }
-
   send(connection: connection, message: Message) {
+    this.channel.stats.totalOutgoingMessages++;
     connection.sendUTF(JSON.stringify(message));
   }
 }

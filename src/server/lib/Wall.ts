@@ -13,26 +13,30 @@ import pino from "pino";
 import path from "path";
 import { ContextHandler, ContextType } from "../../spec/Canvas";
 import { Environment } from "./Environment";
+import { ChannelConfig } from "../../spec/Config";
 
 export interface WallOptions {
   env: Environment;
   logger: pino.Logger;
   config: Config;
+  channelConfig: ChannelConfig;
 }
 
 export class Wall {
   private env: Environment;
   private logger: pino.Logger;
   private config: Config;
+  public channelConfig: ChannelConfig;
   private lastHash: string;
   private canvas: Canvas;
   public ctx: CanvasRenderingContext2D;
   private ctxMap: Record<string, ContextHandler>;
 
-  constructor({ env, logger, config }: WallOptions) {
+  constructor({ env, logger, config, channelConfig }: WallOptions) {
     this.env = env;
     this.logger = logger;
     this.config = config;
+    this.channelConfig = channelConfig;
     this.lastHash = "";
     this.canvas = createCanvas(this.config.width, this.config.height);
     this.ctx = this.canvas.getContext("2d");
@@ -58,13 +62,17 @@ export class Wall {
   }
 
   load() {
-    loadImage(path.join(this.env.rootPath.client, this.config.imageName))
+    const imgPath = path.join(
+      this.env.rootPath.client,
+      this.channelConfig.imageName
+    );
+    loadImage(imgPath)
       .then((image) => {
         this.ctx.drawImage(image, 0, 0);
         this.lastHash = createHash("sha256")
           .update(this.canvas.toBuffer("image/png").toString())
           .digest("hex");
-        this.logger.debug(`Initialized image context`);
+        this.logger.debug({ imgPath }, `Initialized image context`);
       })
       .catch((error) => {
         this.logger.debug("Error opening image");
@@ -75,10 +83,10 @@ export class Wall {
   restore() {
     fs.copyFile(
       path.join(this.env.rootPath.client, "new-wall.png"),
-      path.join(this.env.rootPath.client, this.config.imageName),
-      (error: any) => {
-        if (error) {
-          this.logger.error("There was a problem restoring the wall");
+      path.join(this.env.rootPath.client, this.channelConfig.imageName),
+      (err: any) => {
+        if (err) {
+          this.logger.error({ err }, "There was a problem restoring the wall");
         } else {
           this.logger.info("Wall was missing, but has been restored");
           this.load();
@@ -94,10 +102,11 @@ export class Wall {
   }
 
   save(buffer: Buffer, hash: string) {
+    this.logger.info(`Saving image (hash: ${hash})`);
     this.lastHash = hash;
     fs.writeFileSync(
-      path.join(this.env.rootPath.client, this.config.imageName),
-      buffer
+      path.join(this.env.rootPath.client, this.channelConfig.imageName),
+      new Uint8Array(buffer)
     );
   }
 
@@ -114,5 +123,13 @@ export class Wall {
         this.ctxMap[key](ctx[key]);
       }
     }
+  }
+
+  drawLine(x1: number, y1: number, x2: number, y2: number) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.stroke();
+    this.ctx.closePath();
   }
 }

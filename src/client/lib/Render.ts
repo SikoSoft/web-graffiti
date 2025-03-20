@@ -132,7 +132,7 @@ export class Render {
 
   loadImage(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.image.src = `${this.wg.config.webServer}/${this.wg.config.imageName}`;
+      this.image.src = `${this.wg.config.webServer}/${this.wg.config.channel.imageName}`;
       this.image.onload = () => {
         resolve();
       };
