@@ -25,6 +25,10 @@
       }
     </style>
 
+    <script>
+      const WEBGRAFFITI_ENV = `%WEBGRAFFITI_ENV%`;
+    </script>
+
     <script src="/ss-user-bundle.js"></script>
 
     <script type="importmap">
@@ -82,7 +86,7 @@
 
   <body>
     <div id="webGraffiti"></div>
-    <user-portal></user-portal>
+    <user-portal env="%WEBGRAFFITI_ENV%"></user-portal>
     <template id="user-template">
       <span class="name">Anonymous</span>
       <ss-icon class="profile" size="24" color="#fff"></ss-icon>
