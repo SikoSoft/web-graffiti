@@ -18,6 +18,8 @@ export class Render {
   public xRatio: number;
   public yRatio: number;
 
+  public canvasContainer: HTMLDivElement;
+  public canvasCursor: HTMLDivElement;
   public canvas: HTMLCanvasElement;
   public ctx: CanvasRenderingContext2D;
   public image: HTMLImageElement;
@@ -36,6 +38,8 @@ export class Render {
     this.xRatio = 1;
     this.yRatio = 1;
 
+    this.canvasContainer = document.createElement("div");
+    this.canvasCursor = document.createElement("div");
     this.canvas = document.createElement("canvas");
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.image = new Image();
@@ -57,8 +61,14 @@ export class Render {
   }
 
   init() {
+    this.canvasContainer.className = "webGraffiti__canvasContainer";
+    this.wg.rootElement.append(this.canvasContainer);
+
+    this.canvasCursor.className = "webGraffiti__canvasCursor";
+    this.canvasContainer.append(this.canvasCursor);
+
     this.canvas.className = "webGraffiti__canvas";
-    this.wg.rootElement.append(this.canvas);
+    this.canvasContainer.append(this.canvas);
 
     this.setWidth(this.wg.config.width);
     this.setHeight(this.wg.config.height);
@@ -176,5 +186,13 @@ export class Render {
   syncCursor() {
     const halfSize = parseInt(String(this.wg.client.ctx.lineWidth)) * 0.5;
     this.canvas.style.cursor = `url('data:image/svg+xml;base64,${this.getCursor()}') ${halfSize} ${halfSize}, crosshair`;
+  }
+
+  setMousePosition(x: number, y: number) {
+    console.log("setMousePosition", x, y);
+    this.canvasContainer.style.setProperty("--mouse-x", `${x}`);
+    this.canvasContainer.style.setProperty("--mouse-y", `${y}`);
+    //this.canvasCursor.style.left = `${x}px`;
+    //this.canvasCursor.style.top = `${y}px`;
   }
 }

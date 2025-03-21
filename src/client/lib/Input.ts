@@ -235,6 +235,10 @@ export class Input {
   }
 
   handleMove(e: MouseEvent): void {
+    const x = e.pageX - this.wg.render.canvas.offsetLeft;
+    const y = e.pageY - this.wg.render.canvas.offsetTop;
+    this.wg.render.setMousePosition(x, y);
+
     if (this.mouseDown) {
       this.updateMouse(e);
       if (this.multiGesture) {
