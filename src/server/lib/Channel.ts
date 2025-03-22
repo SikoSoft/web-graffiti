@@ -198,10 +198,10 @@ export class Channel {
       });
   }
 
-  removeClient(client: Client) {
+  async removeClient(client: Client): Promise<void> {
     this.logger.info(`Client ${client.id} disconnected`);
     this.clients.splice(this.clients.indexOf(client), 1);
-    this.broadcast({
+    await this.broadcast({
       event: MessageEvent.CLIENT_DISCONNECTED,
       payload: {
         id: client.id,
@@ -209,28 +209,32 @@ export class Channel {
       },
     });
     if (this.clients.length === 0 || client.hasUnsavedEdits) {
-      this.syncWall();
+      await this.syncWall();
     }
     this.stats.lastDisconnectionTime = new Date();
   }
 
-  syncWall() {
-    this.wall.sync();
+  async syncWall() {
+    await this.wall.sync();
     this.clients.forEach((client) => {
       client.hasUnsavedEdits = false;
     });
   }
 
-  broadcast(message: Message, ignoreClientId: string | undefined = "") {
-    this.clients
-      .filter((client) => !ignoreClientId || client.id !== ignoreClientId)
-      .forEach((client) => {
-        this.messenger.send(client.connection, message);
-      });
+  async broadcast(
+    message: Message,
+    ignoreClientId: string | undefined = ""
+  ): Promise<void> {
+    for (let i = 0; i < this.clients.length; i++) {
+      const client = this.clients[i];
+      if (client.id !== ignoreClientId) {
+        await this.messenger.send(client.connection, message);
+      }
+    }
   }
 
-  announceClientUpdated() {
-    this.broadcast({
+  async announceClientUpdated() {
+    await this.broadcast({
       event: MessageEvent.DEV_CLIENT_UPDATE,
       payload: {},
     });

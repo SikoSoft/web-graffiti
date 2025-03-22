@@ -158,7 +158,9 @@ export class ConfigCore implements ConfigProperties {
     Object.assign(this, configProperties);
   }
 
-  validateInput(input: Partial<ConfigProperties>): ConfigValidationResult {
+  static validateInput(
+    input: Partial<ConfigProperties>
+  ): ConfigValidationResult {
     const result: ConfigValidationResult = {
       isValid: false,
       missingProperties: [],

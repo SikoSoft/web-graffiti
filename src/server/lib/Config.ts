@@ -24,16 +24,13 @@ export class Config extends ConfigCore {
     this.logger = logger;
   }
 
-  init() {
+  async init() {
     try {
-      const configJson = fs.readFileSync(
-        path.join(this.env.rootPath.config, "/config.json"),
-        { encoding: "utf8" }
+      const configProperties = await Config.loadConfig(
+        path.join(this.env.rootPath.config, "/config.json")
       );
 
-      const configProperties = JSON.parse(configJson) as ConfigProperties;
-
-      const verification = this.validateInput(configProperties);
+      const verification = Config.validateInput(configProperties);
       if (!verification.isValid) {
         verification.missingProperties.forEach((property) => {
           this.logger.warn(`Property '${property}' is missing from config`);
@@ -53,6 +50,15 @@ export class Config extends ConfigCore {
       this.logger.error(
         `Encountered an error while trying to load config.json: ${error}`
       );
+    }
+  }
+
+  static async loadConfig(file: string): Promise<ConfigProperties> {
+    try {
+      const configJson = fs.readFileSync(file, { encoding: "utf8" });
+      return Promise.resolve(JSON.parse(configJson) as ConfigProperties);
+    } catch (error) {
+      throw new Error(`Error reading config.json: ${error}`);
     }
   }
 
