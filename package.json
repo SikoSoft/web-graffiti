@@ -13,6 +13,8 @@
     "compile-scss": "sass src/client:build/client",
     "copy-static": "cp -r ./static/. ./build/client/ && npm run process-template",
     "dev": "npm-run-all --parallel watch-scss watch-client watch-client-spec watch-run-server",
+    "dev-sync": "tsx ./src/setup/dev-sync.ts",
+    "dev-watch": "tsx ./src/setup/dev-watch.ts",
     "prepare": "husky install",
     "process-template": "tsx ./src/setup/process-template.ts",
     "___process-template": "tsc -p tsconfig.setup.json && node ./build/setup/process-template.js",
@@ -20,7 +22,8 @@
     "watch-client-spec": "tsc -w -p tsconfig.client-spec.json",
     "watch-run-server": "NODE_OPTIONS=--enable-source-maps tsc-watch -p tsconfig.server.json --onSuccess \"node .\"",
     "watch-server": "tsc -w -p tsconfig.server.json",
-    "watch-scss": "npm-run-all \"compile-scss -- -w\""
+    "watch-scssXXXX": "npm-run-all \"compile-scss -- -w\"",
+    "watch-scss": "npm-run-all \"compile-scss -- -w\" --parallel dev-watch"
   },
   "repository": {
     "type": "git",
