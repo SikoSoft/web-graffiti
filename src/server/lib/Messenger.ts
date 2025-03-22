@@ -130,8 +130,18 @@ export class Messenger {
     });
   }
 
-  send(connection: connection, message: Message) {
-    this.channel.stats.totalOutgoingMessages++;
-    connection.sendUTF(JSON.stringify(message));
+  async send(connection: connection, message: Message): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.channel.stats.totalOutgoingMessages++;
+
+      connection.sendUTF(JSON.stringify(message), (err) => {
+        if (err) {
+          this.logger.error(`Error sending message: ${err}`);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 }

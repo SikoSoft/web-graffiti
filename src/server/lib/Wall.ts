@@ -101,16 +101,17 @@ export class Wall {
       .digest("hex");
   }
 
-  save(buffer: Buffer, hash: string) {
+  async save(buffer: Buffer, hash: string): Promise<void> {
     this.logger.info(`Saving image (hash: ${hash})`);
     this.lastHash = hash;
     fs.writeFileSync(
       path.join(this.env.rootPath.client, this.channelConfig.imageName),
       new Uint8Array(buffer)
     );
+    return Promise.resolve();
   }
 
-  sync() {
+  async sync() {
     const hash = this.getHash();
     if (hash !== this.lastHash) {
       this.save(this.canvas.toBuffer("image/png"), hash);

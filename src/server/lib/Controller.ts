@@ -85,6 +85,13 @@ export class Controller {
   registerRoutes() {
     this.httpApp.use(express.static(this.env.rootPath.client));
 
+    this.router.get("/dev-sync", (req, res) => {
+      this.channels.forEach(async (channel) => {
+        await channel.announceClientUpdated();
+      });
+      res.send("Synced");
+    });
+
     this.router.get("/config/:channelId", (req, res) => {
       const filteredConfig: Partial<ConfigProperties> = Object.values(
         ConfigProperty

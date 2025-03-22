@@ -228,4 +228,11 @@ export class Channel {
         this.messenger.send(client.connection, message);
       });
   }
+
+  announceClientUpdated() {
+    this.broadcast({
+      event: MessageEvent.DEV_CLIENT_UPDATE,
+      payload: {},
+    });
+  }
 }
