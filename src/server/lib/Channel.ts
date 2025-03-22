@@ -164,7 +164,7 @@ export class Channel {
 
     this.stats.lastConnectionTime = new Date();
 
-    this.logger.info({ clientOptions }, "Client connected");
+    this.logger.info({ ...clientOptions.client }, "Client connected");
 
     return client;
   }
