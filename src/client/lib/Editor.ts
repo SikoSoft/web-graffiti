@@ -14,6 +14,7 @@ export interface EditorState {
   selected: number;
   colors: string[];
   palettePosition: number;
+  brushSize: number;
 }
 
 export class Editor {
@@ -42,6 +43,7 @@ export class Editor {
       selected: 0,
       colors: [],
       palettePosition: 0,
+      brushSize: 0,
     };
     this.initialized = false;
     this.enabled = false;
@@ -96,6 +98,12 @@ export class Editor {
     this.setupBrushTool();
     this.selectColor(this.state.selected);
     this.updatePaintMeter();
+
+    if (this.state.brushSize) {
+      console.log("restore brushsize", this.state.brushSize);
+      this.setBrushSize(this.state.brushSize);
+      this.brushSlider.setAttribute("value", String(this.state.brushSize));
+    }
 
     this.palette.scrollLeft = this.state.palettePosition;
     this.initialized = true;
@@ -218,8 +226,11 @@ export class Editor {
   }
 
   setBrushSize(size: number) {
+    console.log("setBrushSize", size);
+    this.state.brushSize = size;
     this.wg.client.setLineWidth(size);
     this.updateBrushPreview();
+    this.save();
   }
 
   updateBrushPreview() {
@@ -254,6 +265,10 @@ export class Editor {
       if (state.palettePosition) {
         this.state.palettePosition = state.palettePosition;
       }
+
+      if (state.brushSize) {
+        this.state.brushSize = state.brushSize;
+      }
     }
   }
 
@@ -266,6 +281,7 @@ export class Editor {
       selected: 0,
       colors: [],
       palettePosition: 0,
+      brushSize: 0,
     };
     this.save();
     this.init();
