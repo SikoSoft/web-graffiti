@@ -15,11 +15,12 @@ export class Loader {
     this.spinner = document.createElement("div");
   }
 
-  init() {
+  async init() {
     this.element.className = "webGraffiti__loader";
     this.spinner.className = "webGraffiti__loader_spinner";
     this.element.append(this.spinner);
     this.wg.rootElement.append(this.element);
+    return Promise.resolve();
   }
 
   show() {

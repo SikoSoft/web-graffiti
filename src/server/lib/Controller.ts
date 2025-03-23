@@ -176,6 +176,7 @@ export class Controller {
         });
 
         connection.on("close", () => {
+          console.log("connection closed");
           channel.removeClient(client);
         });
       }

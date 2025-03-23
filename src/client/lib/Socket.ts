@@ -24,6 +24,10 @@ export class Socket {
   private receivedPerSecond: number;
   public connected: boolean;
   private connectionPromise: Promise<void> | null;
+  //private disconnectPromise: Promise<void>;
+  private disconnectResolve:
+    | ((value: void | PromiseLike<void>) => void)
+    | undefined;
   private messageHandlers: Record<string, MessageHander>;
 
   constructor({ wg }: SocketOptions) {
@@ -82,18 +86,31 @@ export class Socket {
         }
       };
       this.ws.onclose = () => {
+        console.log("connection close callback");
         this.wg.editor.disable();
         this.wg.input.disable();
+        //this.disconnectPromise = Promise.resolve();
         this.connectionPromise = null;
         this.connected = false;
+        this.disconnectResolve && this.disconnectResolve();
       };
     });
   }
 
-  async reconnect(accessToken = ""): Promise<void> {
-    if (this.ws.OPEN) {
+  async disconnect(): Promise<void> {
+    console.log("disconnect");
+    return new Promise((resolve, reject) => {
+      this.disconnectResolve = resolve;
       this.ws.close();
+    });
+  }
+
+  async reconnect(accessToken = ""): Promise<void> {
+    console.log("reconnect", this.ws.OPEN, this.connected);
+    if (this.ws.OPEN) {
+      await this.disconnect();
     }
+    console.log("reconnect", this.ws.OPEN, this.connected);
     await this.connect(accessToken);
   }
 

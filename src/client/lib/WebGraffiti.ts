@@ -79,23 +79,13 @@ export class WebGraffiti {
   }
 
   async load(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.config
-        .load(this.initConfig)
-        .then(() => {
-          return this.loader.init();
-        })
-        .then(() => {
-          return this.render.load();
-        })
-        .then(() => {
-          resolve();
-        })
-        .catch((error) => {
-          console.log("Encountered an error while loading!", error); // eslint-disable-line
-          reject(error);
-        });
-    });
+    try {
+      await this.config.load(this.initConfig);
+      await this.loader.init();
+      await this.render.load();
+    } catch (error) {
+      console.log("Encountered an error while loading!", error); // eslint-disable-line
+    }
   }
 
   async run() {
