@@ -189,7 +189,6 @@ export class Render {
   }
 
   setMousePosition(x: number, y: number) {
-    console.log("setMousePosition", x, y);
     this.canvasContainer.style.setProperty("--mouse-x", `${x}`);
     this.canvasContainer.style.setProperty("--mouse-y", `${y}`);
     //this.canvasCursor.style.left = `${x}px`;
