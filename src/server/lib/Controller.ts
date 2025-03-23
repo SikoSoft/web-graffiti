@@ -52,7 +52,9 @@ export class Controller {
     this.router = express.Router();
   }
 
-  init() {
+  async init() {
+    await Promise.resolve();
+
     this.registerChannels();
 
     this.registerRoutes();

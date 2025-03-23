@@ -39,17 +39,19 @@ async function main(): Promise<void> {
   const env = new Environment();
 
   const config = new Config({ env, logger });
-  config.init();
+  await config.init();
 
   const access = new Access({ logger, config });
 
   const middleware = new Middleware({ logger });
 
-  const walls = config.channels.map((channelConfig) => {
-    const wall = new Wall({ env, logger, config, channelConfig });
-    wall.init();
-    return wall;
-  });
+  const walls = await Promise.all(
+    config.channels.map(async (channelConfig) => {
+      const wall = new Wall({ env, logger, config, channelConfig });
+      await wall.init();
+      return wall;
+    })
+  );
 
   const controller = new Controller({
     env,
@@ -59,7 +61,7 @@ async function main(): Promise<void> {
     access,
     middleware,
   });
-  controller.init();
+  await controller.init();
 
   const app: App = {
     env,
