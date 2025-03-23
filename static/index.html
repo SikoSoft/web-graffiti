@@ -72,14 +72,23 @@
             document.querySelector("user-portal").showLoginForm();
           });
           wg.menu.registerOption(userNode);
+
+          const accessToken = sessionStorage.getItem("accessToken");
+          if (accessToken) {
+            setUserLoggedIn(sessionStorage.getItem("username"));
+          }
         }
+      };
+
+      const setUserLoggedIn = (username = "Anonymous") => {
+        userNode.querySelector(".name").textContent = username;
       };
 
       window.addEventListener("user-logged-in", (e) => {
         const user = e.detail;
         sessionStorage.setItem("accessToken", user.authToken);
-        userNode.querySelector(".name").textContent = user.username;
-        wg.reconnect(e.detail.authToken);
+        setUserLoggedIn(user.username, user.authToken);
+        wg.reconnect(authToken);
       });
     </script>
   </head>
