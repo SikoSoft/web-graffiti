@@ -140,7 +140,7 @@ export class Render {
     });
   }
 
-  loadImage(): Promise<void> {
+  async loadImage(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.image.src = `${this.wg.config.webServer}/${this.wg.config.channel.imageName}`;
       this.image.onload = () => {
@@ -150,6 +150,12 @@ export class Render {
         reject();
       };
     });
+  }
+
+  async reset() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    await this.loadImage();
+    this.drawImage();
   }
 
   setContext(ctx: Record<string, string | number>): void {

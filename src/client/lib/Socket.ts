@@ -7,6 +7,7 @@ import {
   NewClientMessage,
   PaintMessage,
   SetContextMessage,
+  WallResetMessage,
   WelcomeMessage,
 } from "../../spec/MessageSpec";
 import { WebGraffiti } from "./WebGraffiti";
@@ -56,6 +57,9 @@ export class Socket {
         this.handleClientDisconnected(
           message.payload as ClientDisconnectedMessage["payload"]
         ),
+      [MessageEvent.WALL_RESET]: (message) => {
+        this.handleWallReset(message.payload as WallResetMessage["payload"]);
+      },
     };
   }
 
@@ -178,5 +182,9 @@ export class Socket {
     this.receivedPerSecond = number;
     this.wg.useNetworkMonitor &&
       this.wg.networkMonitor.setReceivedPerSecond(number);
+  }
+
+  handleWallReset(payload: WallResetMessage["payload"]) {
+    this.wg.render.reset();
   }
 }

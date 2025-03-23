@@ -98,4 +98,8 @@ export class Client {
   setId(id: string): void {
     this.id = id;
   }
+
+  resetWall(): void {
+    this.wg.socket.sendMessage({ event: MessageEvent.RESET_WALL, payload: {} });
+  }
 }

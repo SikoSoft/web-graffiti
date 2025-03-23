@@ -5,6 +5,7 @@ import {
   Message,
   MessageEvent,
   RefillMessage,
+  ResetWallMessage,
   SetContextMessage,
   SetRoleMessage,
 } from "../../spec/MessageSpec";
@@ -46,6 +47,11 @@ export class Messenger {
         ),
       [MessageEvent.REFILL]: (client, message) =>
         this.handleRefill(client, message.payload as RefillMessage["payload"]),
+      [MessageEvent.RESET_WALL]: (client, message) =>
+        this.handleResetWall(
+          client,
+          message.payload as ResetWallMessage["payload"]
+        ),
     };
   }
 
@@ -127,6 +133,14 @@ export class Messenger {
     this.send(client.connection, {
       event: MessageEvent.PAINT,
       payload: { paint: this.config.paintVolume },
+    });
+  }
+
+  handleResetWall(client: Client, payload: ResetWallMessage["payload"]) {
+    client.channel.wall.restore();
+    this.channel.broadcast({
+      event: MessageEvent.WALL_RESET,
+      payload: {},
     });
   }
 

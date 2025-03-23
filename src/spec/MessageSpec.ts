@@ -11,6 +11,8 @@ export enum MessageEvent {
   NEW_CLIENT = "newClient",
   DEV_CLIENT_UPDATE = "devClientUpdate",
   CLIENT_DISCONNECTED = "clientDisconnected",
+  RESET_WALL = "resetWall",
+  WALL_RESET = "wallReset",
 }
 
 export interface MessagePayload {
@@ -48,6 +50,8 @@ export interface MessagePayload {
     id: string;
     totalClients: number;
   };
+  [MessageEvent.RESET_WALL]: {};
+  [MessageEvent.WALL_RESET]: {};
 }
 
 export interface WelcomeMessage {
@@ -95,6 +99,16 @@ export interface ClientDisconnectedMessage {
   payload: MessagePayload[MessageEvent.CLIENT_DISCONNECTED];
 }
 
+export interface ResetWallMessage {
+  event: MessageEvent.RESET_WALL;
+  payload: MessagePayload[MessageEvent.RESET_WALL];
+}
+
+export interface WallResetMessage {
+  event: MessageEvent.WALL_RESET;
+  payload: MessagePayload[MessageEvent.WALL_RESET];
+}
+
 export type Message =
   | WelcomeMessage
   | SetContextMessage
@@ -104,4 +118,6 @@ export type Message =
   | RefillMessage
   | NewClientMessage
   | DevClientUpdateMessage
-  | ClientDisconnectedMessage;
+  | ClientDisconnectedMessage
+  | ResetWallMessage
+  | WallResetMessage;
