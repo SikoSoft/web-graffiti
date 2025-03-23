@@ -133,6 +133,10 @@ export class Messenger {
   async send(connection: connection, message: Message): Promise<void> {
     return new Promise((resolve, reject) => {
       this.channel.stats.totalOutgoingMessages++;
+      if (!connection.connected) {
+        this.logger.warn("Connection is not open, cannot send message");
+        return resolve();
+      }
       connection.sendUTF(JSON.stringify(message), (err) => {
         if (err) {
           this.logger.error(`Error sending message: ${err}`);
