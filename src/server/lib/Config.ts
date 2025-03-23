@@ -71,6 +71,7 @@ export class Config extends ConfigCore {
       id: -1,
       infinitePaint: false,
       mode: ClientMode.INTERACT,
+      resetWall: false,
     };
   }
 

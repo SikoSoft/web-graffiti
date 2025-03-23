@@ -137,11 +137,13 @@ export class Messenger {
   }
 
   handleResetWall(client: Client, payload: ResetWallMessage["payload"]) {
-    client.channel.wall.restore();
-    this.channel.broadcast({
-      event: MessageEvent.WALL_RESET,
-      payload: {},
-    });
+    if (client.role.resetWall) {
+      client.channel.wall.restore();
+      this.channel.broadcast({
+        event: MessageEvent.WALL_RESET,
+        payload: {},
+      });
+    }
   }
 
   async send(connection: connection, message: Message): Promise<void> {

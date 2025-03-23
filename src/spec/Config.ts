@@ -4,12 +4,14 @@ export enum RoleConfigProperty {
   ID = "id",
   INFINITE_PAINT = "infinitePaint",
   MODE = "mode",
+  RESET_WALL = "resetWall",
 }
 
 export interface RoleConfig {
   [RoleConfigProperty.ID]: number;
   [RoleConfigProperty.INFINITE_PAINT]: boolean;
   [RoleConfigProperty.MODE]: ClientMode;
+  [RoleConfigProperty.RESET_WALL]: boolean;
 }
 
 export enum ServerConfigProperty {
@@ -139,6 +141,7 @@ export class ConfigCore implements ConfigProperties {
         [RoleConfigProperty.ID]: 0,
         [RoleConfigProperty.INFINITE_PAINT]: false,
         [RoleConfigProperty.MODE]: ClientMode.INTERACT,
+        [RoleConfigProperty.RESET_WALL]: false,
       },
     ];
     this[ConfigProperty.MODE] = ClientMode.INTERACT;
