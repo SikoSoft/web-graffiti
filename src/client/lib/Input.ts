@@ -219,8 +219,8 @@ export class Input {
   updateMouse(e: MouseEvent): void {
     this.mouse.pageX = e.pageX;
     this.mouse.pageY = e.pageY;
-    this.mouse.x = e.pageX - this.wg.render.canvas.offsetLeft;
-    this.mouse.y = e.pageY - this.wg.render.canvas.offsetTop;
+    this.mouse.x = e.pageX - this.wg.render.canvasContainer.offsetLeft;
+    this.mouse.y = e.pageY - this.wg.render.canvasContainer.offsetTop;
   }
 
   handleDown(e: MouseEvent): void {
