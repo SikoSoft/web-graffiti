@@ -41,7 +41,7 @@ export class WebGraffiti {
 
   constructor() {
     this.rootElement = document.createElement("div");
-    this.storage = new ApiStorage({ logger: console });
+    this.storage = new ApiStorage({ logger: console, wg: this });
     this.config = new Config({
       wg: this,
       storage: this.storage,

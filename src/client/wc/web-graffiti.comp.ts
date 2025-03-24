@@ -1,8 +1,9 @@
 import { ClientMode } from "../../spec/Client";
 import { ConfigCore, ConfigProperties } from "../../spec/Config";
+import { StorageStub } from "../../spec/Storage";
 import { WebGraffiti } from "../lib/WebGraffiti";
 
-const config = new ConfigCore();
+const config = new ConfigCore({ logger: console, storage: new StorageStub() });
 
 export class WebGraffitiComponent extends HTMLElement {
   private wg: WebGraffiti;

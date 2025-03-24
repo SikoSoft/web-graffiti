@@ -26,6 +26,14 @@ export class Config extends ConfigCore {
     this.channel = this.channels[0];
   }
 
+  async init(): Promise<void> {
+    if (Object.keys(this.wg.initConfig).length) {
+      Object.assign(this, this.wg.initConfig);
+    }
+
+    super.init();
+  }
+
   async load(initConfig: Partial<ConfigProperties> = {}): Promise<boolean> {
     if (Object.keys(initConfig).length) {
       Object.assign(this, initConfig);

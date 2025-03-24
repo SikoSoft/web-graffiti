@@ -1,7 +1,5 @@
 import { Storage } from "./Storage";
 import { ClientMode } from "./Client";
-import pino from "pino";
-import { Config } from "../client/lib/Config";
 
 export interface Palette {
   id: number;
@@ -191,7 +189,7 @@ export class ConfigCore implements ConfigProperties {
     this[ConfigProperty.PALETTES] = [];
   }
 
-  async init() {
+  async init(): Promise<void> {
     console.log("config init");
 
     try {
