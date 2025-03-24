@@ -39,7 +39,7 @@ async function main(): Promise<void> {
 
   const env = new Environment();
 
-  const storage = new JsonFileStorage(logger);
+  const storage = new JsonFileStorage({ env, logger });
 
   const config = new Config({ env, logger, storage });
   await config.init();
