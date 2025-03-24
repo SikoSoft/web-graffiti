@@ -1,4 +1,13 @@
+import { Storage } from "./Storage";
 import { ClientMode } from "./Client";
+import pino from "pino";
+import { Config } from "../client/lib/Config";
+
+export interface Palette {
+  id: number;
+  name: string;
+  colors: string[];
+}
 
 export enum RoleConfigProperty {
   ID = "id",
@@ -64,10 +73,12 @@ export enum ConfigProperty {
   DEF_BRUSH_SIZE = "defBrushSize",
   DEF_COLORS = "defColors",
   DEF_ROLE = "defRole",
+  DEF_PALETTE = "defPalette",
   ROLES = "roles",
   MODE = "mode",
   CHANNELS = "channels",
   DEF_CHANNEL = "defChannel",
+  PALETTES = "palettes",
 }
 
 export interface ConfigProperties {
@@ -84,15 +95,28 @@ export interface ConfigProperties {
   [ConfigProperty.DEF_BRUSH_SIZE]: number;
   [ConfigProperty.DEF_COLORS]: string[];
   [ConfigProperty.DEF_ROLE]: number;
+  [ConfigProperty.DEF_PALETTE]: number;
   [ConfigProperty.ROLES]: RoleConfig[];
   [ConfigProperty.MODE]: ClientMode;
   [ConfigProperty.CHANNELS]: ChannelConfig[];
   [ConfigProperty.DEF_CHANNEL]: number;
+  [ConfigProperty.PALETTES]: Palette[];
 }
 
 export interface ConfigValidationResult {
   isValid: boolean;
   missingProperties: string[];
+}
+
+export interface ConfigCoreOptions {
+  storage: Storage;
+  logger: ConfigLogger;
+}
+
+export interface ConfigLogger {
+  info: (message: string) => void;
+  warn: (message: string) => void;
+  error: (message: string) => void;
 }
 
 export class ConfigCore implements ConfigProperties {
@@ -109,12 +133,20 @@ export class ConfigCore implements ConfigProperties {
   [ConfigProperty.DEF_BRUSH_SIZE]: number;
   [ConfigProperty.DEF_COLORS]: string[];
   [ConfigProperty.DEF_ROLE]: number;
+  [ConfigProperty.DEF_PALETTE]: number;
   [ConfigProperty.ROLES]: RoleConfig[];
   [ConfigProperty.MODE]: ClientMode;
   [ConfigProperty.CHANNELS]: ChannelConfig[];
   [ConfigProperty.DEF_CHANNEL]: number;
+  [ConfigProperty.PALETTES]: Palette[];
 
-  constructor() {
+  private storage: Storage;
+  private logger: ConfigLogger;
+
+  constructor({ storage, logger }: ConfigCoreOptions) {
+    this.storage = storage;
+    this.logger = logger;
+
     this[ConfigProperty.SERVER] = {
       secure: false,
       secureKey: "",
@@ -136,6 +168,7 @@ export class ConfigCore implements ConfigProperties {
     this[ConfigProperty.DEF_BRUSH_SIZE] = 3;
     this[ConfigProperty.DEF_COLORS] = [];
     this[ConfigProperty.DEF_ROLE] = 0;
+    this[ConfigProperty.DEF_PALETTE] = 0;
     this[ConfigProperty.ROLES] = [
       {
         [RoleConfigProperty.ID]: 0,
@@ -155,15 +188,48 @@ export class ConfigCore implements ConfigProperties {
       },
     ];
     this[ConfigProperty.DEF_CHANNEL] = 0;
+    this[ConfigProperty.PALETTES] = [];
+  }
+
+  async init() {
+    console.log("config init");
+
+    try {
+      const configProperties = await this.getConfig();
+
+      const verification = this.validateInput(configProperties);
+      if (!verification.isValid) {
+        verification.missingProperties.forEach((property) => {
+          this.logger.warn(`Property '${property}' is missing from config`);
+        });
+        throw new Error(`config.json is invalid`);
+      }
+
+      this.process(configProperties);
+    } catch (error) {
+      this.logger.error(
+        `Encountered an error while trying to load config.json: ${error}`
+      );
+    }
+  }
+
+  async getConfig(): Promise<ConfigProperties> {
+    return await this.storage.getConfig();
+  }
+
+  async getPalettes(): Promise<Palette[]> {
+    return await this.storage.getPalettes();
+  }
+
+  async getChannels(): Promise<ChannelConfig[]> {
+    return await this.storage.getChannels();
   }
 
   process(configProperties: Partial<ConfigProperties>) {
     Object.assign(this, configProperties);
   }
 
-  static validateInput(
-    input: Partial<ConfigProperties>
-  ): ConfigValidationResult {
+  validateInput(input: Partial<ConfigProperties>): ConfigValidationResult {
     const result: ConfigValidationResult = {
       isValid: false,
       missingProperties: [],

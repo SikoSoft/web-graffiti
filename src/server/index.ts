@@ -4,6 +4,7 @@ import { Controller } from "./lib/Controller";
 import { Wall } from "./lib/Wall";
 import { Environment } from "./lib/Environment";
 import { Access } from "./lib/Access";
+import { JsonFileStorage } from "./lib/JsonFileStorage";
 import * as fs from "fs";
 import * as path from "path";
 import { App } from "./models/App";
@@ -38,7 +39,9 @@ async function main(): Promise<void> {
 
   const env = new Environment();
 
-  const config = new Config({ env, logger });
+  const storage = new JsonFileStorage(logger);
+
+  const config = new Config({ env, logger, storage });
   await config.init();
 
   const access = new Access({ logger, config });

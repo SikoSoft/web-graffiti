@@ -7,6 +7,7 @@ import { Loader } from "./Loader";
 import { Input } from "./Input";
 import { Client } from "./Client";
 import { Menu } from "./Menu";
+import { ApiStorage } from "./ApiStorage";
 
 import { ConfigProperties } from "../../spec/Config";
 import { Context, ContextType, Coord } from "../../spec/Canvas";
@@ -15,6 +16,7 @@ import { WelcomeMessage } from "../../spec/MessageSpec";
 
 export class WebGraffiti {
   public rootElement: HTMLElement;
+  private storage: ApiStorage;
   public config: Config;
   public socket: Socket;
   public editor: Editor;
@@ -39,7 +41,12 @@ export class WebGraffiti {
 
   constructor() {
     this.rootElement = document.createElement("div");
-    this.config = new Config({ wg: this });
+    this.storage = new ApiStorage({ logger: console });
+    this.config = new Config({
+      wg: this,
+      storage: this.storage,
+      logger: console,
+    });
     this.socket = new Socket({ wg: this });
     this.editor = new Editor({ wg: this });
     this.networkMonitor = new NetworkMonitor({ wg: this });

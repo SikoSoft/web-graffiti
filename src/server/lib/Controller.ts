@@ -95,6 +95,12 @@ export class Controller {
     });
 
     this.router.get("/config/:channelId", (req, res) => {
+      const channel = this.getChannel(parseInt(req.params.channelId));
+      if (!channel) {
+        res.status(404).send("Channel not found");
+        return;
+      }
+
       const filteredConfig: Partial<ConfigProperties> = Object.values(
         ConfigProperty
       ).reduce(
@@ -106,13 +112,11 @@ export class Controller {
       );
       const { server, channels, roles, ...rest } = filteredConfig;
 
-      const channel = this.getChannel(parseInt(req.params.channelId));
-
       res.setHeader("content-type", "application/json");
       res.send(
         JSON.stringify({
           ...rest,
-          channel: channel?.config,
+          channel: channel.config,
         })
       );
     });

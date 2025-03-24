@@ -5,26 +5,29 @@ import pino from "pino";
 import { ConfigCore, ConfigProperties, RoleConfig } from "../../spec/Config";
 import { ClientMode } from "../../spec/Client";
 import { Environment } from "./Environment";
+import { Storage } from "../../spec/Storage";
 
 export interface ConfigOptions {
   env: Environment;
   logger: pino.Logger;
+  storage: Storage;
 }
 
 export class Config extends ConfigCore {
   secureConfig: https.ServerOptions;
   env: Environment;
-  logger: pino.Logger;
+  //logger: pino.Logger;
 
-  constructor({ env, logger }: ConfigOptions) {
-    super();
+  constructor({ env, logger, storage }: ConfigOptions) {
+    super({ storage, logger });
 
     this.secureConfig = {};
     this.env = env;
-    this.logger = logger;
   }
 
+  /*
   async init() {
+    await super.init();
     try {
       const configProperties = await Config.loadConfig(
         path.join(this.env.rootPath.config, "/config.json")
@@ -52,6 +55,7 @@ export class Config extends ConfigCore {
       );
     }
   }
+*/
 
   static async loadConfig(file: string): Promise<ConfigProperties> {
     try {

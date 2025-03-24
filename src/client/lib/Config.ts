@@ -1,9 +1,17 @@
 import { ClientMode } from "../../spec/Client";
-import { ChannelConfig, ConfigCore, ConfigProperties } from "../../spec/Config";
+import {
+  ChannelConfig,
+  ConfigCore,
+  ConfigLogger,
+  ConfigProperties,
+} from "../../spec/Config";
+import { Storage } from "../../spec/Storage";
 import { WebGraffiti } from "./WebGraffiti";
 
 export interface ConfigOptions {
   wg: WebGraffiti;
+  storage: Storage;
+  logger: ConfigLogger;
 }
 
 export type ConfigProperty = Partial<ConfigProperties>;
@@ -12,8 +20,8 @@ export class Config extends ConfigCore {
   private wg: WebGraffiti;
   public channel: ChannelConfig;
 
-  constructor({ wg }: ConfigOptions) {
-    super();
+  constructor({ wg, storage, logger }: ConfigOptions) {
+    super({ storage, logger });
     this.wg = wg;
     this.channel = this.channels[0];
   }
