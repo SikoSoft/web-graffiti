@@ -141,6 +141,10 @@ export class ConfigCore implements ConfigProperties {
   private storage: Storage;
   private logger: ConfigLogger;
 
+  private _properties: ConfigProperties | null = null;
+  private _palettes: Palette[] | null = null;
+  private _channels: ChannelConfig[] | null = null;
+
   constructor({ storage, logger }: ConfigCoreOptions) {
     this.storage = storage;
     this.logger = logger;
@@ -212,15 +216,27 @@ export class ConfigCore implements ConfigProperties {
   }
 
   async getConfig(): Promise<ConfigProperties> {
-    return await this.storage.getConfig();
+    if (!this._properties) {
+      this._properties = await this.storage.getConfig();
+    }
+
+    return this._properties;
   }
 
   async getPalettes(): Promise<Palette[]> {
-    return await this.storage.getPalettes();
+    if (!this._palettes) {
+      this._palettes = await this.storage.getPalettes();
+    }
+
+    return this._palettes;
   }
 
   async getChannels(): Promise<ChannelConfig[]> {
-    return await this.storage.getChannels();
+    if (!this._channels) {
+      this._channels = await this.storage.getChannels();
+    }
+
+    return this._channels;
   }
 
   process(configProperties: Partial<ConfigProperties>) {
