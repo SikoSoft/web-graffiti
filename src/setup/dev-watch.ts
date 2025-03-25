@@ -34,6 +34,7 @@ const main = async () => {
   const env = new Environment();
   const storage = new JsonFileStorage({ env, logger });
   const config = new Config({ env, logger, storage });
+  await config.init();
 
   const cssPath = path.join(env.rootPath.client, "/WebGraffiti.css");
   const indexHtmlPath = path.join(env.rootPath.static, "/index.html");

@@ -14,6 +14,7 @@ const main = async () => {
   const env = new Environment();
   const storage = new JsonFileStorage({ env, logger });
   const config = new Config({ env, logger, storage });
+  await config.init();
 
   const url = new URL("dev-sync", config[ConfigProperty.WEB_SERVER]);
 
