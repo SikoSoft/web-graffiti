@@ -30,6 +30,8 @@ export class Editor {
   public containerInner: HTMLDivElement;
   public paintMeter: HTMLDivElement;
   public palette: HTMLDivElement;
+  public paletteContainer: HTMLDivElement;
+  public paletteSelector: HTMLSelectElement;
   public handle: HTMLDivElement;
   public paintRemaining: HTMLDivElement;
   public brushTool: HTMLDivElement;
@@ -53,6 +55,8 @@ export class Editor {
     this.containerInner = document.createElement("div");
     this.paintMeter = document.createElement("div");
     this.palette = document.createElement("div");
+    this.paletteContainer = document.createElement("div");
+    this.paletteSelector = document.createElement("select");
     this.handle = document.createElement("div");
     this.paintRemaining = document.createElement("div");
     this.brushTool = document.createElement("div");
@@ -61,18 +65,35 @@ export class Editor {
     this.brushSlider = document.createElement("input");
   }
 
-  init(): void {
+  async init(): Promise<void> {
     this.restore();
     if (!this.state.colors.length) {
       this.state.colors = [...this.wg.config.defColors];
     }
 
     this.container.className = "webGraffiti__editor";
-
     this.containerInner.className = "webGraffiti__editor_inner";
 
     this.paintMeter.className = "webGraffiti__editor_paint_meter";
     this.containerInner.append(this.paintMeter);
+
+    this.paletteContainer.className = "webGraffiti__editor_palette_container";
+    this.containerInner.append(this.paletteContainer);
+
+    this.paletteSelector.className = "webGraffiti__editor_palette_selector";
+
+    const palettes = await this.wg.config.getPalettes();
+    palettes.forEach((palette) => {
+      const option = document.createElement("option");
+      option.value = String(palette.id);
+      option.text = palette.name;
+      this.paletteSelector.append(option);
+    });
+
+    this.paletteSelector.addEventListener("change", (event) => {
+      this.handlePaletteChange(event as HTMLElementEvent<HTMLSelectElement>);
+    });
+    this.paletteContainer.append(this.paletteSelector);
 
     this.palette.className = "webGraffiti__editor_palette";
     this.palette.addEventListener("scroll", (e) => {
@@ -83,17 +104,17 @@ export class Editor {
       this.scrollTimeout = setTimeout(() => {
         this.save();
       }, 100);
+      e.preventDefault();
     });
-    this.containerInner.append(this.palette);
+    this.paletteContainer.append(this.palette);
+    this.containerInner.append(this.paletteContainer);
+
     this.container.append(this.containerInner);
     this.wg.rootElement.append(this.container);
 
     this.handle.className = "webGraffiti__editor_handle";
     this.containerInner.append(this.handle);
-    this.palette.innerHTML = "";
-    this.state.colors.forEach((color, index) => {
-      this.palette.append(this.setupButton(color, index));
-    });
+    this.setupColors();
     this.setupPaintMeter();
     this.setupBrushTool();
     this.selectColor(this.state.selected);
@@ -121,6 +142,30 @@ export class Editor {
       this.enabled = false;
       this.container.classList.add("webGraffiti__editor--gone");
     }
+  }
+
+  async handlePaletteChange(
+    event: HTMLElementEvent<HTMLSelectElement>
+  ): Promise<void> {
+    const paletteId = parseInt(event.target.value);
+    const palettes = await this.wg.config.getPalettes();
+    const palette = palettes.find((p) => p.id === paletteId);
+    if (!palette) {
+      return;
+    }
+
+    this.palette.innerHTML = "";
+    this.state.colors = palette.colors;
+    this.state.selected = 0;
+    this.state.palettePosition = 0;
+    this.setupColors();
+  }
+
+  setupColors(): void {
+    this.palette.innerHTML = "";
+    this.state.colors.forEach((color, index) => {
+      this.palette.append(this.setupButton(color, index));
+    });
   }
 
   setupPaintMeter(): void {

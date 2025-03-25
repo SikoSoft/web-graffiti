@@ -203,12 +203,19 @@ body {
   background-color: #f00;
 }
 
-.webGraffiti__editor_palette {
+.webGraffiti__editor_palette_container {
   flex-grow: 8;
   width: 80%;
   padding: 8px;
-  overflow-y: hidden;
-  overflow-x: auto;
+
+
+  .webGraffiti__editor_palette {
+    overflow-y: hidden;
+    overflow-x: auto;
+    overscroll-behavior-x: none;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .webGraffiti__editor_brush_inner {
