@@ -1,21 +1,25 @@
+import * as pino from "pino";
 import "dotenv/config";
 import { Config } from "../server/lib/Config";
-import path from "path";
 import { ConfigProperty } from "../spec/Config";
+import { Environment } from "../server/lib/Environment";
+import { JsonFileStorage } from "../server/lib/JsonFileStorage";
 
-console.log("sync dev clients");
+const logger = pino.pino({
+  name: "web-graffiti-dev-sync",
+  level: "debug",
+});
 
 const main = async () => {
-  const configRoot = process.env.CONFIG_ROOT || "";
-
-  const configFile = path.join(configRoot, "/config.json");
-  const config = await Config.loadConfig(configFile);
+  const env = new Environment();
+  const storage = new JsonFileStorage({ env, logger });
+  const config = new Config({ env, logger, storage });
 
   const url = new URL("dev-sync", config[ConfigProperty.WEB_SERVER]);
 
   await fetch(url.href);
 };
 
-main().catch((error) => {
-  console.error(`Encountered an error in main process: ${error}`);
+main().catch((err) => {
+  logger.error({ err }, "Encountered an error in main process");
 });

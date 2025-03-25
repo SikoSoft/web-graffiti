@@ -16,7 +16,6 @@ export interface ConfigOptions {
 export class Config extends ConfigCore {
   secureConfig: https.ServerOptions;
   env: Environment;
-  //logger: pino.Logger;
 
   constructor({ env, logger, storage }: ConfigOptions) {
     super({ storage, logger });
@@ -24,38 +23,6 @@ export class Config extends ConfigCore {
     this.secureConfig = {};
     this.env = env;
   }
-
-  /*
-  async init() {
-    await super.init();
-    try {
-      const configProperties = await Config.loadConfig(
-        path.join(this.env.rootPath.config, "/config.json")
-      );
-
-      const verification = Config.validateInput(configProperties);
-      if (!verification.isValid) {
-        verification.missingProperties.forEach((property) => {
-          this.logger.warn(`Property '${property}' is missing from config`);
-        });
-        throw new Error(`config.json is invalid`);
-      }
-
-      this.process(configProperties);
-
-      this.secureConfig = this.server.secure
-        ? {
-            key: fs.readFileSync(this.server.secureKey),
-            cert: fs.readFileSync(this.server.secureCert),
-          }
-        : {};
-    } catch (error) {
-      this.logger.error(
-        `Encountered an error while trying to load config.json: ${error}`
-      );
-    }
-  }
-*/
 
   static async loadConfig(file: string): Promise<ConfigProperties> {
     try {

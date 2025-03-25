@@ -6,6 +6,7 @@ export class Environment {
     server: string;
     config: string;
     public: string;
+    static: string;
   };
 
   constructor() {
@@ -14,6 +15,7 @@ export class Environment {
       server: process.env.SERVER_ROOT || "",
       config: process.env.CONFIG_ROOT || "",
       public: process.env.PUBLIC_ROOT || "",
+      static: process.env.STATIC_ROOT || "",
     };
   }
 }
