@@ -121,6 +121,17 @@ export class Controller {
       );
     });
 
+    this.router.get("/config/:channelId/palettes", async (req, res) => {
+      const channel = this.getChannel(parseInt(req.params.channelId));
+      if (!channel) {
+        res.status(404).send("Channel not found");
+        return;
+      }
+
+      res.setHeader("content-type", "application/json");
+      res.send(JSON.stringify(await this.config.getPalettes()));
+    });
+
     this.router.get("/channel/:channelId/stats", (req, res) => {
       const channel = this.getChannel(parseInt(req.params.channelId));
       res.setHeader("content-type", "application/json");
