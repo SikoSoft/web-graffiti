@@ -37,7 +37,14 @@ export class JsonFileStorage implements Storage {
 
     this.logger.info("Getting palettes");
 
-    return [];
+    const file = path.join(this.env.rootPath.config, "/palette.json");
+
+    try {
+      const json = fs.readFileSync(file, { encoding: "utf8" });
+      return Promise.resolve(JSON.parse(json) as Palette[]);
+    } catch (error) {
+      throw new Error(`Error reading palette.json: ${error}`);
+    }
   }
 
   async getConfig(): Promise<ConfigProperties> {
@@ -48,8 +55,8 @@ export class JsonFileStorage implements Storage {
     const file = path.join(this.env.rootPath.config, "/config.json");
 
     try {
-      const configJson = fs.readFileSync(file, { encoding: "utf8" });
-      return Promise.resolve(JSON.parse(configJson) as ConfigProperties);
+      const json = fs.readFileSync(file, { encoding: "utf8" });
+      return Promise.resolve(JSON.parse(json) as ConfigProperties);
     } catch (error) {
       throw new Error(`Error reading config.json: ${error}`);
     }

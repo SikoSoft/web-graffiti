@@ -30,42 +30,28 @@ export class ApiStorage implements Storage {
   }
 
   async getPalettes(): Promise<Palette[]> {
-    await Promise.resolve();
-
+    let json: unknown;
     this.logger.info("Getting palettes");
-
-    return [];
+    try {
+      const response = await fetch(`config/${this.wg.channelId}/palettes`);
+      json = await response.json();
+    } catch (error) {
+      this.logger.error(
+        `Encountered an error while trying to load config ${error}`
+      );
+    }
+    return json as Palette[];
   }
 
   async getConfig(): Promise<ConfigProperties> {
-    let json: unknown;
     this.logger.info("Getting config");
-
-    /*
-    if (Object.keys(initConfig).length) {
-      Object.assign(this, initConfig);
-      return true;
-    }
-*/
-
+    let json: unknown;
     try {
       const response = await fetch(`config/${this.wg.channelId}`);
-      json = response.json();
-
-      /*
-        .then((configJson) => {
-          this.process(configJson as ConfigProperties);
-          resolve(true);
-        })
-        .catch(() => {
-          reject();
-        });
-
-    });
-    */
+      json = await response.json();
     } catch (error) {
       this.logger.error(
-        `Encountered an error while trying to load config.json: ${error}`
+        `Encountered an error while trying to load config ${error}`
       );
     }
 
