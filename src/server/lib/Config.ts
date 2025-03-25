@@ -24,15 +24,6 @@ export class Config extends ConfigCore {
     this.env = env;
   }
 
-  static async loadConfig(file: string): Promise<ConfigProperties> {
-    try {
-      const configJson = fs.readFileSync(file, { encoding: "utf8" });
-      return Promise.resolve(JSON.parse(configJson) as ConfigProperties);
-    } catch (error) {
-      throw new Error(`Error reading config.json: ${error}`);
-    }
-  }
-
   getRole(roleId: number): RoleConfig {
     const role = this.roles.find((r) => r.id == roleId);
     if (role) {
