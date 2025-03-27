@@ -158,8 +158,16 @@ export default function (app: App) {
       const result = await api.get<Introspection>("user/introspect");
 
       let newRole = payload.config.defRole;
+      let tokenAccepted = payload.client.tokenAccepted;
+
+      if (result && result.status === 403) {
+        tokenAccepted = false;
+      }
+
+      console.log("result", result);
 
       if (result && result.response) {
+        console.log("result", result);
         if (
           result.response.introspection.isLoggedIn &&
           result.response.introspection.user.roles.includes("webgraffiti-admin")
@@ -173,6 +181,7 @@ export default function (app: App) {
         client: {
           ...payload.client,
           role: newRole,
+          tokenAccepted,
         },
       };
     }

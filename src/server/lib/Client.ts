@@ -11,6 +11,8 @@ export interface ClientOptions {
   joinTime: number;
   paint: number;
   role: number;
+  tokenProvided: boolean;
+  tokenAccepted: boolean;
   connection: connection;
   channel: Channel;
 }
@@ -31,6 +33,8 @@ export class Client {
   public connection: connection;
   public channel: Channel;
   public hasUnsavedEdits: boolean;
+  public tokenProvided: boolean;
+  public tokenAccepted: boolean;
 
   constructor({
     config,
@@ -52,6 +56,8 @@ export class Client {
     this.connection = connection;
     this.channel = channel;
     this.hasUnsavedEdits = false;
+    this.tokenProvided = false;
+    this.tokenAccepted = false;
   }
 
   hasInfinitePaint(): boolean {

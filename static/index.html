@@ -65,6 +65,15 @@
         if (document.readyState === "complete") {
           await wg.init(document.getElementById("webGraffiti"));
 
+          const notificationProvider = document.querySelector(
+            "notification-provider"
+          );
+          if (notificationProvider) {
+            wg.registerNotificationHandler((message, type) => {
+              notificationProvider.addNotification(message, type);
+            });
+          }
+
           userNode.appendChild(
             document.getElementById("user-template").content.cloneNode(true)
           );
@@ -89,7 +98,7 @@
         const user = e.detail;
         sessionStorage.setItem("accessToken", user.authToken);
         setUserLoggedIn(user.username, user.authToken);
-        wg.reconnect(authToken);
+        wg.reconnect(user.authToken);
       });
     </script>
   </head>
@@ -97,6 +106,7 @@
   <body>
     <div id="webGraffiti"></div>
     <user-portal env="%WEBGRAFFITI_ENV%"></user-portal>
+    <notification-provider></notification-provider>
     <template id="user-template">
       <span class="name">Anonymous</span>
       <ss-icon class="profile" size="24" color="#fff"></ss-icon>

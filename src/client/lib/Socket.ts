@@ -144,11 +144,13 @@ export class Socket {
     if (payload.ctx) {
       this.wg.setClientContext(payload.id, payload.ctx);
     }
+    this.wg.notify("New client connected");
   }
 
   handleClientDisconnected(payload: ClientDisconnectedMessage["payload"]) {
     this.wg.removeClient(payload.id);
     this.wg.menu.setTotalClients(payload.totalClients);
+    this.wg.notify("Client disconnected");
   }
 
   handleSetContext(payload: SetContextMessage["payload"]) {
@@ -186,5 +188,6 @@ export class Socket {
 
   handleWallReset(payload: WallResetMessage["payload"]) {
     this.wg.render.reset();
+    this.wg.notify("The wall has been reset");
   }
 }

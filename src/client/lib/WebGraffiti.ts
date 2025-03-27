@@ -14,6 +14,8 @@ import { Context, ContextType, Coord } from "../../spec/Canvas";
 import { ClientMode } from "../../spec/Client";
 import { WelcomeMessage } from "../../spec/MessageSpec";
 
+declare type NotificationHandler = (message: string, type: string) => void;
+
 export class WebGraffiti {
   public rootElement: HTMLElement;
   private storage: ApiStorage;
@@ -38,6 +40,7 @@ export class WebGraffiti {
   public panOffset: Coord;
   public minOffset: Coord;
   public channelId: number;
+  private notificationHandlers: NotificationHandler[];
 
   constructor() {
     this.rootElement = document.createElement("div");
@@ -67,6 +70,7 @@ export class WebGraffiti {
     this.minOffset = { x: 0, y: 0 };
     this.client = new Client({ wg: this });
     this.channelId = 0;
+    this.notificationHandlers = [];
   }
 
   async init(
@@ -193,9 +197,28 @@ export class WebGraffiti {
         this.client.setRole(parseInt(role));
       }
     }
+    if (payload.tokenProvided && !payload.tokenAccepted) {
+      this.clearSessionData();
+      this.reload();
+    }
+    this.notify("Welcome", "success");
   }
 
   reconnect(accessToken = "") {
     this.socket.reconnect(accessToken);
+  }
+
+  registerNotificationHandler(handler: NotificationHandler) {
+    if (handler) {
+      this.notificationHandlers.push(handler);
+    }
+  }
+
+  notify(message: string, type: string = "info") {
+    this.notificationHandlers.forEach((handler) => handler(message, type));
+  }
+
+  clearSessionData() {
+    sessionStorage.clear();
   }
 }

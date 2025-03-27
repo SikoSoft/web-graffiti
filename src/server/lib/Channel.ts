@@ -132,6 +132,8 @@ export class Channel {
           joinTime: Date.now(),
           paint: this.config.paintVolume,
           role: config.defRole,
+          tokenProvided: !!accessToken,
+          tokenAccepted: false,
         },
       }
     );
@@ -155,6 +157,8 @@ export class Channel {
         join: client.joinTime,
         mode: client.role.mode,
         totalClients: this.stats.totalClients,
+        tokenProvided: client.tokenProvided,
+        tokenAccepted: client.tokenAccepted,
       },
     });
 
@@ -177,6 +181,7 @@ export class Channel {
           id: newClient.id,
           ctx: newClient.ctx,
           totalClients: this.stats.totalClients,
+          join: newClient.joinTime,
         },
       },
       newClient.id
@@ -193,6 +198,7 @@ export class Channel {
             id: client.id,
             ctx: client.ctx,
             totalClients: this.stats.totalClients,
+            join: client.joinTime,
           },
         });
       });

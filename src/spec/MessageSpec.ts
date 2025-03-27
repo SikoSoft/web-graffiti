@@ -24,6 +24,8 @@ export interface MessagePayload {
     join: number;
     mode: ClientMode;
     totalClients: number;
+    tokenProvided: boolean;
+    tokenAccepted: boolean;
   };
   [MessageEvent.LINE]: {
     line: Line;
@@ -44,6 +46,7 @@ export interface MessagePayload {
     id: string;
     ctx?: Context;
     totalClients: number;
+    join: number;
   };
   [MessageEvent.DEV_CLIENT_UPDATE]: {};
   [MessageEvent.CLIENT_DISCONNECTED]: {
