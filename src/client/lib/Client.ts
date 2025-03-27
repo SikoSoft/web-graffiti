@@ -18,6 +18,7 @@ export class Client {
   private alpha: number;
   public ctx: Context;
   public mode: ClientMode;
+  public joinTime: number;
 
   constructor({ wg, id }: ClientOptions) {
     this.wg = wg;
@@ -29,6 +30,7 @@ export class Client {
     this.alpha = 1;
     this.ctx = Object.assign({}, initialContext);
     this.mode = ClientMode.INTERACT;
+    this.joinTime = 0;
   }
 
   init() {
@@ -82,6 +84,10 @@ export class Client {
 
   setMode(mode: ClientMode) {
     this.mode = mode;
+  }
+
+  setJoinTime(joinTime: number): void {
+    this.joinTime = joinTime;
   }
 
   refill(): void {

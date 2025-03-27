@@ -180,6 +180,7 @@ export class WebGraffiti {
 
   handleWelcome(payload: WelcomeMessage["payload"]) {
     this.menu.setTotalClients(payload.totalClients);
+    this.client.setJoinTime(payload.join);
     this.client.setId(payload.id);
     this.client.setPaint(payload.paint);
     this.client.setDelta(Date.now() - payload.join);

@@ -144,7 +144,9 @@ export class Socket {
     if (payload.ctx) {
       this.wg.setClientContext(payload.id, payload.ctx);
     }
-    this.wg.notify("New client connected");
+    if (payload.join > this.wg.client.joinTime) {
+      this.wg.notify("New client connected");
+    }
   }
 
   handleClientDisconnected(payload: ClientDisconnectedMessage["payload"]) {
