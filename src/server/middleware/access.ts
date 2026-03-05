@@ -17,20 +17,21 @@ export default function (app: App) {
         return payload;
       }
 
-      const hasRoleResult = await Identity.hasRole(
-        accessToken,
-        "webgraffiti-admin"
-      );
-
       let newRole = payload.config.defRole;
       let tokenAccepted = payload.client.tokenAccepted;
 
-      if (hasRoleResult.isOk && hasRoleResult.value) {
-        tokenAccepted = true;
-      } else {
-        tokenAccepted = false;
-      }
+      if (payload.client.tokenProvided) {
+        const hasRoleResult = await Identity.hasRole(
+          accessToken,
+          "webgraffiti-admin"
+        );
 
+        if (hasRoleResult.isOk && hasRoleResult.value) {
+          tokenAccepted = true;
+        } else {
+          tokenAccepted = false;
+        }
+      }
       return {
         ...payload,
         client: {
