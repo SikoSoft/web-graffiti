@@ -1,5 +1,6 @@
 import { MiddlewarePayload, MiddlewareTrigger } from "../lib/Middleware";
 import { App } from "../models/App";
+import { Identity } from "@ss/identity";
 
 export interface ApiResponse<ResponseBodyType> {
   status: number;
@@ -152,14 +153,29 @@ export default function (app: App) {
         `${MiddlewareTrigger.CLIENT_CONNECTED} middleware handler triggered`
       );
 
-      await Promise.resolve();
+      const accessToken = payload.accessToken;
+      if (!accessToken) {
+        return payload;
+      }
 
-      api.setAuthToken(payload.accessToken || "");
-      const result = await api.get<Introspection>("user/introspect");
+      //api.setAuthToken(payload.accessToken || "");
+      //const result = await api.get<Introspection>("user/introspect");
+
+      const hasRoleResult = await Identity.hasRole(
+        accessToken,
+        "webgraffiti-admin"
+      );
 
       let newRole = payload.config.defRole;
       let tokenAccepted = payload.client.tokenAccepted;
 
+      if (hasRoleResult.isOk && hasRoleResult.value) {
+        tokenAccepted = true;
+      } else {
+        tokenAccepted = false;
+      }
+
+      /*
       if (result && result.status === 403) {
         tokenAccepted = false;
       }
@@ -175,6 +191,8 @@ export default function (app: App) {
           newRole = 1;
         }
       }
+
+      */
 
       return {
         ...payload,
