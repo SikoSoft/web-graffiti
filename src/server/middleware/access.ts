@@ -28,6 +28,7 @@ export default function (app: App) {
 
         if (hasRoleResult.isOk && hasRoleResult.value) {
           tokenAccepted = true;
+          newRole = 1;
         } else {
           tokenAccepted = false;
         }
